@@ -8,7 +8,7 @@ export default function AboutSection() {
         <div className="flex flex-col gap-4 max-w-2xl">
           <div className="flex flex-col border border-primary-500 rounded-lg p-6 bg-white justify-center items-center gap-4">
             <img
-              src="/public/dusan.jpeg"
+              src="/dusan.jpeg"
               alt="Srdjan Radic"
               className="w-24 h-24 rounded-full"
             />
