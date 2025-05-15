@@ -7,11 +7,11 @@ export default function HeroSection({
 }) {
   return (
     <div className="flex flex-col items-center justify-center">
-      <SectionHeader title="Welcome to My World" />
+      <SectionHeader title="Welcome the future of technology" />
       <p className="text-lg max-w-xl text-gray-600 text-wrap">
-        I'm a developer passionate about building modular ecosystems with clean
-        architecture and smooth user experiences. Explore my projects, read my
-        blog, or get to know me.
+        We harness cutting-edge technology to solve your challenges. At dradic
+        tech, we transform complex problems into simple, elegant solutions that
+        work for you.
       </p>
       <div className="mt-8">
         <button
