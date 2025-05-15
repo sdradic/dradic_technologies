@@ -1,15 +1,123 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@layer components {
+  .btn-primary {
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 shadow-2xl justify-center bg-primary-600 hover:bg-primary-500 border-primary-300 hover:border-primary-400 items-center border rounded-md text-sm font-medium cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
+  }
+
+  .btn-secondary {
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 shadow-2xl justify-center items-center border border-primary-400 hover:border-primary-600 rounded-md text-sm font-medium cursor-pointer text-primary-400 hover:text-primary-600 dark:border-dark-300 dark:hover:border-dark-200 dark:text-dark-100 dark:hover:text-dark-50;
+  }
+
+  .btn-small {
+    @apply flex flex-row w-8 h-8 gap-2 shadow-2xl justify-center items-center border border-primary-400 rounded-full font-medium cursor-pointer text-primary-400 dark:border-dark-300 dark:text-dark-300;
+  }
+
+  .btn-primary-long {
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center bg-primary-400 hover:bg-primary-500 border-primary-300 hover:border-primary-400 items-center border rounded-md text-sm font-medium cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
+  }
+
+  .btn-secondary-long {
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center items-center border border-primary-400 hover:border-primary-600 rounded-md text-sm font-medium cursor-pointer text-primary-400 hover:text-primary-600 dark:border-dark-300 dark:hover:border-dark-200 dark:text-dark-100 dark:hover:text-dark-50;
+  }
+
+  .separator {
+    @apply w-full h-px bg-gray-300 dark:bg-dark-400;
+  }
 }
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+@theme {
+  /* Light mode colors (shades of cyan) */
+  --color-primary-50: oklch(0.97 0.03 200);
+  --color-primary-100: oklch(0.94 0.05 200); 
+  --color-primary-200: oklch(0.88 0.08 200);
+  --color-primary-300: oklch(0.82 0.10 200);
+  --color-primary-400: oklch(0.76 0.11 200);
+  --color-primary-500: oklch(0.72 0.11 200);
+  /* Base color */
+  --color-primary-600: oklch(0.63 0.12 200);
+  --color-primary-700: oklch(0.56 0.13 200);
+  --color-primary-800: oklch(0.50 0.14 200);
+  --color-primary-900: oklch(0.44 0.15 200);
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+  /* Dark mode colors (refined neutral black/gray scale) */
+  --color-dark-50: oklch(0.85 0.01 250);
+  --color-dark-100: oklch(0.75 0.01 250);
+  --color-dark-200: oklch(0.65 0.01 250);
+  --color-dark-300: oklch(0.55 0.01 250);
+  --color-dark-400: oklch(0.45 0.01 250);
+  --color-dark-500: oklch(0.35 0.01 250);
+  --color-dark-600: oklch(0.30 0.01 250);
+  --color-dark-700: oklch(0.25 0.01 250);
+  --color-dark-800: oklch(0.20 0.01 250);
+  --color-dark-900: oklch(0.15 0.01 250);
+}
+
+body {
+  font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+main {
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* Remove arrows/spinners from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input {
+  @apply w-full p-2 border rounded-lg border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+textarea {
+  @apply w-full p-2 border rounded-lg resize-none overflow-auto border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+label {
+  @apply block text-sm font-medium mb-1 text-left ml-1;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+@media (min-width: 480px) {
+  h1 {
+    max-width: none;
   }
+
+  p {
+    max-width: 100%;
+    text-wrap: balance;
+    color: #6b7280;
+  }
+}
+
+.nav-background {
+  background: transparent;
+  backdrop-filter: blur(10px);
+}
+
+.gradient-background {
+  background: linear-gradient(to bottom, #7CBCC2, #ffffff);
+}
+
+.inverted-gradient-background {
+  background: linear-gradient(to bottom, #ffffff, #7CBCC2);
 }
