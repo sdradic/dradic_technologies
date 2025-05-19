@@ -10,7 +10,9 @@ export default function AboutSection() {
   return (
     <div className="flex flex-col items-center justify-center">
       <SectionHeader title="About Us" />
-      <MemberCard description={description} name={name} title={title} />
+      <div className="flex flex-row gap-4">
+        <MemberCard description={description} name={name} title={title} />
+      </div>
     </div>
   );
 }
