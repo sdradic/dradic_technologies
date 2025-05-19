@@ -12,8 +12,9 @@ export default function App() {
   const projectsRef = useRef<HTMLDivElement>(null);
   const blogRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="font-sans text-dark-800">
+    <div className="font-sans text-dark-800 snap-y snap-mandatory h-screen overflow-y-scroll">
       {/* Navbar */}
       <Navbar
         homeRef={homeRef}
@@ -23,7 +24,7 @@ export default function App() {
       />
 
       {/* Hero Section */}
-      <div className="w-full gradient-background">
+      <div className="w-full gradient-background snap-start">
         <div className="max-w-[1000px] mx-auto">
           <section
             className="h-screen flex flex-col items-center justify-center text-center px-4"
@@ -36,7 +37,7 @@ export default function App() {
       </div>
 
       {/* Projects Section */}
-      <div className="w-full inverted-gradient-background">
+      <div className="w-full inverted-gradient-background snap-start">
         <div className="max-w-[1000px] mx-auto">
           <section
             ref={projectsRef}
@@ -49,7 +50,7 @@ export default function App() {
       </div>
 
       {/* Blog Section */}
-      <div className="w-full gradient-background">
+      <div className="w-full gradient-background snap-start">
         <div className="max-w-[1000px] mx-auto">
           <section
             ref={blogRef}
@@ -62,18 +63,21 @@ export default function App() {
       </div>
 
       {/* About Section */}
-      <div className="w-full bg-gray-50 inverted-gradient-background">
+      <div
+        className="w-full inverted-gradient-background snap-start"
+        ref={aboutRef}
+      >
         <div className="max-w-[1000px] mx-auto">
           <section
-            ref={aboutRef}
-            className="h-screen flex flex-col items-center justify-center text-center px-4"
+            className="min-h-screen flex flex-col items-center justify-between text-center px-4 py-8"
             id="about"
           >
-            <AboutSection />
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <AboutSection />
+            </div>
+            <Footer />
           </section>
         </div>
-        {/* Footer */}
-        <Footer />
       </div>
     </div>
   );
