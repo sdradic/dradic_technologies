@@ -121,10 +121,10 @@ export default function App() {
       {/* Go to top button */}
       {currentSection !== "home" && (
         <div
-          className="fixed btn-small bottom-16 right-4 z-10"
+          className="fixed btn-small bottom-16 right-4 sm:right-14 z-10"
           onClick={() => scrollToSection(homeRef)}
         >
-          <ArrowUpIcon className="size-8 stroke-white" />
+          <ArrowUpIcon className="size-8 stroke-primary-400" />
         </div>
       )}
     </div>
