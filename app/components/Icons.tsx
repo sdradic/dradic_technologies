@@ -15,3 +15,22 @@ export const TallyUpLogo = ({ className, ...props }: any) => {
     </svg>
   );
 };
+
+export const ArrowUpIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <path
+        d="M7 14L12 8L17 14"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};

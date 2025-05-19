@@ -7,17 +7,23 @@ type NavItem = {
 
 type NavConfig = NavItem[];
 
+interface NavbarProps {
+  homeRef: React.RefObject<HTMLDivElement | null>;
+  projectsRef: React.RefObject<HTMLDivElement | null>;
+  blogRef: React.RefObject<HTMLDivElement | null>;
+  aboutRef: React.RefObject<HTMLDivElement | null>;
+  currentSection: string;
+  setCurrentSection: (section: string) => void;
+}
+
 export default function Navbar({
   homeRef,
   projectsRef,
   blogRef,
   aboutRef,
-}: {
-  homeRef: React.RefObject<HTMLDivElement | null>;
-  projectsRef: React.RefObject<HTMLDivElement | null>;
-  blogRef: React.RefObject<HTMLDivElement | null>;
-  aboutRef: React.RefObject<HTMLDivElement | null>;
-}) {
+  currentSection,
+  setCurrentSection,
+}: NavbarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navConfig: NavConfig = [
@@ -27,15 +33,19 @@ export default function Navbar({
     { label: "About", ref: aboutRef },
   ];
 
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    ref?.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToSection = (
+    ref: React.RefObject<HTMLDivElement | null>,
+    section: string
+  ) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+    setCurrentSection(section);
     setIsSidebarOpen(false);
   };
 
   const NavButton = ({ item }: { item: NavItem }) => (
     <button
       className="text-gray-800 cursor-pointer hover:text-gray-700"
-      onClick={() => scrollToSection(item.ref)}
+      onClick={() => scrollToSection(item.ref, item.label.toLowerCase())}
     >
       {item.label}
     </button>
@@ -44,7 +54,7 @@ export default function Navbar({
   const MobileNavButton = ({ item }: { item: NavItem }) => (
     <button
       className="text-gray-600 text-left text-lg hover:text-gray-800 cursor-pointer hover:bg-gray-100 rounded-md p-2"
-      onClick={() => scrollToSection(item.ref)}
+      onClick={() => scrollToSection(item.ref, item.label.toLowerCase())}
     >
       {item.label}
     </button>
