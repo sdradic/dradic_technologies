@@ -2,5 +2,5 @@ export interface Project {
   name: string;
   description: string;
   link: string;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
 }

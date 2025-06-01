@@ -1,0 +1,47 @@
+import type { NavItem } from "./types";
+
+interface DesktopNavProps {
+  navConfig: NavItem[];
+  selectedPath: string;
+  onNavClick: (item: NavItem) => void;
+}
+
+const NavButton = ({
+  item,
+  selectedPath,
+  onNavClick,
+}: {
+  item: NavItem;
+  selectedPath: string;
+  onNavClick: (item: NavItem) => void;
+}) => (
+  <button
+    className={`text-gray-800 cursor-pointer gap-2 px-2 py-1 rounded-md transition-all duration-300 ${
+      selectedPath === item.path
+        ? "border-b-2 border-primary-600 rounded-none"
+        : ""
+    }`}
+    onClick={() => onNavClick(item)}
+  >
+    {item.label}
+  </button>
+);
+
+export const DesktopNav = ({
+  navConfig,
+  selectedPath,
+  onNavClick,
+}: DesktopNavProps) => {
+  return (
+    <div className="hidden md:flex space-x-4">
+      {navConfig.map((item) => (
+        <NavButton
+          key={item.label}
+          item={item}
+          selectedPath={selectedPath}
+          onNavClick={onNavClick}
+        />
+      ))}
+    </div>
+  );
+};

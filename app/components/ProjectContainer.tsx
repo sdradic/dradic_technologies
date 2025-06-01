@@ -1,8 +1,8 @@
-import type { Project } from "../../module/models";
+import type { Project } from "~/module/models";
 
 export default function ProjectContainer({ project }: { project: Project }) {
   return (
-    <div className="border border-primary-500 rounded-2xl h-64 w-64 p-4 cursor-pointer bg-white hover:bg-gray-100 hover:border-primary-600 transition-colors duration-300">
+    <div className="border border-gray-200 rounded-2xl h-64 w-64 p-4 cursor-pointer bg-white hover:scale-105 transition-all duration-300">
       <a href={project.link} target="_blank" rel="noopener noreferrer">
         <h3 className="text-3xl font-bold mb-6">{project.name}</h3>
         <p className="text-gray-700 hover:text-gray-800">

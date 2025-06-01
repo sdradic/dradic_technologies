@@ -3,7 +3,7 @@
 
 @layer components {
   .btn-primary {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 shadow-2xl justify-center bg-primary-600 hover:bg-primary-500 border-primary-300 hover:border-primary-400 items-center border rounded-md text-sm font-medium cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 shadow-2xl justify-center bg-primary-600 hover:bg-primary-500 transition-all duration-300 border-primary-300 hover:border-primary-400 items-center border rounded-md text-sm font-medium cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
   }
 
   .btn-secondary {
@@ -56,6 +56,7 @@
 
 body {
   font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: linear-gradient(to bottom, #7CBCC2, #ffffff);
 }
 
 main {
@@ -112,14 +113,6 @@ label {
 .nav-background {
   background: transparent;
   backdrop-filter: blur(10px);
-}
-
-.gradient-background {
-  background: linear-gradient(to bottom, #7CBCC2, #ffffff);
-}
-
-.inverted-gradient-background {
-  background: linear-gradient(to bottom, #ffffff, #7CBCC2);
 }
 
 .flip-card {

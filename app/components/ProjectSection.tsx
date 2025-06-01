@@ -1,8 +1,8 @@
-import type { Project } from "module/models";
 import ProjectContainer from "./ProjectContainer";
 import SectionHeader from "./SectionHeader";
+import { projects } from "module/projectsConfig";
 
-export default function ProjectSection({ projects }: { projects: Project[] }) {
+export default function ProjectSection() {
   return (
     <div className="flex flex-col h-full items-center justify-center text-center">
       <SectionHeader title="Projects" />
