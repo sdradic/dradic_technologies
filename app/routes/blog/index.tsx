@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { Link, useLoaderData, useNavigate } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
+import Footer from "~/components/Footer";
+import SectionHeader from "~/components/SectionHeader";
 
 interface BlogPost {
   slug: string;
@@ -26,19 +28,20 @@ export async function loader() {
   return posts;
 }
 
-export default function BlogIndex() {
+export default function BlogPage() {
   const posts = useLoaderData() as BlogPost[];
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col min-h-full">
-      <div className="flex-1">
-        <ul className="space-y-4 flex flex-wrap gap-4 justify-evenly">
+    <div className="flex flex-col h-screen justify-between">
+      <main className="flex flex-col h-full justify-center items-center">
+        <SectionHeader title="Blog Posts" />
+        <ul className="space-y-4 flex flex-wrap gap-4">
           {posts?.map((post) => (
             <li
               key={post.slug}
               className="p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
               onClick={() => {
-                navigate(`/blog/${post.slug}`);
+                navigate(`/blog/posts/${post.slug}`);
               }}
             >
               <img
@@ -53,7 +56,8 @@ export default function BlogIndex() {
             </li>
           ))}
         </ul>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

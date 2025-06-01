@@ -16,7 +16,7 @@ const NavButton = ({
   onNavClick: (item: NavItem) => void;
 }) => (
   <button
-    className={`text-gray-800 cursor-pointer gap-2 px-2 py-1 rounded-md transition-all duration-300 ${
+    className={`text-gray-800 cursor-pointer gap-2 px-2 py-1 rounded-md ${
       selectedPath === item.path
         ? "border-b-2 border-primary-600 rounded-none"
         : ""

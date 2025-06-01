@@ -4,10 +4,24 @@ import path from "path";
 import matter from "gray-matter";
 import { marked } from "marked";
 
+interface LoaderData {
+  html: string;
+  metadata: {
+    title: string;
+    date: string;
+  };
+}
+
 export async function loader({ params }: { params: { slug: string } }) {
   console.log("Blog post loader called with params:", params);
   const slug = params.slug;
-  const postsDir = path.join(process.cwd(), "app", "routes", "blog", "posts");
+  const postsDir = path.resolve(
+    process.cwd(),
+    "app",
+    "routes",
+    "blog",
+    "posts"
+  );
   const filePath = path.join(postsDir, `${slug}.md`);
 
   console.log("Looking for file at:", filePath);
@@ -22,18 +36,29 @@ export async function loader({ params }: { params: { slug: string } }) {
   const html = marked.parse(content);
 
   console.log("Successfully loaded post:", data.title);
-  return { html, metadata: data };
+  return { html, metadata: data } as LoaderData;
 }
 
 export default function BlogPost() {
   console.log("Blog post component rendering");
-  const { html, metadata } = useLoaderData<typeof loader>();
+  const data = useLoaderData() as LoaderData;
+  console.log("Loader data:", data);
+
+  if (!data) {
+    console.log("No data received from loader");
+    return <div>Loading...</div>;
+  }
 
   return (
-    <article className="prose max-w-2xl mx-auto py-8">
-      <h1>{metadata.title}</h1>
-      <p className="text-gray-500 text-sm">{metadata.date}</p>
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-    </article>
+    <div className="w-full max-w-4xl mx-auto">
+      <article className="prose prose-lg max-w-none">
+        <h1 className="text-3xl font-bold mb-4">{data.metadata.title}</h1>
+        <p className="text-gray-500 text-sm mb-8">{data.metadata.date}</p>
+        <div
+          className="prose prose-lg max-w-none"
+          dangerouslySetInnerHTML={{ __html: data.html }}
+        />
+      </article>
+    </div>
   );
 }

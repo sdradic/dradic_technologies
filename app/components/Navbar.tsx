@@ -14,6 +14,7 @@ export default function Navbar() {
 
   const navConfig: NavConfig = [
     { label: "Home", path: "/" },
+    { label: "Projects", path: "/projects" },
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
   ];
@@ -26,7 +27,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full nav-background shadow z-10">
-        <div className="max-w-4xl max-h-18 mx-auto px-4 py-1 flex justify-between items-center">
+        <div className="max-w-6xl max-h-18 mx-auto px-4 py-1 flex justify-between items-center">
           <Logo className="w-auto" />
 
           <DesktopNav

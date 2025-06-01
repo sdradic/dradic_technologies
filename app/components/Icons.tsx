@@ -61,3 +61,102 @@ export const MenuIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
+
+export const ChipSVG = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 220 220"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <rect
+        x="40"
+        y="40"
+        width="140"
+        height="140"
+        rx="20"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="8"
+      />
+      <rect x="80" y="80" width="60" height="60" rx="12" fill="#16B6C6" />
+      <circle cx="110" cy="110" r="10" fill="#2ED9E7" />
+      {/* Pins */}
+      <line x1="110" y1="10" x2="110" y2="40" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="110"
+        cy="10"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="110" y1="180" x2="110" y2="210" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="110"
+        cy="210"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="40" y1="110" x2="10" y2="110" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="10"
+        cy="110"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="180" y1="110" x2="210" y2="110" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="210"
+        cy="110"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      {/* More pins for corners */}
+      <line x1="60" y1="60" x2="35" y2="35" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="35"
+        cy="35"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+      <line x1="160" y1="60" x2="185" y2="35" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="185"
+        cy="35"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+      <line x1="60" y1="160" x2="35" y2="185" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="35"
+        cy="185"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+      <line x1="160" y1="160" x2="185" y2="185" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="185"
+        cy="185"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+    </svg>
+  );
+};

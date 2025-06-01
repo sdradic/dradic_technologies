@@ -1,4 +1,6 @@
+import Footer from "~/components/Footer";
 import MemberCard from "~/components/MemberCard";
+import SectionHeader from "~/components/SectionHeader";
 
 export default function AboutPage() {
   const description =
@@ -6,31 +8,35 @@ export default function AboutPage() {
   const name = "Dusan Radic";
   const title = "Founder & Lead Engineer";
   return (
-    <div className="flex flex-col min-h-full justify-center items-center">
-      <div className="text-center max-w-3xl">
-        <p className="text-lg text-gray-700 leading-relaxed">
-          At Dradic Technologies, we solve real-world challenges by integrating
-          hardware and software solutions. We create impactful innovations by
-          combining cutting-edge technology with practical applications.
-        </p>
-        <p className="text-lg text-gray-700 leading-relaxed mt-4">
-          With expertise in embedded systems, IoT, and custom hardware, we
-          tackle complex problems holistically. Our deep knowledge of hardware
-          and software allows us to build efficient, scalable solutions that
-          make a difference across industries.
-        </p>
-      </div>
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold text-center mb-8">Our Team</h2>
-        <div className="flex flex-wrap gap-8 justify-center">
-          <MemberCard
-            description={description}
-            name={name}
-            title={title}
-            image="/dusan.jpeg"
-          />
+    <div className="flex flex-col h-screen justify-between">
+      <main className="flex flex-col md:flex-row h-full w-full max-w-7xl mx-auto justify-center items-center px-4 pt-24">
+        <div className="flex flex-col text-center md:text-left w-full">
+          <SectionHeader title="About Dradic Technologies" />
+          <p className="text-lg text-gray-700 leading-relaxed">
+            At Dradic Technologies, we solve real-world challenges by
+            integrating hardware and software solutions. We create impactful
+            innovations by combining cutting-edge technology with practical
+            applications.
+          </p>
+          <p className="text-lg text-gray-700 leading-relaxed mt-4">
+            With expertise in embedded systems, IoT, and custom hardware, we
+            tackle complex problems holistically. Our deep knowledge of hardware
+            and software allows us to build efficient, scalable solutions that
+            make a difference across industries.
+          </p>
         </div>
-      </div>
+        {/* <div className="flex flex-col mt-8 md:mt-0">
+          <div className="flex flex-wrap gap-8 justify-center">
+            <MemberCard
+              description={description}
+              name={name}
+              title={title}
+              image="/dusan.jpeg"
+            />
+          </div>
+        </div> */}
+      </main>
+      <Footer />
     </div>
   );
 }
