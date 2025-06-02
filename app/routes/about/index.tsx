@@ -25,8 +25,8 @@ export default function AboutPage() {
             make a difference across industries.
           </p>
         </div>
-        {/* <div className="flex flex-col mt-8 md:mt-0">
-          <div className="flex flex-wrap gap-8 justify-center">
+        <div className="flex flex-col md:mt-0">
+          <div className="flex flex-wrap gap-8 justify-center mb-8 md:mb-0">
             <MemberCard
               description={description}
               name={name}
@@ -34,7 +34,7 @@ export default function AboutPage() {
               image="/dusan.jpeg"
             />
           </div>
-        </div> */}
+        </div>
       </main>
       <Footer />
     </div>

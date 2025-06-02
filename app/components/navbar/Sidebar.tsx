@@ -26,13 +26,13 @@ export const Sidebar = ({
         <img
           src="/dradic_tech_logo_w_title.png"
           alt="Dradic Technologies"
-          className="w-full h-60 object-contain"
+          className="w-full h-14 mt-8 mb-4 object-contain"
         />
         <div className="flex flex-col p-6 space-y-4">
           {navConfig.map((item) => (
             <button
               key={item.label}
-              className={`text-gray-600 text-left text-lg hover:text-gray-800 cursor-pointer hover:bg-gray-100 rounded-md p-2 ${
+              className={`text-gray-800 text-left text-lg cursor-pointer hover:bg-primary-100 rounded-md p-2 ${
                 selectedPath === item.path
                   ? "border-b-2 border-primary-600 rounded-none"
                   : ""

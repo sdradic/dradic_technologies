@@ -29,11 +29,19 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1"
+          font-family="Roboto, sans-serif"
+        />
         <Meta />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap"
+          rel="stylesheet"
+        ></link>
         <Links />
       </head>
-      <body>
+      <body className="inverse-gradient-background">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -70,7 +78,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   return (
     <RootLayout>
-      <main className="flex flex-col items-center justify-center pt-16 p-4 container mx-auto h-screen">
+      <main className="flex flex-col items-center justify-center pt-16 p-4 container mx-auto h-screen inverse-gradient-background">
         <h1 className="text-4xl font-bold">{message}</h1>
         <p className="text-lg">{details}</p>
         {stack && (

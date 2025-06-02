@@ -9,7 +9,7 @@ export default function App() {
       <div className="flex flex-row w-full h-full">
         {/* Left Side: Text Content */}
         <div className="flex flex-col w-full justify-center items-center md:items-start px-4 md:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight text-center md:text-left">
+          <h1 className="text-5xl font-bold text-gray-800 leading-tight text-center md:text-left">
             Innovating
             <br />
             Electronics &<br />

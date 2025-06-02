@@ -14,12 +14,12 @@ export const Logo = ({ className = "" }: LogoProps) => {
       <img
         src="/dradic_tech_logo_w_title.png"
         alt="Dradic Technologies"
-        className={`hidden sm:block h-48 w-auto object-contain ${className}`}
+        className={`hidden sm:block h-16 w-auto object-contain ${className}`}
       />
       <img
         src="/dradic_tech_logo.png"
         alt="Dradic Technologies"
-        className={`sm:hidden h-12 w-auto object-contain ${className}`}
+        className={`sm:hidden h-16 w-auto object-contain ${className}`}
       />
     </div>
   );

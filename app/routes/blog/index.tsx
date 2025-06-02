@@ -39,7 +39,7 @@ export default function BlogPage() {
           {posts?.map((post) => (
             <li
               key={post.slug}
-              className="p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
+              className=" mx-auto p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
               onClick={() => {
                 navigate(`/blog/posts/${post.slug}`);
               }}

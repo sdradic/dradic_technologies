@@ -10,11 +10,11 @@ export const MobileNav = ({
   onToggleSidebar,
 }: MobileNavProps) => {
   return (
-    <button
-      className="md:hidden text-gray-800 cursor-pointer"
-      onClick={onToggleSidebar}
-    >
-      <MenuIcon isSidebarOpen={isSidebarOpen} className="w-6 h-6" />
+    <button className="md:hidden cursor-pointer" onClick={onToggleSidebar}>
+      <MenuIcon
+        isSidebarOpen={isSidebarOpen}
+        className="w-8 h-8 stroke-primary-600"
+      />
     </button>
   );
 };
