@@ -1,16 +1,18 @@
 import Footer from "~/components/Footer";
 import MemberCard from "~/components/MemberCard";
+import Navbar from "~/components/Navbar";
 import SectionHeader from "~/components/SectionHeader";
 
 export default function AboutPage() {
   const description =
-    "An Electrical and Software Engineer from Chile, specializing in embedded systems and hardware-software integration. Experienced in developing firmware for microcontrollers and real-time systems. Passionate about IoT solutions, robotics, and low-level programming using C/C++. Currently working on innovative projects combining hardware design with secure software implementations.";
+    "Electrical and Software Engineer specializing in embedded systems, IoT, and hardware-software integration. Experienced in firmware development and real-time systems, with expertise in C/C++ programming.";
   const name = "Dusan Radic";
   const title = "Founder & Lead Engineer";
   return (
-    <div className="flex flex-col h-screen justify-between">
-      <main className="flex flex-col md:flex-row h-full w-full max-w-7xl mx-auto justify-center items-center px-4 pt-24">
-        <div className="flex flex-col text-center md:text-left w-full">
+    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
+      <Navbar />
+      <div className="flex flex-col md:flex-row justify-center items-center py-12 max-w-6xl mx-auto">
+        <div className="flex flex-col text-center md:text-left w-full px-4 md:px-8">
           <SectionHeader title="About Dradic Technologies" />
           <p className="text-lg text-gray-700 leading-relaxed">
             At Dradic Technologies, we solve real-world challenges by
@@ -25,8 +27,8 @@ export default function AboutPage() {
             make a difference across industries.
           </p>
         </div>
-        <div className="flex flex-col md:mt-0">
-          <div className="flex flex-wrap gap-8 justify-center mb-8 md:mb-0">
+        <div className="flex flex-col md:mt-0 mt-12 px-4 md:px-8">
+          <div className="flex flex-wrap gap-8 justify-center">
             <MemberCard
               description={description}
               name={name}
@@ -35,7 +37,7 @@ export default function AboutPage() {
             />
           </div>
         </div>
-      </main>
+      </div>
       <Footer />
     </div>
   );

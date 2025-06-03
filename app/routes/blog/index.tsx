@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { useLoaderData, useNavigate } from "react-router";
 import Footer from "~/components/Footer";
 import SectionHeader from "~/components/SectionHeader";
+import Navbar from "~/components/Navbar";
 
 interface BlogPost {
   slug: string;
@@ -32,14 +33,15 @@ export default function BlogPage() {
   const posts = useLoaderData() as BlogPost[];
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col h-screen justify-between">
-      <main className="flex flex-col h-full justify-center items-center">
+    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
+      <Navbar />
+      <div className="flex flex-col justify-center items-center py-12 max-w-6xl mx-auto">
         <SectionHeader title="Blog Posts" />
-        <ul className="space-y-4 flex flex-wrap gap-4">
+        <ul className="flex flex-wrap gap-4">
           {posts?.map((post) => (
             <li
               key={post.slug}
-              className=" mx-auto p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
+              className="mx-auto p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
               onClick={() => {
                 navigate(`/blog/posts/${post.slug}`);
               }}
@@ -56,7 +58,7 @@ export default function BlogPage() {
             </li>
           ))}
         </ul>
-      </main>
+      </div>
       <Footer />
     </div>
   );

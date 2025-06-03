@@ -26,8 +26,8 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full nav-background z-10">
-        <div className="max-w-6xl max-h-18 mx-auto px-4 mt-2 py-1 flex justify-between items-center">
+      <nav className="w-full nav-background border-b border-gray-200">
+        <div className="max-w-6xl max-h-18 mx-auto px-4 py-1 flex justify-between items-center">
           <Logo className="w-auto" />
 
           <DesktopNav
