@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
-      <div className="flex flex-col md:flex-row justify-center items-center py-12 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-center items-center py-12 max-w-6xl mx-auto px-4">
         {/* Left Side: Text Content */}
         <div className="flex flex-col w-full justify-center items-center md:items-start px-4 md:px-8">
           <h1 className="text-5xl font-bold text-gray-800 leading-tight text-center md:text-left">

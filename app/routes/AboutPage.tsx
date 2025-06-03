@@ -13,7 +13,7 @@ export default function AboutPage() {
       <Navbar />
       <div className="flex flex-col md:flex-row justify-center items-center py-12 max-w-6xl mx-auto">
         <div className="flex flex-col text-center md:text-left w-full px-4 md:px-8">
-          <SectionHeader title="About Dradic Technologies" />
+          <SectionHeader title="About Us" />
           <p className="text-lg text-gray-700 leading-relaxed">
             At Dradic Technologies, we solve real-world challenges by
             integrating hardware and software solutions. We create impactful
