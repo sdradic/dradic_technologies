@@ -1,12 +1,14 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import "./app.css";
-import { lazy } from "react";
-
-const LoadingPage = lazy(() => import("./routes/LoadingPage"));
+import Loader from "./components/Loader";
 
 export function HydrateFallback() {
-  return <LoadingPage />;
+  return (
+    <div className="flex flex-col justify-center items-center h-screen inverse-gradient-background gap-4">
+      <Loader />
+    </div>
+  );
 }
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
