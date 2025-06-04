@@ -14,7 +14,7 @@ interface BlogPost {
 }
 
 export async function loader() {
-  const dir = path.resolve(process.cwd(), "app/routes/blog/posts");
+  const dir = path.resolve(process.cwd(), "app/routes/blog/post");
   const files = fs.readdirSync(dir);
 
   const posts = files
@@ -43,7 +43,7 @@ export default function BlogPage() {
               key={post.slug}
               className="mx-auto p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
               onClick={() => {
-                navigate(`/blog/posts/${post.slug}`);
+                navigate(`/blog/post/${post.slug}`);
               }}
             >
               <img

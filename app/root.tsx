@@ -1,6 +1,13 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import "./app.css";
+import { lazy } from "react";
+
+const LoadingPage = lazy(() => import("./routes/LoadingPage"));
+
+export function HydrateFallback() {
+  return <LoadingPage />;
+}
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (

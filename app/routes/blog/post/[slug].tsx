@@ -15,13 +15,7 @@ interface LoaderData {
 export async function loader({ params }: { params: { slug: string } }) {
   console.log("Blog post loader called with params:", params);
   const slug = params.slug;
-  const postsDir = path.resolve(
-    process.cwd(),
-    "app",
-    "routes",
-    "blog",
-    "posts"
-  );
+  const postsDir = path.resolve(process.cwd(), "app", "routes", "blog", "post");
   const filePath = path.join(postsDir, `${slug}.md`);
 
   console.log("Looking for file at:", filePath);

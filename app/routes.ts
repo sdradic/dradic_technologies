@@ -6,6 +6,6 @@ export default [
   route("projects", "routes/ProjectsPage.tsx"),
   route("about", "routes/AboutPage.tsx"),
   route("blog", "routes/blog/index.tsx", [
-    route("posts/[slug]", "routes/blog/posts/[slug].tsx"),
+    route("post/[slug]", "routes/blog/post/[slug].tsx"),
   ]),
 ] satisfies RouteConfig;
