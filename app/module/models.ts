@@ -8,7 +8,7 @@ export interface Project {
 export interface BlogPost {
   slug: string;
   title: string;
-  date: string;
+  created_at: string;
   image: string;
   content: string;
 }

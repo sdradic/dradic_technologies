@@ -1,6 +1,6 @@
 import Footer from "~/components/Footer";
 import SectionHeader from "~/components/SectionHeader";
-import { projects } from "module/projectsConfig";
+import { projects } from "~/module/projectsConfig";
 import Navbar from "~/components/Navbar";
 
 // Define the Project type
