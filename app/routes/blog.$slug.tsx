@@ -1,7 +1,8 @@
 import { Await, useLoaderData } from "react-router";
 import { marked } from "marked";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { app } from "module/firebase";
+import { app } from "~/module/firebase";
+import { formatDate } from "~/module/utils";
 import Loader from "~/components/Loader";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
@@ -11,7 +12,7 @@ interface LoaderData {
   html: string;
   metadata: {
     title: string;
-    date: string;
+    created_at: string;
     image: string;
   };
 }
@@ -43,14 +44,15 @@ export async function loader({
               const markdownContent = parts[2];
 
               const title = metadata.match(/title:\s*(.*)/)?.[1] || "";
-              const date = metadata.match(/date:\s*(.*)/)?.[1] || "";
+              const created_at =
+                metadata.match(/created_at:\s*(.*)/)?.[1] || "";
               const image = metadata.match(/image:\s*(.*)/)?.[1] || "";
 
               const html = marked.parse(markdownContent);
 
               return {
                 html,
-                metadata: { title, date, image },
+                metadata: { title, created_at, image },
               } as LoaderData;
             }
           }
@@ -85,14 +87,14 @@ export async function loader({
         const markdownContent = parts[2];
 
         const title = metadata.match(/title:\s*(.*)/)?.[1] || "";
-        const date = metadata.match(/date:\s*(.*)/)?.[1] || "";
+        const created_at = metadata.match(/created_at:\s*(.*)/)?.[1] || "";
         const image = metadata.match(/image:\s*(.*)/)?.[1] || "";
 
         const html = marked.parse(markdownContent);
 
         resolve({
           html,
-          metadata: { title, date, image },
+          metadata: { title, created_at, image },
         });
       } catch (error) {
         console.error("Error loading blog post:", error);
@@ -106,12 +108,14 @@ function BlogPostContent({ post }: { post: LoaderData }) {
   return (
     <div className="flex flex-col justify-center items-center py-12 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">{post.metadata.title}</h1>
-      <p className="text-gray-500 text-sm mb-8">{post.metadata.date}</p>
-      <div className="prose prose-lg max-w-none">
+      <p className="text-gray-500 text-sm mb-8">
+        {formatDate(post.metadata.created_at)}
+      </p>
+      <div className="flex flex-col items-center justify-center max-w-md bg-white dark:bg-gray-800 rounded-lg p-4 overflow-y-auto">
         <div
           className="prose prose-lg max-w-none"
           dangerouslySetInnerHTML={{ __html: post.html }}
-        />
+        ></div>
       </div>
     </div>
   );

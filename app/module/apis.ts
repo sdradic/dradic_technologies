@@ -1,5 +1,5 @@
 import { getDownloadURL, getStorage, listAll, ref } from "firebase/storage";
-import { app } from "module/firebase";
+import { app } from "~/module/firebase";
 import type { BlogPost } from "./models";
 
 export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
@@ -26,13 +26,13 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
       // Parse the markdown frontmatter to get metadata
       const metadata = content.split("---")[1];
       const title = metadata.match(/title:\s*(.*)/)?.[1] || "";
-      const date = metadata.match(/date:\s*(.*)/)?.[1] || "";
+      const created_at = metadata.match(/created_at:\s*(.*)/)?.[1] || "";
       const image = metadata.match(/image:\s*(.*)/)?.[1] || "";
 
       posts.push({
         slug,
         title,
-        date,
+        created_at,
         image,
         content,
       });

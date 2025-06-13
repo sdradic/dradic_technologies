@@ -30,6 +30,3 @@ A simple, elegant React-based site that links out to all projects and the blog.
 - Static JSON or object for project metadata
 - React Router (optional)
 - Deployed via Vercel or Netlify
-
-TODO:
-Load .md files correctly check urls

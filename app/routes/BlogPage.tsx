@@ -4,8 +4,9 @@ import Footer from "~/components/Footer";
 import SectionHeader from "~/components/SectionHeader";
 import Navbar from "~/components/Navbar";
 import Loader from "~/components/Loader";
-import { fetchPostsFromFirebase } from "module/apis";
-import type { BlogPost } from "module/models";
+import { fetchPostsFromFirebase } from "~/module/apis";
+import { formatDate } from "~/module/utils";
+import type { BlogPost } from "~/module/models";
 
 // Create a module-level cache that persists between route changes
 let postsCache: BlogPost[] | null = null;
@@ -65,7 +66,9 @@ export default function BlogPage() {
                 <div className="text-blue-600 text-lg font-medium">
                   {post.title}
                 </div>
-                <p className="text-sm text-gray-500 mt-1">{post.date}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {formatDate(post.created_at)}
+                </p>
               </li>
             ))
           )}
