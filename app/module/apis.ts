@@ -1,6 +1,7 @@
 import { getDownloadURL, getStorage, listAll, ref } from "firebase/storage";
 import { app } from "~/module/firebase";
-import type { BlogPost } from "./models";
+import type { BlogPost } from "./types";
+import { handleSaveLocalStoredBlogMetadata } from "./utils";
 
 export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
   const VITE_FIREBASE_STORAGE_BUCKET = import.meta.env
@@ -12,10 +13,33 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
   );
 
   try {
+    const localStoredBlogMetadata = localStorage.getItem(
+      "localStoredBlogMetadata"
+    );
+    const localStoredBlogMetadataParsed = JSON.parse(
+      localStoredBlogMetadata || "{}"
+    );
     const res = await listAll(folderRef);
     const posts: BlogPost[] = [];
 
     for (const itemRef of res.items) {
+      // If blog post metadata different from local stored blog metadata, update local stored blog metadata
+      if (
+        localStoredBlogMetadata &&
+        localStoredBlogMetadataParsed.some(
+          (post: BlogPost) => post.slug === itemRef.name.replace(/\.md$/, "")
+        )
+      ) {
+        const post = localStoredBlogMetadataParsed.find(
+          (post: BlogPost) => post.slug === itemRef.name.replace(/\.md$/, "")
+        );
+        posts.push(post);
+        console.log(
+          "Blog post metadata is the same as local stored blog metadata"
+        );
+        continue;
+      }
+      // If blog post metadata is different from local stored blog metadata, fetch from Firebase
       const url = await getDownloadURL(itemRef);
       const response = await fetch(url);
       const content = await response.text();
@@ -37,6 +61,7 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
         content,
       });
     }
+    handleSaveLocalStoredBlogMetadata(posts);
 
     return posts;
   } catch (error) {

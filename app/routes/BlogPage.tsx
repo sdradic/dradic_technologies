@@ -6,7 +6,7 @@ import Navbar from "~/components/Navbar";
 import Loader from "~/components/Loader";
 import { fetchPostsFromFirebase } from "~/module/apis";
 import { formatDate } from "~/module/utils";
-import type { BlogPost } from "~/module/models";
+import type { BlogPost } from "~/module/types";
 
 // Create a module-level cache that persists between route changes
 let postsCache: BlogPost[] | null = null;

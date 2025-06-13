@@ -1,5 +1,5 @@
 import { TallyUpLogo } from "~/components/Icons";
-import type { Project } from "./models";
+import type { Project } from "./types";
 
 export const projects: Project[] = [
   {

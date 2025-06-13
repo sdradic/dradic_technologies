@@ -2,6 +2,8 @@
  * Utility functions for the application
  */
 
+import type { BlogPost } from "./types";
+
 /**
  * Format a date string to a human-readable format with time
  * @param dateString - ISO date string or any valid date string
@@ -55,5 +57,14 @@ export function isValidDate(dateString: string | null | undefined): boolean {
     return !isNaN(date.getTime());
   } catch {
     return false;
+  }
+}
+
+export function handleSaveLocalStoredBlogMetadata(posts: BlogPost[]) {
+  try {
+    localStorage.setItem("localStoredBlogMetadata", JSON.stringify(posts));
+  } catch (error) {
+    console.error("Error saving local stored blog metadata:", error);
+    throw error;
   }
 }
