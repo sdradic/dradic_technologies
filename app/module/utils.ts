@@ -2,7 +2,121 @@
  * Utility functions for the application
  */
 
+import { marked } from "marked";
 import type { BlogPost } from "./types";
+
+// Configure marked for better parsing
+marked.use({
+  breaks: true,
+  gfm: true,
+});
+
+/**
+ * Parse markdown content with frontmatter
+ * @param content - markdown content with frontmatter
+ * @returns parsed metadata and body content
+ */
+export function parseMarkdownWithFrontmatter(content: string): {
+  metadata: {
+    title: string;
+    created_at: string;
+    updated_at: string;
+    image: string;
+  };
+  body: string;
+} {
+  const defaultMetadata = {
+    title: "",
+    created_at: "",
+    updated_at: "",
+    image: "",
+  };
+
+  try {
+    // Split content into frontmatter and body
+    const parts = content.split("---");
+
+    if (parts.length < 3) {
+      // No frontmatter, return content as body
+      return {
+        metadata: defaultMetadata,
+        body: content,
+      };
+    }
+
+    const frontmatter = parts[1].trim();
+    const body = parts.slice(2).join("---").trim();
+
+    // Parse frontmatter
+    const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "";
+    const created_at =
+      frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() || "";
+    const updated_at =
+      frontmatter.match(/updated_at:\s*(.*)/)?.[1]?.trim() || "";
+    const image = frontmatter.match(/image:\s*(.*)/)?.[1]?.trim() || "";
+
+    return {
+      metadata: { title, created_at, updated_at, image },
+      body,
+    };
+  } catch (error) {
+    console.error("Error parsing markdown frontmatter:", error);
+    return {
+      metadata: defaultMetadata,
+      body: content,
+    };
+  }
+}
+
+/**
+ * Render markdown content to HTML
+ * @param content - markdown content (with or without frontmatter)
+ * @returns HTML string
+ */
+export async function renderMarkdownToHtml(content: string): Promise<string> {
+  try {
+    let markdownBody = content;
+
+    // Check if content has frontmatter (starts with ---)
+    if (content.trim().startsWith("---")) {
+      try {
+        // Parse frontmatter and get the body
+        const { body } = parseMarkdownWithFrontmatter(content);
+        markdownBody = body;
+      } catch (error) {
+        // If frontmatter parsing fails, try to extract content after the second ---
+        const lines = content.split("\n");
+        let inFrontmatter = false;
+        let frontmatterEnded = false;
+        const bodyLines: string[] = [];
+
+        for (const line of lines) {
+          if (line.trim() === "---") {
+            if (!inFrontmatter) {
+              inFrontmatter = true;
+            } else {
+              frontmatterEnded = true;
+              continue;
+            }
+          } else if (frontmatterEnded) {
+            bodyLines.push(line);
+          }
+        }
+
+        markdownBody = bodyLines.join("\n");
+      }
+    }
+
+    // Convert markdown to HTML
+    const html = await marked.parse(markdownBody);
+    return html;
+  } catch (error) {
+    console.error("Failed to render markdown to HTML:", error);
+    // Return the original content as HTML if parsing completely fails
+    const fallbackHtml = await marked.parse(content);
+    return fallbackHtml;
+  }
+}
 
 /**
  * Format a date string to a human-readable format with time

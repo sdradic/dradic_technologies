@@ -25,6 +25,99 @@
   .separator {
     @apply w-full h-px bg-gray-300 dark:bg-dark-400;
   }
+
+  /* Enhanced prose styling for markdown content */
+  .prose {
+    @apply text-gray-800 dark:text-gray-200;
+  }
+
+  .prose h1 {
+    @apply text-3xl font-bold mb-6 mt-8 text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2;
+  }
+
+  .prose h2 {
+    @apply text-2xl font-semibold mb-4 mt-6 text-gray-800 dark:text-gray-200;
+  }
+
+  .prose h3 {
+    @apply text-xl font-semibold mb-3 mt-5 text-gray-800 dark:text-gray-200;
+  }
+
+  .prose h4 {
+    @apply text-lg font-semibold mb-2 mt-4 text-gray-800 dark:text-gray-200;
+  }
+
+  .prose h5 {
+    @apply text-base font-semibold mb-2 mt-3 text-gray-800 dark:text-gray-200;
+  }
+
+  .prose h6 {
+    @apply text-sm font-semibold mb-2 mt-3 text-gray-800 dark:text-gray-200;
+  }
+
+  .prose p {
+    @apply mb-4 text-gray-700 dark:text-gray-300 leading-7;
+  }
+
+  .prose ul {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  .prose ol {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  .prose li {
+    @apply text-gray-700 dark:text-gray-300 leading-6;
+  }
+
+  .prose ul li {
+    @apply list-disc;
+  }
+
+  .prose ol li {
+    @apply list-decimal;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary-300 dark:border-primary-600 pl-4 py-2 mb-4 italic text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800;
+  }
+
+  .prose code {
+    @apply bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono text-gray-800 dark:text-gray-200;
+  }
+
+  .prose pre {
+    @apply bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
+  }
+
+  .prose pre code {
+    @apply bg-transparent px-0 py-0 text-gray-100;
+  }
+
+  .prose a {
+    @apply text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 underline;
+  }
+
+  .prose img {
+    @apply max-w-full h-auto rounded-lg mb-4;
+  }
+
+  .prose table {
+    @apply w-full border-collapse border border-gray-300 dark:border-gray-600 mb-4;
+  }
+
+  .prose th {
+    @apply border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold text-left;
+  }
+
+  .prose td {
+    @apply border border-gray-300 dark:border-gray-600 px-4 py-2;
+  }
+
+  .prose hr {
+    @apply border-0 border-t border-gray-300 dark:border-gray-600 my-8;
+  }
 }
 
 @theme {

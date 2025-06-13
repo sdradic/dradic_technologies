@@ -1,8 +1,11 @@
 import { useLoaderData, useLocation } from "react-router";
-import { marked } from "marked";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "~/module/firebase";
-import { formatDate } from "~/module/utils";
+import {
+  formatDate,
+  parseMarkdownWithFrontmatter,
+  renderMarkdownToHtml,
+} from "~/module/utils";
 import Loader from "~/components/Loader";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
@@ -33,51 +36,33 @@ export default function BlogPost() {
   useEffect(() => {
     const load = async () => {
       try {
+        let content = "";
+
         if (postFromState?.content) {
-          const parts = postFromState.content.split("---");
-          if (parts.length >= 3) {
-            const metadata = parts[1];
-            const markdownContent = parts[2];
-
-            const title = metadata.match(/title:\s*(.*)/)?.[1] || "";
-            const created_at = metadata.match(/created_at:\s*(.*)/)?.[1] || "";
-            const updated_at = metadata.match(/updated_at:\s*(.*)/)?.[1] || "";
-            const image = metadata.match(/image:\s*(.*)/)?.[1] || "";
-
-            const html = await marked.parse(markdownContent);
-            setPost({
-              html,
-              metadata: { title, created_at, updated_at, image },
-            });
-            return;
-          }
+          // Use content from navigation state
+          content = postFromState.content;
+        } else {
+          // Fetch from Firebase if no state available
+          const storage = getStorage(app);
+          const fileRef = ref(
+            storage,
+            `gs://${
+              import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+            }/blog_posts/${slug}.md`
+          );
+          const url = await getDownloadURL(fileRef);
+          const response = await fetch(url);
+          content = await response.text();
         }
 
-        // If no state or parsing failed, fetch from Firebase
-        const storage = getStorage(app);
-        const fileRef = ref(
-          storage,
-          `gs://${
-            import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
-          }/blog_posts/${slug}.md`
-        );
-        const url = await getDownloadURL(fileRef);
-        const response = await fetch(url);
-        const content = await response.text();
+        // Parse markdown content using utility functions
+        const { metadata, body } = parseMarkdownWithFrontmatter(content);
+        const html = await renderMarkdownToHtml(content);
 
-        const parts = content.split("---");
-        if (parts.length < 3) throw new Error("Invalid markdown");
-
-        const metadata = parts[1];
-        const markdownContent = parts[2];
-
-        const title = metadata.match(/title:\s*(.*)/)?.[1] || "";
-        const created_at = metadata.match(/created_at:\s*(.*)/)?.[1] || "";
-        const updated_at = metadata.match(/updated_at:\s*(.*)/)?.[1] || "";
-        const image = metadata.match(/image:\s*(.*)/)?.[1] || "";
-
-        const html = await marked.parse(markdownContent);
-        setPost({ html, metadata: { title, created_at, updated_at, image } });
+        setPost({
+          html,
+          metadata,
+        });
       } catch (err) {
         console.error("Failed to load blog post", err);
       } finally {
