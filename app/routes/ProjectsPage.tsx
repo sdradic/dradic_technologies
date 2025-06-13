@@ -18,7 +18,7 @@ function ProjectContainer({ project }: { project: Project }) {
         <h3 className="text-3xl text-center font-semibold mb-6 text-gray-800">
           {project.name}
         </h3>
-        <p className="text-gray-700">{project.description}</p>
+        <p className="text-gray-700 text-center">{project.description}</p>
         <div className="flex justify-center items-center mt-8">
           {project.icon}
         </div>
@@ -29,10 +29,10 @@ function ProjectContainer({ project }: { project: Project }) {
 
 export default function ProjectsPage() {
   return (
-    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
+    <div className="inverse-gradient-background min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-col justify-center items-center py-12 max-w-6xl mx-auto">
-        <SectionHeader title="Projects" />
+      <div className="flex flex-col max-w-6xl mx-auto px-4 py-12 items-center my-auto">
+        <SectionHeader title="Projects" className="text-center" />
         <ul className="flex flex-row gap-8 flex-wrap justify-center">
           {projects.map((project) => (
             <li key={project.name}>

@@ -15,10 +15,18 @@ export const projects: Project[] = [
   //   name: "Project 2",
   //   description: "Description 2",
   //   link: "http://localhost:3000",
+  //   icon: TallyUpLogo({
+  //     className:
+  //       "w-16 h-16 stroke-[#8DD3B7] fill-[#8DD3B7] dark:stroke-[#6BC3A1] dark:fill-[#6BC3A1] cursor-pointer",
+  //   }),
   // },
   // {
   //   name: "Project 3",
   //   description: "Description 3",
   //   link: "http://localhost:3000",
+  //   icon: TallyUpLogo({
+  //     className:
+  //       "w-16 h-16 stroke-[#8DD3B7] fill-[#8DD3B7] dark:stroke-[#6BC3A1] dark:fill-[#6BC3A1] cursor-pointer",
+  //   }),
   // },
 ];

@@ -42,8 +42,8 @@ export default function BlogPage() {
   return (
     <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
-      <div className="flex flex-col justify-center items-center py-12 max-w-6xl mx-auto">
-        <SectionHeader title="Blog Posts" />
+      <div className="flex flex-col max-w-6xl mx-auto px-4 py-12 items-center">
+        <SectionHeader title="Blog Posts" className="text-center" />
         <ul className="flex flex-wrap gap-4">
           {isLoading ? (
             <div className="flex justify-center items-center min-h-[400px]">
@@ -53,7 +53,7 @@ export default function BlogPage() {
             posts.map((post) => (
               <li
                 key={post.slug}
-                className="mx-auto p-4 rounded-lg border border-gray-200 h-72 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
+                className="mx-auto p-4 h-full rounded-lg border border-gray-200 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
                 onClick={() => {
                   navigate(`/blog/${post.slug}`, { state: { post } });
                 }}
@@ -66,7 +66,7 @@ export default function BlogPage() {
                 <div className="text-blue-600 text-lg font-medium">
                   {post.title}
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 py-2">
                   {formatDate(post.created_at)}
                 </p>
               </li>

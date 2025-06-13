@@ -2,21 +2,19 @@ import { ChipSVG } from "~/components/Icons";
 import { useNavigate } from "react-router";
 import Footer from "~/components/Footer";
 import Navbar from "~/components/Navbar";
+import SectionHeader from "~/components/SectionHeader";
 
 export default function HomePage() {
   const navigate = useNavigate();
   return (
-    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
+    <div className="inverse-gradient-background min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row justify-center items-center py-12 max-w-6xl mx-auto px-4">
-        {/* Left Side: Text Content */}
+      <div className="flex flex-col md:flex-row max-w-6xl mx-auto px-4 my-auto">
         <div className="flex flex-col w-full justify-center items-center md:items-start px-4 md:px-8">
-          <h1 className="text-5xl font-bold text-gray-800 leading-tight text-center md:text-left">
-            Innovating
-            <br />
-            Electronics &<br />
-            IoT Solutions
-          </h1>
+          <SectionHeader
+            title="Innovating Electronics & IoT Solutions"
+            className="text-center md:text-left"
+          />
           <p className="text-lg text-gray-50 text-wrap text-center md:text-left">
             We specialize in cutting-edge embedded systems and technology.
           </p>

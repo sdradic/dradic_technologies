@@ -89,27 +89,31 @@ export default function BlogPost() {
   }, [postFromState, slug]);
 
   return (
-    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
-      <Navbar />
-      {loading ? (
-        <Loader showText={false} />
-      ) : post ? (
-        <div className="flex flex-col justify-center items-center py-12 max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-4">{post.metadata.title}</h1>
-          <p className="text-gray-500 text-sm mb-8">
-            {formatDate(post.metadata.created_at)}
-          </p>
-          <div className="flex flex-col items-center justify-center max-w-md bg-white dark:bg-gray-800 rounded-lg p-4 overflow-y-auto">
-            <div
-              className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.html }}
-            ></div>
+    <div className="inverse-gradient-background flex flex-col justify-between min-h-screen">
+      <div className="flex flex-col justify-between">
+        <Navbar />
+        {loading ? (
+          <Loader showText={false} />
+        ) : post ? (
+          <div className="flex flex-col max-w-4xl mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-4 pt-12 text-center">
+              {post.metadata.title}
+            </h1>
+            <p className="text-gray-500 text-sm mb-8 text-center">
+              {formatDate(post.metadata.created_at)}
+            </p>
+            <div className="flex flex-col items-center p-4 justify-center bg-white dark:bg-gray-800 rounded-lg min-h-72 w-full">
+              <div
+                className="prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ __html: post.html }}
+              ></div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="text-center text-red-600 py-8">Post not found.</div>
-      )}
-      <Footer />
+        ) : (
+          <div className="text-center text-red-600 py-8">Post not found.</div>
+        )}
+        <Footer />
+      </div>
     </div>
   );
 }
