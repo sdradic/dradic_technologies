@@ -2,12 +2,14 @@ import Footer from "~/components/Footer";
 import MemberCard from "~/components/MemberCard";
 import Navbar from "~/components/Navbar";
 import SectionHeader from "~/components/SectionHeader";
+import { useNavigate } from "react-router";
 
 export default function AboutPage() {
   const description =
     "Electrical and Software Engineer specializing in embedded systems, IoT, and hardware-software integration. Experienced in firmware development and real-time systems, with expertise in C/C++ programming.";
   const name = "Dusan Radic";
   const title = "Founder & Lead Engineer";
+  const navigate = useNavigate();
   return (
     <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
@@ -26,6 +28,16 @@ export default function AboutPage() {
             and software allows us to build efficient, scalable solutions that
             make a difference across industries.
           </p>
+          <div className="flex w-full pt-8 items-center justify-center md:justify-start">
+            <button
+              className="btn-primary"
+              onClick={() => {
+                navigate("/contact");
+              }}
+            >
+              Contact us
+            </button>
+          </div>
         </div>
         <div className="flex flex-col md:mt-0 mt-12 px-4 md:px-8">
           <div className="flex flex-wrap gap-8 justify-center">

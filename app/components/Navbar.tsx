@@ -17,6 +17,7 @@ export default function Navbar() {
     { label: "Projects", path: "/projects" },
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
   ];
 
   const handleNavClick = (item: { label: string; path: string }) => {
