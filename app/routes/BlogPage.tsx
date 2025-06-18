@@ -53,7 +53,7 @@ export default function BlogPage() {
             posts.map((post) => (
               <li
                 key={post.slug}
-                className="mx-auto p-4 h-full rounded-lg border border-gray-200 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
+                className="mx-auto max-w-[300px] p-4 h-full rounded-lg border border-gray-200 bg-white cursor-pointer hover:underline hover:scale-105 transition-all duration-300"
                 onClick={() => {
                   navigate(`/blog/${post.slug}`, { state: { post } });
                 }}
@@ -64,7 +64,7 @@ export default function BlogPage() {
                   alt={post.title}
                 />
                 <div className="text-blue-600 text-lg font-medium">
-                  {post.title}
+                  {post.title.slice(0, 40) + "..."}
                 </div>
                 <p className="text-sm text-gray-500 py-2">
                   {formatDate(post.created_at)}
