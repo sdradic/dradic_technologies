@@ -78,7 +78,9 @@ export default function BlogPost() {
       <div className="flex flex-col justify-between">
         <Navbar />
         {loading ? (
-          <Loader showText={false} />
+          <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
+            <Loader showText={true} />
+          </div>
         ) : post ? (
           <div className="flex flex-col max-w-4xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-4 pt-12 text-center">

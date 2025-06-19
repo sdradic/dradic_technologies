@@ -5,8 +5,8 @@ import Loader from "./components/Loader";
 
 export function HydrateFallback() {
   return (
-    <div className="flex flex-col justify-center items-center h-screen inverse-gradient-background gap-4">
-      <Loader />
+    <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
+      <Loader showText={true} />
     </div>
   );
 }
