@@ -82,17 +82,23 @@ export default function BlogPost() {
             <Loader showText={true} />
           </div>
         ) : post ? (
-          <div className="flex flex-col max-w-4xl mx-auto px-4 py-8">
+          <div className="flex flex-col w-full max-w-4xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-4 pt-12 text-center">
               {post.metadata.title}
             </h1>
             <p className="text-gray-500 text-sm mb-8 text-center">
               {formatDate(post.metadata.created_at)}
             </p>
-            <div className="flex flex-col items-center p-4 justify-center bg-white dark:bg-gray-800 rounded-lg min-h-72 w-full">
+            <div className="w-full bg-white dark:bg-gray-800 rounded-lg min-h-72 p-4 md:p-6 overflow-hidden">
               <div
-                className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: post.html }}
+                className="prose prose-sm md:prose-base lg:prose-lg max-w-none w-full overflow-x-auto"
+                style={{
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                }}
+                dangerouslySetInnerHTML={{ 
+                  __html: post.html,
+                }}
               ></div>
             </div>
           </div>
