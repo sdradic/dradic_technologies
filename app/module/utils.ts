@@ -3,7 +3,7 @@
  */
 
 import { marked } from "marked";
-import type { BlogPost } from "./types";
+import type { BlogPostMetadata } from "./types";
 
 // Configure marked for better parsing
 marked.use({
@@ -174,7 +174,7 @@ export function isValidDate(dateString: string | null | undefined): boolean {
   }
 }
 
-export function handleSaveLocalStoredBlogMetadata(posts: BlogPost[]) {
+export function handleSaveLocalStoredBlogMetadata(posts: BlogPostMetadata[]) {
   try {
     localStorage.setItem("localStoredBlogMetadata", JSON.stringify(posts));
   } catch (error) {

@@ -14,23 +14,42 @@ let postsCache: BlogPost[] | null = null;
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      // If we have cached posts, use them instead of fetching
+      // If we have cached posts, use them while fetching fresh data
       if (postsCache) {
         setPosts(postsCache);
-        setIsLoading(false);
-        return;
       }
 
       try {
+        setIsLoading(true);
         const fetchedPosts = await fetchPostsFromFirebase();
-        postsCache = fetchedPosts as BlogPost[];
-        setPosts(postsCache);
+        // Filter out any posts that failed to load
+        const validPosts = fetchedPosts.filter(
+          (post) =>
+            post.content && !post.content.includes("Error loading content")
+        );
+
+        if (validPosts.length === 0 && fetchedPosts.length > 0) {
+          setError(
+            "Failed to load blog posts. Please check your connection and refresh the page."
+          );
+        } else if (validPosts.length < fetchedPosts.length) {
+          console.warn(
+            `Failed to load ${
+              fetchedPosts.length - validPosts.length
+            } blog posts`
+          );
+        }
+
+        postsCache = validPosts;
+        setPosts(validPosts);
       } catch (error) {
         console.error("Error loading blog posts:", error);
+        setError("Failed to load blog posts. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -44,10 +63,28 @@ export default function BlogPage() {
       <Navbar />
       <div className="flex flex-col max-w-6xl mx-auto px-4 py-12 items-center">
         <SectionHeader title="Blog Posts" className="text-center" />
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 w-full max-w-2xl">
+            <p>{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 text-red-700 underline hover:text-red-900"
+            >
+              Refresh page
+            </button>
+          </div>
+        )}
+
         <ul className="flex flex-wrap gap-4">
           {isLoading ? (
-            <div className="flex justify-center items-center min-h-[400px]">
-              <Loader showText={false} />
+            <div className="flex justify-center items-center min-h-[400px] w-full">
+              <Loader
+                showText={true}
+                text={
+                  posts.length > 0 ? "Loading updates..." : "Loading posts..."
+                }
+              />
             </div>
           ) : (
             posts.map((post) => (
