@@ -9,7 +9,7 @@ async function fetchPostContent(slug: string): Promise<string> {
   const storage = getStorage(app);
   const fileRef = ref(
     storage,
-    `gs://${VITE_FIREBASE_STORAGE_BUCKET}/blog_posts/${slug}`
+    `gs://${VITE_FIREBASE_STORAGE_BUCKET}/blog_posts/${slug}.md`
   );
 
   try {
@@ -18,7 +18,7 @@ async function fetchPostContent(slug: string): Promise<string> {
     return await response.text();
   } catch (error) {
     console.error(`Error fetching post content for ${slug}:`, error);
-    return '';
+    return "";
   }
 }
 
@@ -33,28 +33,32 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
 
   try {
     // Get local metadata
-    const localStoredBlogMetadata = localStorage.getItem("localStoredBlogMetadata");
+    const localStoredBlogMetadata = localStorage.getItem(
+      "localStoredBlogMetadata"
+    );
     const localPosts: BlogPostMetadata[] = localStoredBlogMetadata
       ? JSON.parse(localStoredBlogMetadata)
       : [];
-    const localPostsMap = new Map(localPosts.map(post => [post.slug, post]));
+    const localPostsMap = new Map(localPosts.map((post) => [post.slug, post]));
 
     const res = await listAll(folderRef);
     const posts: BlogPost[] = [];
-    const firebaseSlugs = new Set(res.items.map(item => item.name.replace(/\.md$/, '')));
+    const firebaseSlugs = new Set(
+      res.items.map((item) => item.name.replace(/\.md$/, ""))
+    );
 
     // Process each post
     for (const itemRef of res.items) {
       const slug = itemRef.name.replace(/\.md$/, "");
       const localPost = localPostsMap.get(slug);
-      
+
       try {
-        let content = '';
-        let title = 'Untitled';
+        let content = "";
+        let title = "Untitled";
         let created_at = new Date().toISOString();
         let updated_at = new Date().toISOString();
-        let image = '';
-        
+        let image = "";
+
         try {
           content = await fetchPostContent(slug);
           if (content) {
@@ -62,14 +66,16 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
             if (metadataMatch && metadataMatch[1]) {
               const metadata = metadataMatch[1];
               const getMetadataValue = (field: string): string => {
-                const match = metadata.match(new RegExp(`${field}:\\s*([^\\n]+)`));
-                return match ? match[1].trim() : '';
+                const match = metadata.match(
+                  new RegExp(`${field}:\\s*([^\\n]+)`)
+                );
+                return match ? match[1].trim() : "";
               };
 
-              const new_updated_at = getMetadataValue('updated_at');
-              const new_title = getMetadataValue('title');
-              const new_created_at = getMetadataValue('created_at');
-              const new_image = getMetadataValue('image');
+              const new_updated_at = getMetadataValue("updated_at");
+              const new_title = getMetadataValue("title");
+              const new_created_at = getMetadataValue("created_at");
+              const new_image = getMetadataValue("image");
 
               if (new_updated_at) updated_at = new_updated_at;
               if (new_title) title = new_title;
@@ -77,7 +83,10 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
               if (new_image) image = new_image;
 
               // Only use cached content if the post hasn't been updated
-              if (localPost?.updated_at && localPost.updated_at === updated_at) {
+              if (
+                localPost?.updated_at &&
+                localPost.updated_at === updated_at
+              ) {
                 posts.push({
                   ...localPost,
                   content: content,
@@ -97,7 +106,7 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
           created_at,
           updated_at,
           image,
-          content: content || 'Error loading content',
+          content: content || "Error loading content",
         });
       } catch (error) {
         console.error(`Error processing post ${slug}:`, error);
@@ -114,12 +123,17 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
   } catch (error) {
     console.error("Error loading blog posts:", error);
     // Return local posts if available, or empty array if not
-    const localStoredBlogMetadata = localStorage.getItem("localStoredBlogMetadata");
+    const localStoredBlogMetadata = localStorage.getItem(
+      "localStoredBlogMetadata"
+    );
     if (localStoredBlogMetadata) {
-      const localPosts: BlogPostMetadata[] = JSON.parse(localStoredBlogMetadata);
-      return localPosts.map(post => ({
+      const localPosts: BlogPostMetadata[] = JSON.parse(
+        localStoredBlogMetadata
+      );
+      return localPosts.map((post) => ({
         ...post,
-        content: 'Error loading content. Please check your connection and refresh.'
+        content:
+          "Error loading content. Please check your connection and refresh.",
       }));
     }
     return [];
