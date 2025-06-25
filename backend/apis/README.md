@@ -1,56 +1,135 @@
-# Unified dradic technologies applications APIS
+# Dradic Technologies Unified API
 
-A collection of APIs for various applications built by Dradic Technologies.
+This is the unified API backend for all Dradic Technologies projects, including:
+- Blog CMS
+- Expense Tracker
+- Portfolio
+- And more...
 
-## APIs
+## Features
 
-### Authentication (`/api/v1/auth`)
+- **Authentication**: JWT-based authentication system
+- **Modular Design**: Organized by feature with FastAPI routers
+- **CORS**: Pre-configured for local development
+- **Documentation**: Automatic API documentation with Swagger UI and ReDoc
 
-- `POST /login` - Login a user
-- `POST /register` - Register a new user
-- `POST /logout` - Logout a user
-- `GET /me` - Get current user
+## Setup
 
-### Portfolio (`/api/v1/portfolio`)
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
-- `GET /` - Get all projects
-- `GET /{project_id}` - Get specific project
-- `POST /` - Create new project
-- `PUT /{project_id}` - Update project
-- `DELETE /{project_id}` - Delete project
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Blog (`/api/v1/blog`)
+3. Create a `.env` file in the `backend` directory with your configuration:
+   ```
+   SECRET_KEY=your-secret-key-here
+   DATABASE_URL=sqlite:///./sql_app.db
+   ```
 
-- `GET /` - Get all blog posts
-- `GET /{post_id}` - Get specific blog post
-- `POST /` - Create new blog post
-- `PUT /{post_id}` - Update blog post
-- `DELETE /{post_id}` - Delete blog post
+4. Run the development server:
+   ```bash
+   uvicorn apis.server:app --reload
+   ```
 
-### Expense Tracker (`/api/v1/expense-tracker`)
+## API Documentation
 
-- `GET /` - Get all expenses
-- `GET /{expense_id}` - Get specific expense
-- `POST /` - Create new expense
-- `PUT /{expense_id}` - Update expense
-- `DELETE /{expense_id}` - Delete expense
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+## Project Structure
+
+```
+backend/
+├── apis/
+│   ├── __init__.py
+│   ├── server.py           # Main FastAPI application
+│   └── routers/           # API route modules
+│       ├── __init__.py
+│       ├── auth.py        # Authentication routes
+│       ├── blog.py        # Blog CMS routes
+│       ├── portfolio.py   # Portfolio routes
+│       └── expense_tracker/
+│           ├── expenses.py
+│           ├── expenses_items.py
+│           ├── groups.py
+│           └── users.py
+├── requirements.txt       # Project dependencies
+└── README.md             # This file
+```
 
 ## Authentication
 
-Authentication is handled by the `/api/v1/auth` endpoints. The `login` and `register` endpoints return a JSON Web Token (JWT) which should be sent in the `Authorization` header for all subsequent requests.
+### Register a new user
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-## Authorization
+{
+  "username": "user@example.com",
+  "email": "user@example.com",
+  "full_name": "John Doe",
+  "password": "securepassword"
+}
+```
 
-Authorization is handled by the `Authorization` header. The header should contain a valid JWT token.
+### Get access token
+```http
+POST /api/auth/token
+Content-Type: application/x-www-form-urlencoded
 
-## Error Handling
+grant_type=password&username=user@example.com&password=securepassword
+```
 
-All endpoints return a JSON response with a `status` and `error` property. The `status` property is a boolean indicating whether the request was successful. The `error` property is a string containing an error message if the request was not successful.
+### Access protected routes
+```http
+GET /api/me
+Authorization: Bearer your-jwt-token
+```
 
-## CORS
+## Environment Variables
 
-The API is configured to allow CORS requests from any origin. This means that the API can be accessed from any website or application.
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SECRET_KEY` | Secret key for JWT token generation | `your-secret-key-here` |
+| `DATABASE_URL` | Database connection URL | `sqlite:///./sql_app.db` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token expiration time in minutes | `30` |
 
 ## Development
 
-The API is built using FastAPI. To run the API locally, run the following command in the root directory of the repository:
+### Running Tests
+```bash
+# Install test dependencies
+pip install -r requirements-test.txt
+
+# Run tests
+pytest
+```
+
+### Code Style
+This project uses `black` for code formatting and `flake8` for linting.
+
+```bash
+# Format code
+black .
+
+# Check code style
+flake8
+```
+
+## Deployment
+
+For production deployment, consider using:
+- Gunicorn with Uvicorn workers for production
+- Environment variables for configuration
+- A proper database (PostgreSQL recommended)
+- HTTPS with a valid certificate
+
+## License
+
+Proprietary - All rights reserved
