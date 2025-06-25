@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
 from routers.expense_tracker import expense_items, expenses, groups, users
 
 app = FastAPI(
@@ -68,15 +69,23 @@ app.include_router(apiroutes, prefix="/api")
 app.include_router(
     groups.groups_router,
     prefix="/api/expense-tracker/groups",
+    tags=["Expense Tracker - Groups"],
 )
 app.include_router(
     users.users_router,
     prefix="/api/expense-tracker/users",
+    tags=["Expense Tracker - Users"],
 )
 app.include_router(
-    expense_items.expense_items_router, prefix="/api/expense-tracker/expense-items"
+    expense_items.expense_items_router,
+    prefix="/api/expense-tracker/expense-items",
+    tags=["Expense Tracker - Expense Items"],
 )
-app.include_router(expenses.expenses_router, prefix="/api/expense-tracker/expenses")
+app.include_router(
+    expenses.expenses_router,
+    prefix="/api/expense-tracker/expenses",
+    tags=["Expense Tracker - Expenses"],
+)
 
 
 if __name__ == "__main__":
