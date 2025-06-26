@@ -11,7 +11,7 @@ export default function ContactForm() {
   };
   return (
     <div className="flex items-center justify-center sm:px-2 px-8 max-h-screen">
-      <div className="max-w-md w-full p-8 bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="max-w-md w-full p-8 bg-white dark:bg-gray-800 rounded-lg">
         <div>
           <div className="flex flex-col items-center justify-center gap-1 mt-2">
             <h3 className="text-gray-500 dark:text-gray-400 mb-8">

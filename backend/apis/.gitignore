@@ -4,7 +4,6 @@
 .env.production
 
 # Service account key (NEVER COMMIT THIS)
-serviceAccountKey.json
 firebase-service-account.json
 
 # Python
