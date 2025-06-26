@@ -1,128 +1,75 @@
-import { getDownloadURL, getStorage, listAll, ref } from "firebase/storage";
-import { app } from "~/module/firebase";
 import type { BlogPost, BlogPostMetadata } from "./types";
 import { handleSaveLocalStoredBlogMetadata } from "./utils";
 
-async function fetchPostContent(slug: string): Promise<string> {
-  const VITE_FIREBASE_STORAGE_BUCKET = import.meta.env
-    .VITE_FIREBASE_STORAGE_BUCKET;
-  const storage = getStorage(app);
-  const fileRef = ref(
-    storage,
-    `gs://${VITE_FIREBASE_STORAGE_BUCKET}/blog_posts/${slug}.md`
-  );
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
+// Module-level cache for posts metadata
+let cachedPostsMetadata: BlogPostMetadata[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+export async function fetchSinglePost(slug: string): Promise<BlogPost | null> {
   try {
-    const url = await getDownloadURL(fileRef);
-    const response = await fetch(url);
-    return await response.text();
+    const response = await fetch(`${API_BASE_URL}/blog/posts/${slug}`);
+    if (!response.ok) {
+      console.error(`Error fetching post ${slug}: ${response.statusText}`);
+      return null;
+    }
+    const post: BlogPost = await response.json();
+    return post;
   } catch (error) {
-    console.error(`Error fetching post content for ${slug}:`, error);
-    return "";
+    console.error(`Error fetching post ${slug}:`, error);
+    return null;
   }
 }
 
-export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
-  const VITE_FIREBASE_STORAGE_BUCKET = import.meta.env
-    .VITE_FIREBASE_STORAGE_BUCKET;
-  const storage = getStorage(app);
-  const folderRef = ref(
-    storage,
-    `gs://${VITE_FIREBASE_STORAGE_BUCKET}/blog_posts/`
-  );
-
+export async function fetchBlogPosts(
+  force: boolean = false
+): Promise<BlogPost[]> {
   try {
-    // Get local metadata
-    const localStoredBlogMetadata = localStorage.getItem(
-      "localStoredBlogMetadata"
-    );
-    const localPosts: BlogPostMetadata[] = localStoredBlogMetadata
-      ? JSON.parse(localStoredBlogMetadata)
-      : [];
-    const localPostsMap = new Map(localPosts.map((post) => [post.slug, post]));
-
-    const res = await listAll(folderRef);
-    const posts: BlogPost[] = [];
-    const firebaseSlugs = new Set(
-      res.items.map((item) => item.name.replace(/\.md$/, ""))
-    );
-
-    // Process each post
-    for (const itemRef of res.items) {
-      const slug = itemRef.name.replace(/\.md$/, "");
-      const localPost = localPostsMap.get(slug);
-
-      try {
-        let content = "";
-        let title = "Untitled";
-        let created_at = new Date().toISOString();
-        let updated_at = new Date().toISOString();
-        let image = "";
-
-        try {
-          content = await fetchPostContent(slug);
-          if (content) {
-            const metadataMatch = content.match(/---\s*([\s\S]*?)\s*---/);
-            if (metadataMatch && metadataMatch[1]) {
-              const metadata = metadataMatch[1];
-              const getMetadataValue = (field: string): string => {
-                const match = metadata.match(
-                  new RegExp(`${field}:\\s*([^\\n]+)`)
-                );
-                return match ? match[1].trim() : "";
-              };
-
-              const new_updated_at = getMetadataValue("updated_at");
-              const new_title = getMetadataValue("title");
-              const new_created_at = getMetadataValue("created_at");
-              const new_image = getMetadataValue("image");
-
-              if (new_updated_at) updated_at = new_updated_at;
-              if (new_title) title = new_title;
-              if (new_created_at) created_at = new_created_at;
-              if (new_image) image = new_image;
-
-              // Only use cached content if the post hasn't been updated
-              if (
-                localPost?.updated_at &&
-                localPost.updated_at === updated_at
-              ) {
-                posts.push({
-                  ...localPost,
-                  content: content,
-                });
-                continue;
-              }
-            }
-          }
-        } catch (error) {
-          console.error(`Error processing post ${slug}:`, error);
-          // Continue to create a post with available data
-        }
-
-        posts.push({
-          slug,
-          title,
-          created_at,
-          updated_at,
-          image,
-          content: content || "Error loading content",
-        });
-      } catch (error) {
-        console.error(`Error processing post ${slug}:`, error);
-        // Skip this post if there's an error
-        continue;
-      }
+    // Check cache first unless force refresh
+    const now = Date.now();
+    if (!force && cachedPostsMetadata && now - lastFetchTime < CACHE_DURATION) {
+      return cachedPostsMetadata.map((metadata) => ({
+        ...metadata,
+        content: "", // No content for metadata-only responses
+      }));
     }
 
-    // Clean up local storage by removing metadata for posts that no longer exist in Firebase
-    const updatedLocalPosts = posts.map(({ content, ...metadata }) => metadata);
-    handleSaveLocalStoredBlogMetadata(updatedLocalPosts);
+    const response = await fetch(`${API_BASE_URL}/blog/posts-metadata`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch posts metadata: ${response.statusText}`);
+    }
+
+    const postsMetadata: BlogPostMetadata[] = await response.json();
+
+    // Update cache
+    cachedPostsMetadata = postsMetadata;
+    lastFetchTime = now;
+
+    // Save to localStorage for offline access
+    handleSaveLocalStoredBlogMetadata(postsMetadata);
+
+    // Return posts without content (metadata-only)
+    const posts: BlogPost[] = postsMetadata.map((metadata) => ({
+      ...metadata,
+      content: "", // No content for listing view
+    }));
 
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-    // Return local posts if available, or empty array if not
+
+    // Return cached data if available
+    if (cachedPostsMetadata) {
+      return cachedPostsMetadata.map((metadata) => ({
+        ...metadata,
+        content: "",
+      }));
+    }
+
+    // Fall back to localStorage
     const localStoredBlogMetadata = localStorage.getItem(
       "localStoredBlogMetadata"
     );
@@ -132,10 +79,10 @@ export async function fetchPostsFromFirebase(): Promise<BlogPost[]> {
       );
       return localPosts.map((post) => ({
         ...post,
-        content:
-          "Error loading content. Please check your connection and refresh.",
+        content: "",
       }));
     }
+
     return [];
   }
 }

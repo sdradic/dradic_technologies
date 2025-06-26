@@ -1,19 +1,22 @@
 import os
 from typing import Any
-
-from fastapi import APIRouter, FastAPI
+from dotenv import load_dotenv
+from datetime import datetime, timezone
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from routers.expense_tracker import expense_items, expenses, groups, users
+from routers.blog import blog_router
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI(
     title="Dradic Technologies API",
     description="Unified API for all Dradic Technologies projects",
     version="1.0.0",
 )
-
-apiroutes = APIRouter()
 
 DRADIC_ENV = os.getenv("DRADIC__ENV")
 
@@ -49,23 +52,23 @@ async def errors_handling(request: Any, call_next):
         )
 
 
+# Root endpoint
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Dradic Technologies API"}
+    return {"message": "Welcome to Dradic Technologies Unified API"}
 
-
+# Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "version": "1.0.0"}
-
-
-@apiroutes.get("/")
-async def read_root():
-    return {"message": "Hello from api root!"}
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
 
 
 # Include routers
-app.include_router(apiroutes, prefix="/api")
+app.include_router(
+    blog_router,
+    prefix="/api/blog",
+    tags=["Blog"],
+)
 app.include_router(
     groups.groups_router,
     prefix="/api/expense-tracker/groups",
@@ -86,7 +89,6 @@ app.include_router(
     prefix="/api/expense-tracker/expenses",
     tags=["Expense Tracker - Expenses"],
 )
-
 
 if __name__ == "__main__":
     import os

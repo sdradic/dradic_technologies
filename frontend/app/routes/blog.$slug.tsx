@@ -1,6 +1,4 @@
-import { useLoaderData, useLocation } from "react-router";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { app } from "~/module/firebase";
+import { Link, useLoaderData, useLocation } from "react-router";
 import {
   formatDate,
   parseMarkdownWithFrontmatter,
@@ -10,6 +8,10 @@ import Loader from "~/components/Loader";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
 import { useEffect, useState } from "react";
+import { ChevronLeftIcon } from "~/components/Icons";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
 interface LoaderData {
   html: string;
@@ -38,21 +40,20 @@ export default function BlogPost() {
       try {
         let content = "";
 
-        if (postFromState?.content) {
-          // Use content from navigation state
+        if (
+          postFromState?.content &&
+          postFromState.content !== "Error loading content"
+        ) {
+          // Use content from navigation state if available and valid
           content = postFromState.content;
         } else {
-          // Fetch from Firebase if no state available
-          const storage = getStorage(app);
-          const fileRef = ref(
-            storage,
-            `gs://${
-              import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
-            }/blog_posts/${slug}.md`
-          );
-          const url = await getDownloadURL(fileRef);
-          const response = await fetch(url);
-          content = await response.text();
+          // Fetch from backend API
+          const response = await fetch(`${API_BASE_URL}/blog/posts/${slug}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch post: ${response.statusText}`);
+          }
+          const blogPost = await response.json();
+          content = blogPost.content;
         }
 
         // Parse markdown content using utility functions
@@ -78,14 +79,23 @@ export default function BlogPost() {
       <div className="flex flex-col justify-between">
         <Navbar />
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
-            <Loader showText={true} />
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <Loader showText={false} />
           </div>
         ) : post ? (
           <div className="flex flex-col w-full max-w-4xl mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-4 pt-12 text-center">
-              {post.metadata.title}
-            </h1>
+            <div className="flex flex-col w-full mb-4 pt-4">
+              <Link
+                to="/blog"
+                className="text-gray-500 text-sm flex items-center gap-2 mb-8"
+              >
+                <ChevronLeftIcon className="w-6 h-6 stroke-gray-500 hover:stroke-gray-700" />
+                Back to Blog
+              </Link>
+              <h1 className="text-4xl font-bold text-center">
+                {post.metadata.title}
+              </h1>
+            </div>
             <p className="text-gray-500 text-sm mb-8 text-center">
               {formatDate(post.metadata.created_at)}
             </p>
@@ -93,10 +103,10 @@ export default function BlogPost() {
               <div
                 className="prose prose-sm md:prose-base lg:prose-lg max-w-none w-full overflow-x-auto"
                 style={{
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word',
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
-                dangerouslySetInnerHTML={{ 
+                dangerouslySetInnerHTML={{
                   __html: post.html,
                 }}
               ></div>

@@ -1,90 +1,89 @@
 import { useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Footer from "~/components/Footer";
 import SectionHeader from "~/components/SectionHeader";
 import Navbar from "~/components/Navbar";
 import Loader from "~/components/Loader";
-import { fetchPostsFromFirebase } from "~/module/apis";
+import { fetchBlogPosts } from "~/module/apis";
 import { formatDate } from "~/module/utils";
 import type { BlogPost } from "~/module/types";
-
-// Create a module-level cache that persists between route changes
-let postsCache: BlogPost[] | null = null;
+import { RefreshIcon } from "~/components/Icons";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      // If we have cached posts, use them while fetching fresh data
-      if (postsCache) {
-        setPosts(postsCache);
-      }
-
-      try {
+  const fetchPosts = useCallback(async (force: boolean = false) => {
+    try {
+      if (force) {
+        setIsRefreshing(true);
+      } else {
         setIsLoading(true);
-        const fetchedPosts = await fetchPostsFromFirebase();
-        // Filter out any posts that failed to load
-        const validPosts = fetchedPosts.filter(
-          (post) =>
-            post.content && !post.content.includes("Error loading content")
-        );
-
-        if (validPosts.length === 0 && fetchedPosts.length > 0) {
-          setError(
-            "Failed to load blog posts. Please check your connection and refresh the page."
-          );
-        } else if (validPosts.length < fetchedPosts.length) {
-          console.warn(
-            `Failed to load ${
-              fetchedPosts.length - validPosts.length
-            } blog posts`
-          );
-        }
-
-        postsCache = validPosts;
-        setPosts(validPosts);
-      } catch (error) {
-        console.error("Error loading blog posts:", error);
-        setError("Failed to load blog posts. Please try again later.");
-      } finally {
-        setIsLoading(false);
       }
-    };
 
-    fetchPosts();
+      const fetchedPosts = await fetchBlogPosts(force);
+
+      console.log("fetchedPosts", fetchedPosts);
+
+      if (fetchedPosts.length > 0) {
+        setPosts(fetchedPosts);
+        setError(null);
+      } else {
+        setError("No blog posts found.");
+      }
+    } catch (error) {
+      console.error("Error loading blog posts:", error);
+      setError("Failed to load blog posts. Please try again later.");
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
   }, []);
+
+  const handleReload = useCallback(() => {
+    fetchPosts(true); // Force refresh
+  }, [fetchPosts]);
+
+  useEffect(() => {
+    fetchPosts(); // Initial load
+  }, [fetchPosts]);
 
   return (
     <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
       <div className="flex flex-col max-w-6xl mx-auto px-4 py-12 items-center">
-        <SectionHeader title="Blog Posts" className="text-center" />
+        <SectionHeader title="Blog Posts" className="text-center flex-1" />
+        <button
+          onClick={handleReload}
+          disabled={isLoading || isRefreshing}
+          className={`btn-primary justify-center mb-4 ${
+            isLoading || isRefreshing ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          title="Reload posts"
+        >
+          <RefreshIcon className="w-4 h-4" />
+          {isLoading ? "Loading..." : isRefreshing ? "Reloading..." : "Reload"}
+        </button>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 w-full max-w-2xl">
             <p>{error}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleReload}
               className="mt-2 text-red-700 underline hover:text-red-900"
             >
-              Refresh page
+              Try again
             </button>
           </div>
         )}
 
         <ul className="flex flex-wrap gap-4">
-          {isLoading ? (
+          {isLoading && posts.length === 0 ? (
             <div className="flex justify-center items-center min-h-[400px] w-full">
-              <Loader
-                showText={true}
-                text={
-                  posts.length > 0 ? "Loading updates..." : "Loading posts..."
-                }
-              />
+              <Loader showText={true} text="Loading posts..." />
             </div>
           ) : (
             posts.map((post) => (

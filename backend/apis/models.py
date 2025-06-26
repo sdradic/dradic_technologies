@@ -208,3 +208,55 @@ class ExpenseResponse(BaseModel):
     expenses: List[ExpenseWithDetails]
     total_count: int
     summary: ExpenseSummary
+
+
+# Blog Models
+class BlogPostMetadata(BaseModel):
+    slug: str
+    title: str
+    created_at: str
+    updated_at: str
+    image: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class BlogPost(BlogPostMetadata):
+    content: str
+
+
+class BlogPostCreate(BaseModel):
+    slug: str
+    title: str
+    content: str
+    image: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class BlogPostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    image: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class BlogPostResponse(BaseModel):
+    posts: List[BlogPost]
+    total_count: int
+
+
+# Auth Models
+class AuthToken(BaseModel):
+    token: str
+
+
+class AuthUser(BaseModel):
+    uid: str
+    email: str
+    name: str
+    email_verified: bool
