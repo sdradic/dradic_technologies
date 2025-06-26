@@ -113,7 +113,9 @@ export default function BlogPost() {
             </div>
           </div>
         ) : (
-          <div className="text-center text-red-600 py-8">Post not found.</div>
+          <div className="text-center text-red-600 py-8 min-h-screen">
+            Post not found.
+          </div>
         )}
         <Footer />
       </div>
