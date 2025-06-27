@@ -137,7 +137,7 @@ class IncomeSourceCreate(IncomeSourceBase):
 
 
 class IncomeSource(IncomeSourceBase):
-    id: UUID
+    id: str
     created_at: datetime
     updated_at: datetime
 
@@ -149,7 +149,7 @@ class IncomeSourceWithUser(IncomeSource):
 
 # Income Models
 class IncomeBase(BaseModel):
-    source_id: UUID
+    source_id: str
     amount: float
     currency: str
     date: date
@@ -164,7 +164,7 @@ class IncomeCreate(IncomeBase):
 
 
 class Income(IncomeBase):
-    id: UUID
+    id: str
     created_at: datetime
     updated_at: datetime
 

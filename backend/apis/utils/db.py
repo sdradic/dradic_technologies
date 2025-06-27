@@ -1,6 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, TypeVar
 from uuid import UUID, uuid4
+import uuid
 
 import pandas as pd
 from pydantic import BaseModel
@@ -95,6 +96,39 @@ expenses_table = Table(
     ),
 )
 
+income_sources_table = Table(
+    "income_sources",
+    metadata,
+    Column("id", String, primary_key=True),
+    Column("name", String, nullable=False),
+    Column("category", String),
+    Column("is_recurring", Boolean, nullable=False, server_default=text("true")),
+    Column("user_id", String, ForeignKey("tallyup.users.id"), nullable=False),
+    Column(
+        "created_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+    Column(
+        "updated_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+)
+
+incomes_table = Table(
+    "incomes",
+    metadata,
+    Column("id", String, primary_key=True),
+    Column("source_id", String, ForeignKey("tallyup.income_sources.id"), nullable=False),
+    Column("amount", Float, nullable=False),
+    Column("currency", String, nullable=False),
+    Column("date", Date, nullable=False),
+    Column("description", String),
+    Column(
+        "created_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+    Column(
+        "updated_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+)
+
 
 def get_db() -> Session:
     """Get database session"""
@@ -139,6 +173,8 @@ class DatabaseModel(BaseModel):
             "users": users_table,
             "expense_items": expense_items_table,
             "expenses": expenses_table,
+            "income_sources": income_sources_table,
+            "incomes": incomes_table,
         }
 
         if table_name not in table_map:
@@ -147,9 +183,12 @@ class DatabaseModel(BaseModel):
         table = table_map[table_name]
 
         with engine.connect() as conn:
-            # Add UUID if not present
+            # Add ID if not present
             if "id" not in data:
-                data["id"] = uuid4()
+                if table_name in ["income_sources", "incomes"]:
+                    data["id"] = str(uuid.uuid4())
+                else:
+                    data["id"] = uuid4()
 
             # Insert and return the record
             conn.execute(table.insert().values(**data))
@@ -164,7 +203,7 @@ class DatabaseModel(BaseModel):
 
     @staticmethod
     def update_record(
-        table_name: str, record_id: UUID, data: Dict[str, Any]
+        table_name: str, record_id: str, data: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
         """Update a record in the specified table"""
         table_map = {
@@ -172,6 +211,8 @@ class DatabaseModel(BaseModel):
             "users": users_table,
             "expense_items": expense_items_table,
             "expenses": expenses_table,
+            "income_sources": income_sources_table,
+            "incomes": incomes_table,
         }
 
         if table_name not in table_map:
@@ -197,13 +238,15 @@ class DatabaseModel(BaseModel):
             return dict(updated._mapping) if updated else None
 
     @staticmethod
-    def delete_record(table_name: str, record_id: UUID) -> bool:
+    def delete_record(table_name: str, record_id: str) -> bool:
         """Delete a record from the specified table"""
         table_map = {
             "groups": groups_table,
             "users": users_table,
             "expense_items": expense_items_table,
             "expenses": expenses_table,
+            "income_sources": income_sources_table,
+            "incomes": incomes_table,
         }
 
         if table_name not in table_map:

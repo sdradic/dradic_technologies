@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from routers.expense_tracker import expense_items, expenses, groups, users
+from routers.expense_tracker import expense_items, expenses, groups, users, incomes, income_sources
 from routers.blog import blog_router
 
 # Load environment variables from .env file
@@ -89,6 +89,16 @@ app.include_router(
     prefix="/api/expense-tracker/expenses",
     tags=["Expense Tracker - Expenses"],
 )
+app.include_router(
+    income_sources.income_sources_router,
+    prefix="/api/expense-tracker/income-sources",
+    tags=["Expense Tracker - Income Sources"],
+)
+app.include_router(
+    incomes.incomes_router,
+    prefix="/api/expense-tracker/incomes",
+    tags=["Expense Tracker - Incomes"],
+)   
 
 if __name__ == "__main__":
     import os
