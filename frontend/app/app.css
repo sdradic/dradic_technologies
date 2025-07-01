@@ -147,6 +147,13 @@
   --color-dark-900: oklch(0.15 0.01 250);
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 body {
   font-family: 'Roboto Serif', serif;
 }

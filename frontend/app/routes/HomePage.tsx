@@ -7,9 +7,9 @@ import SectionHeader from "~/components/SectionHeader";
 export default function HomePage() {
   const navigate = useNavigate();
   return (
-    <div className="inverse-gradient-background min-h-screen flex flex-col">
+    <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
-      <div className="flex flex-col md:flex-row max-w-6xl mx-auto px-4 my-auto">
+      <div className="flex flex-col md:flex-row">
         <div className="flex flex-col w-full justify-center items-center md:items-start px-4 md:px-8">
           <SectionHeader
             title="Innovating Electronics & IoT Solutions"
