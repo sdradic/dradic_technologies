@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeftIcon } from "~/components/Icons";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 interface LoaderData {
   html: string;
@@ -48,7 +48,9 @@ export default function BlogPost() {
           content = postFromState.content;
         } else {
           // Fetch from backend API
-          const response = await fetch(`${API_BASE_URL}/blog/posts/${slug}`);
+          const response = await fetch(
+            `${API_BASE_URL}/api/blog/posts/${slug}`
+          );
           if (!response.ok) {
             throw new Error(`Failed to fetch post: ${response.statusText}`);
           }
@@ -99,7 +101,7 @@ export default function BlogPost() {
             <p className="text-gray-500 text-sm mb-8 text-center">
               {formatDate(post.metadata.created_at)}
             </p>
-            <div className="w-full bg-white dark:bg-gray-800 rounded-lg min-h-72 p-4 md:p-6 overflow-hidden">
+            <div className="w-full bg-white dark:bg-gray-800 rounded-lg min-h-72 p-4 md:p-6 overflow-hidden border border-gray-200">
               <div
                 className="prose prose-sm md:prose-base lg:prose-lg max-w-none w-full overflow-x-auto"
                 style={{

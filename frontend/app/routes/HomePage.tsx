@@ -26,7 +26,7 @@ export default function HomePage() {
           </button>
         </div>
         {/* Right Side: Chip SVG Illustration */}
-        <div className="hidden md:flex flex-1 items-center justify-center">
+        <div className="hidden md:flex flex-1 items-center justify-center px-4 md:px-8">
           <ChipSVG className="w-96 h-96" />
         </div>
       </div>

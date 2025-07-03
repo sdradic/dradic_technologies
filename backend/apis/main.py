@@ -27,20 +27,20 @@ app = FastAPI(
 
 DRADIC_ENV = os.getenv("DRADIC__ENV")
 
-if DRADIC_ENV == "LOCAL":
-    allowed_origins = [
-        "http://localhost:3000",
-    ]
-else:
+if DRADIC_ENV != "LOCAL":
     allowed_origins = [
         "https://expense-tracker-kappa-livid.vercel.app",
         "https://dradic-technologies.vercel.app",
         "https://blog-cms-livid.vercel.app",
     ]
+else:
+    allowed_origins = [
+        "http://localhost:3000",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "Accept"],
@@ -70,6 +70,10 @@ async def get_current_user_global(request: Request) -> Optional[dict]:
     
     # Skip authentication for excluded paths
     if path in EXCLUDED_PATHS:
+        return None
+    
+    # Skip authentication for OPTIONS requests (CORS preflight)
+    if request.method == "OPTIONS":
         return None
     
     # Skip auth for specific blog post paths (if they're individual posts)
