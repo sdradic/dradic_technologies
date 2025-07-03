@@ -23,7 +23,7 @@ async def create_income(income: IncomeCreate):
         # Validate income source exists
         source_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.income_sources
+            FROM dradic_tech.income_sources
             WHERE id = :source_id
         """
         source_exists = DatabaseModel.execute_query(
@@ -64,10 +64,10 @@ async def get_incomes(
                 isc.name as source_name, isc.category as source_category,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
-            FROM tallyup.incomes i
-            JOIN tallyup.income_sources isc ON i.source_id = isc.id
-            JOIN tallyup.users u ON isc.user_id = u.id
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            JOIN dradic_tech.users u ON isc.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE 1=1
         """
         params = {}
@@ -106,9 +106,9 @@ async def get_incomes(
                 SUM(i.amount) as total_amount,
                 i.currency,
                 COUNT(*) as count
-            FROM tallyup.incomes i
-            JOIN tallyup.income_sources isc ON i.source_id = isc.id
-            JOIN tallyup.users u ON isc.user_id = u.id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE 1=1
         """
 
@@ -168,9 +168,9 @@ async def get_monthly_income_summary(
                 SUM(i.amount) as total_amount,
                 COUNT(*) as count,
                 isc.category
-            FROM tallyup.incomes i
-            JOIN tallyup.income_sources isc ON i.source_id = isc.id
-            JOIN tallyup.users u ON isc.user_id = u.id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE EXTRACT(YEAR FROM i.date) = :year
                 AND EXTRACT(MONTH FROM i.date) = :month
                 AND i.currency = :currency
@@ -227,10 +227,10 @@ async def get_income(income_id: str):
                 isc.name as source_name, isc.category as source_category,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
-            FROM tallyup.incomes i
-            JOIN tallyup.income_sources isc ON i.source_id = isc.id
-            JOIN tallyup.users u ON isc.user_id = u.id
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            JOIN dradic_tech.users u ON isc.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE i.id = :income_id
         """
         incomes = DatabaseModel.execute_query(query, {"income_id": income_id})
@@ -256,7 +256,7 @@ async def update_income(income_id: str, income: IncomeCreate):
         if income.source_id:
             source_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.income_sources
+                FROM dradic_tech.income_sources
                 WHERE id = :source_id
             """
             source_exists = DatabaseModel.execute_query(

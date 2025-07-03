@@ -16,7 +16,7 @@ async def create_user(user: UserCreate):
         # Check if email already exists
         email_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.users
+            FROM dradic_tech.users
             WHERE email = :email
         """
         email_exists = DatabaseModel.execute_query(
@@ -30,7 +30,7 @@ async def create_user(user: UserCreate):
         if user.group_id:
             group_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.groups
+                FROM dradic_tech.groups
                 WHERE id = :group_id
             """
             group_exists = DatabaseModel.execute_query(
@@ -60,8 +60,8 @@ async def get_users(group_id: Optional[UUID] = None):
             SELECT
                 u.id, u.name, u.email, u.created_at, u.group_id,
                 g.name as group_name, g.description as group_description
-            FROM tallyup.users u
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.users u
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
         """
         params = {}
 
@@ -88,8 +88,8 @@ async def get_user(user_id: str):
             SELECT
                 u.id, u.name, u.email, u.created_at, u.group_id,
                 g.name as group_name, g.description as group_description
-            FROM tallyup.users u
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.users u
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE u.id = :user_id
         """
         users = DatabaseModel.execute_query(query, {"user_id": user_id})
@@ -115,7 +115,7 @@ async def update_user(user: UserCreate):
         if user.group_id:
             group_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.groups
+                FROM dradic_tech.groups
                 WHERE id = :group_id
             """
             group_exists = DatabaseModel.execute_query(
@@ -148,7 +148,7 @@ async def delete_user(user_id: str):
         # Check if user has expense items
         expense_item_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.expense_items
+            FROM dradic_tech.expense_items
             WHERE user_id = :user_id
         """
         expense_items = DatabaseModel.execute_query(
@@ -183,8 +183,8 @@ async def get_user_expense_items(user_id: str):
         query = """
             SELECT ei.id, ei.name, ei.category, ei.is_fixed, ei.user_id,
                    u.name as user_name, u.email as user_email
-            FROM tallyup.expense_items ei
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expense_items ei
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE ei.user_id = :user_id
             ORDER BY ei.name
         """

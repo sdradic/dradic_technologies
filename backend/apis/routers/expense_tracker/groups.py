@@ -29,12 +29,12 @@ async def get_groups(user_id: Optional[str] = None):
     try:
         query = """
             SELECT id, name, description, created_at
-            FROM tallyup.groups
+            FROM dradic_tech.groups
             WHERE 1=1
             ORDER BY created_at DESC
         """
         if user_id:
-            query += " AND EXISTS (SELECT 1 FROM tallyup.users WHERE users.group_id = groups.id AND users.id = :user_id)"
+            query += " AND EXISTS (SELECT 1 FROM dradic_tech.users WHERE users.group_id = groups.id AND users.id = :user_id)"
             groups = DatabaseModel.execute_query(query, {"user_id": user_id})
         else:
             groups = DatabaseModel.execute_query(query)
@@ -52,7 +52,7 @@ async def get_group(group_id: UUID):
     try:
         query = """
             SELECT id, name, description, created_at
-            FROM tallyup.groups
+            FROM dradic_tech.groups
             WHERE id = :group_id
         """
         groups = DatabaseModel.execute_query(query, {"group_id": group_id})
@@ -97,7 +97,7 @@ async def delete_group(group_id: UUID):
         # Check if group has users
         user_check_query = """
             SELECT COUNT(*) as user_count
-            FROM tallyup.users
+            FROM dradic_tech.users
             WHERE group_id = :group_id
         """
         user_count = DatabaseModel.execute_query(
@@ -131,7 +131,7 @@ async def get_group_users(group_id: UUID):
     try:
         query = """
             SELECT u.id, u.name, u.email, u.created_at, u.group_id
-            FROM tallyup.users u
+            FROM dradic_tech.users u
             WHERE u.group_id = :group_id
             ORDER BY u.created_at DESC
         """

@@ -23,10 +23,10 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import func
 
 # Database connection
-SQLALCHEMY_DATABASE_URL = os.getenv("NEON_EXPENSE_DB_URL")
+SQLALCHEMY_DATABASE_URL = os.getenv("SUPABASE_DATABASE_URL")
 
 if not SQLALCHEMY_DATABASE_URL:
-    raise ValueError("NEON_EXPENSE_DB_URL environment variable is required")
+    raise ValueError("SUPABASE_DATABASE_URL environment variable is required")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -37,7 +37,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Define schema metadata
-metadata = MetaData(schema="tallyup")
+metadata = MetaData(schema="dradic_tech")
 
 # Define tables matching the migration schema
 groups_table = Table(
@@ -63,7 +63,7 @@ users_table = Table(
     Column(
         "group_id",
         PG_UUID(as_uuid=True),
-        ForeignKey("tallyup.groups.id"),
+        ForeignKey("dradic_tech.groups.id"),
         nullable=True,
     ),
 )
@@ -75,7 +75,7 @@ expense_items_table = Table(
     Column("name", String, nullable=False),
     Column("category", String),
     Column("is_fixed", Boolean, nullable=False, server_default=text("false")),
-    Column("user_id", String, ForeignKey("tallyup.users.id"), nullable=False),
+    Column("user_id", String, ForeignKey("dradic_tech.users.id"), nullable=False),
 )
 
 expenses_table = Table(
@@ -85,7 +85,7 @@ expenses_table = Table(
     Column(
         "item_id",
         PG_UUID(as_uuid=True),
-        ForeignKey("tallyup.expense_items.id"),
+        ForeignKey("dradic_tech.expense_items.id"),
         nullable=False,
     ),
     Column("date", Date, nullable=False),
@@ -103,7 +103,7 @@ income_sources_table = Table(
     Column("name", String, nullable=False),
     Column("category", String),
     Column("is_recurring", Boolean, nullable=False, server_default=text("true")),
-    Column("user_id", String, ForeignKey("tallyup.users.id"), nullable=False),
+    Column("user_id", String, ForeignKey("dradic_tech.users.id"), nullable=False),
     Column(
         "created_at", DateTime(timezone=True), server_default=func.now(), nullable=False
     ),
@@ -116,7 +116,7 @@ incomes_table = Table(
     "incomes",
     metadata,
     Column("id", String, primary_key=True),
-    Column("source_id", String, ForeignKey("tallyup.income_sources.id"), nullable=False),
+    Column("source_id", String, ForeignKey("dradic_tech.income_sources.id"), nullable=False),
     Column("amount", Float, nullable=False),
     Column("currency", String, nullable=False),
     Column("date", Date, nullable=False),

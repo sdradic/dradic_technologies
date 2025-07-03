@@ -21,7 +21,7 @@ async def create_expense_item(item: ExpenseItemCreate):
         # Validate user exists
         user_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.users
+            FROM dradic_tech.users
             WHERE id = :user_id
         """
         user_exists = DatabaseModel.execute_query(
@@ -58,8 +58,8 @@ async def get_expense_items(
             SELECT
                 ei.id, ei.name, ei.category, ei.is_fixed, ei.user_id,
                 u.name as user_name, u.email as user_email
-            FROM tallyup.expense_items ei
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expense_items ei
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE 1=1
         """
         params = {}
@@ -106,8 +106,8 @@ async def get_expense_item(item_id: UUID):
             SELECT
                 ei.id, ei.name, ei.category, ei.is_fixed, ei.user_id,
                 u.name as user_name, u.email as user_email
-            FROM tallyup.expense_items ei
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expense_items ei
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE ei.id = :item_id
         """
         items = DatabaseModel.execute_query(query, {"item_id": item_id})
@@ -133,7 +133,7 @@ async def update_expense_item(item_id: UUID, item: ExpenseItemCreate):
         if item.user_id:
             user_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.users
+                FROM dradic_tech.users
                 WHERE id = :user_id
             """
             user_exists = DatabaseModel.execute_query(
@@ -166,7 +166,7 @@ async def delete_expense_item(item_id: UUID):
         # Check if item has expenses
         expense_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.expenses
+            FROM dradic_tech.expenses
             WHERE item_id = :item_id
         """
         expenses = DatabaseModel.execute_query(
@@ -204,10 +204,10 @@ async def get_item_expenses(item_id: UUID, limit: int = 100, offset: int = 0):
                 ei.name as item_name, ei.category as item_category, ei.is_fixed as item_is_fixed,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE e.item_id = :item_id
             ORDER BY e.date DESC
             LIMIT :limit OFFSET :offset
@@ -231,7 +231,7 @@ async def get_categories(user_id: Optional[str] = None):
     try:
         query = """
             SELECT DISTINCT category
-            FROM tallyup.expense_items
+            FROM dradic_tech.expense_items
             WHERE category IS NOT NULL
         """
         params = {}

@@ -20,7 +20,7 @@ async def create_income_source(source: IncomeSourceCreate):
         # Validate user exists
         user_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.users
+            FROM dradic_tech.users
             WHERE id = :user_id
         """
         user_exists = DatabaseModel.execute_query(
@@ -56,8 +56,8 @@ async def get_income_sources(
                 isc.id, isc.name, isc.category, isc.is_recurring, isc.user_id,
                 isc.created_at, isc.updated_at,
                 u.name as user_name, u.email as user_email
-            FROM tallyup.income_sources isc
-            JOIN tallyup.users u ON isc.user_id = u.id
+            FROM dradic_tech.income_sources isc
+            JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE 1=1
         """
         params = {}
@@ -98,8 +98,8 @@ async def get_income_source(source_id: str):
                 isc.id, isc.name, isc.category, isc.is_recurring, isc.user_id,
                 isc.created_at, isc.updated_at,
                 u.name as user_name, u.email as user_email
-            FROM tallyup.income_sources isc
-            JOIN tallyup.users u ON isc.user_id = u.id
+            FROM dradic_tech.income_sources isc
+            JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE isc.id = :source_id
         """
         sources = DatabaseModel.execute_query(query, {"source_id": source_id})
@@ -125,7 +125,7 @@ async def update_income_source(source_id: str, source: IncomeSourceCreate):
         if source.user_id:
             user_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.users
+                FROM dradic_tech.users
                 WHERE id = :user_id
             """
             user_exists = DatabaseModel.execute_query(
@@ -160,7 +160,7 @@ async def delete_income_source(source_id: str):
         # Check if source has income records
         income_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.incomes
+            FROM dradic_tech.incomes
             WHERE source_id = :source_id
         """
         incomes = DatabaseModel.execute_query(

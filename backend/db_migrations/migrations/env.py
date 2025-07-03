@@ -16,7 +16,7 @@ target_metadata = Base.metadata  # Use the metadata from your models
 
 
 def get_url():
-    return os.getenv("NEON_EXPENSE_DB_URL")
+    return os.getenv("SUPABASE_DATABASE_URL")
 
 
 def run_migrations_offline() -> None:

@@ -13,20 +13,20 @@ from models import (
     AuthUser,
     AuthToken
 )
-from utils.firebase_service import firebase_service
+from utils.supabase_service import supabase_service
 
 blog_router = APIRouter()
 security = HTTPBearer()
 
 async def get_current_user(authorization: str = Header(None)) -> Optional[AuthUser]:
-    """Verify Firebase token and return user info"""
+    """Verify Supabase token and return user info"""
     if not authorization:
         return None
     
     try:
         # Extract token from "Bearer <token>"
         token = authorization.replace("Bearer ", "")
-        user_info = firebase_service.verify_token(token)
+        user_info = supabase_service.verify_token(token)
         
         if user_info:
             return AuthUser(**user_info)
@@ -75,13 +75,13 @@ def update_frontmatter_field(content: str, field: str, value: str) -> str:
 async def get_blog_posts():
     """Get all blog posts with metadata"""
     try:
-        post_slugs = firebase_service.list_blog_posts()
+        post_slugs = supabase_service.list_blog_posts()
         posts: List[BlogPost] = []
         
         for slug in post_slugs:
-            content = firebase_service.get_blog_post_content(slug)
+            content = supabase_service.get_blog_post_content(slug)
             if content:
-                metadata = firebase_service.parse_blog_post_metadata(content)
+                metadata = supabase_service.parse_blog_post_metadata(content)
                 
                 post = BlogPost(
                     slug=slug,
@@ -105,11 +105,11 @@ async def get_blog_posts():
 async def get_blog_post(slug: str):
     """Get a specific blog post by slug"""
     try:
-        content = firebase_service.get_blog_post_content(slug)
+        content = supabase_service.get_blog_post_content(slug)
         if not content:
             raise HTTPException(status_code=404, detail="Blog post not found")
         
-        metadata = firebase_service.parse_blog_post_metadata(content)
+        metadata = supabase_service.parse_blog_post_metadata(content)
         
         return BlogPost(
             slug=slug,
@@ -140,7 +140,7 @@ async def create_blog_post(
             )
         
         # Check if post already exists
-        existing_content = firebase_service.get_blog_post_content(post_data.slug)
+        existing_content = supabase_service.get_blog_post_content(post_data.slug)
         if existing_content:
             raise HTTPException(status_code=409, detail="Blog post with this slug already exists")
         
@@ -155,8 +155,8 @@ image: {post_data.image or ""}
 
 {post_data.content}"""
         
-        # Upload to Firebase
-        success = firebase_service.upload_blog_post(post_data.slug, frontmatter)
+        # Upload to Supabase
+        success = supabase_service.upload_blog_post(post_data.slug, frontmatter)
         if not success:
             raise HTTPException(status_code=500, detail="Failed to create blog post")
         
@@ -183,7 +183,7 @@ async def update_blog_post(
     """Update an existing blog post"""
     try:
         # Get existing post
-        existing_content = firebase_service.get_blog_post_content(slug)
+        existing_content = supabase_service.get_blog_post_content(slug)
         if not existing_content:
             raise HTTPException(status_code=404, detail="Blog post not found")
         
@@ -212,12 +212,12 @@ async def update_blog_post(
                 updated_content = post_data.content
         
         # Upload updated content
-        success = firebase_service.upload_blog_post(slug, updated_content)
+        success = supabase_service.upload_blog_post(slug, updated_content)
         if not success:
             raise HTTPException(status_code=500, detail="Failed to update blog post")
         
         # Parse and return updated post
-        metadata = firebase_service.parse_blog_post_metadata(updated_content)
+        metadata = supabase_service.parse_blog_post_metadata(updated_content)
         
         return BlogPost(
             slug=slug,
@@ -240,7 +240,7 @@ async def delete_blog_post(
 ):
     """Delete a blog post"""
     try:
-        success = firebase_service.delete_blog_post(slug)
+        success = supabase_service.delete_blog_post(slug)
         if not success:
             raise HTTPException(status_code=404, detail="Blog post not found")
         
@@ -253,9 +253,9 @@ async def delete_blog_post(
 
 @blog_router.post("/auth/verify")
 async def verify_auth_token(token_data: AuthToken):
-    """Verify Firebase authentication token"""
+    """Verify Supabase authentication token"""
     try:
-        user_info = firebase_service.verify_token(token_data.token)
+        user_info = supabase_service.verify_token(token_data.token)
         if not user_info:
             raise HTTPException(status_code=401, detail="Invalid or expired token")
         
@@ -270,13 +270,13 @@ async def verify_auth_token(token_data: AuthToken):
 async def get_blog_posts_metadata():
     """Get blog posts metadata only (without content)"""
     try:
-        post_slugs = firebase_service.list_blog_posts()
+        post_slugs = supabase_service.list_blog_posts()
         posts_metadata: List[BlogPostMetadata] = []
         
         for slug in post_slugs:
-            content = firebase_service.get_blog_post_content(slug)
+            content = supabase_service.get_blog_post_content(slug)
             if content:
-                metadata = firebase_service.parse_blog_post_metadata(content)
+                metadata = supabase_service.parse_blog_post_metadata(content)
                 
                 post_metadata = BlogPostMetadata(
                     slug=slug,

@@ -25,7 +25,7 @@ async def create_expense(expense: ExpenseCreate):
         # Validate expense item exists
         item_check_query = """
             SELECT COUNT(*) as count
-            FROM tallyup.expense_items
+            FROM dradic_tech.expense_items
             WHERE id = :item_id
         """
         item_exists = DatabaseModel.execute_query(
@@ -67,10 +67,10 @@ async def get_expenses(
                 ei.name as item_name, ei.category as item_category, ei.is_fixed as item_is_fixed,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE 1=1
         """
         params = {}
@@ -117,9 +117,9 @@ async def get_expenses(
                 SUM(e.amount) as total_amount,
                 e.currency,
                 COUNT(*) as count
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE 1=1
         """
 
@@ -177,10 +177,10 @@ async def get_expense(expense_id: UUID):
                 ei.name as item_name, ei.category as item_category, ei.is_fixed as item_is_fixed,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
-            LEFT JOIN tallyup.groups g ON u.group_id = g.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE e.id = :expense_id
         """
         expenses = DatabaseModel.execute_query(query, {"expense_id": expense_id})
@@ -206,7 +206,7 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate):
         if expense.item_id:
             item_check_query = """
                 SELECT COUNT(*) as count
-                FROM tallyup.expense_items
+                FROM dradic_tech.expense_items
                 WHERE id = :item_id
             """
             item_exists = DatabaseModel.execute_query(
@@ -271,9 +271,9 @@ async def get_monthly_summary(
                 ei.category,
                 SUM(e.amount) as total_amount,
                 COUNT(*) as count
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE EXTRACT(YEAR FROM e.date) = :year
             AND EXTRACT(MONTH FROM e.date) = :month
             AND e.currency = :currency
@@ -291,9 +291,9 @@ async def get_monthly_summary(
         # Calculate total
         total_query = """
             SELECT SUM(e.amount) as total_amount
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE EXTRACT(YEAR FROM e.date) = :year
             AND EXTRACT(MONTH FROM e.date) = :month
             AND e.currency = :currency
@@ -336,9 +336,9 @@ async def get_currencies(user_id: Optional[str] = None):
     try:
         query = """
             SELECT DISTINCT e.currency
-            FROM tallyup.expenses e
-            JOIN tallyup.expense_items ei ON e.item_id = ei.id
-            JOIN tallyup.users u ON ei.user_id = u.id
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
             WHERE 1=1
         """
         params = {}
