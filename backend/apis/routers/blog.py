@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.security import HTTPBearer
 from typing import List, Optional
 from datetime import datetime
@@ -14,31 +14,21 @@ from models import (
     AuthToken
 )
 from utils.supabase_service import supabase_service
+from utils.auth import get_current_user, get_current_user_optional
 
 blog_router = APIRouter()
 security = HTTPBearer()
 
-async def get_current_user(authorization: str = Header(None)) -> Optional[AuthUser]:
-    """Verify Supabase token and return user info"""
-    if not authorization:
-        return None
-    
-    try:
-        # Extract token from "Bearer <token>"
-        token = authorization.replace("Bearer ", "")
-        user_info = supabase_service.verify_token(token)
-        
-        if user_info:
-            return AuthUser(**user_info)
-        return None
-    except Exception as e:
-        return None
+async def require_auth(request: Request) -> AuthUser:
+    """Require authentication for protected endpoints and return AuthUser"""
+    user_info = await get_current_user(request)
+    return AuthUser(**user_info)
 
-def require_auth(user: Optional[AuthUser] = Depends(get_current_user)) -> AuthUser:
-    """Require authentication for protected routes"""
-    if not user:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    return user
+def validate_user_permissions(user: dict) -> bool:
+    """Validate if user has permissions to manage blog posts"""
+    # For now, any authenticated user can manage blog posts
+    # You can implement role-based permissions here
+    return True
 
 def update_frontmatter_field(content: str, field: str, value: str) -> str:
     """Update a specific field in the frontmatter"""
@@ -72,8 +62,8 @@ def update_frontmatter_field(content: str, field: str, value: str) -> str:
     return f"---{updated_frontmatter}---{body}"
 
 @blog_router.get("/posts", response_model=BlogPostResponse)
-async def get_blog_posts():
-    """Get all blog posts with metadata"""
+async def get_blog_posts(current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """Get all blog posts with metadata (public endpoint)"""
     try:
         post_slugs = supabase_service.list_blog_posts()
         posts: List[BlogPost] = []
@@ -102,8 +92,8 @@ async def get_blog_posts():
         raise HTTPException(status_code=500, detail=f"Failed to fetch blog posts: {str(e)}")
 
 @blog_router.get("/posts/{slug}", response_model=BlogPost)
-async def get_blog_post(slug: str):
-    """Get a specific blog post by slug"""
+async def get_blog_post(slug: str, current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """Get a specific blog post by slug (public endpoint)"""
     try:
         content = supabase_service.get_blog_post_content(slug)
         if not content:
@@ -130,8 +120,12 @@ async def create_blog_post(
     post_data: BlogPostCreate,
     user: AuthUser = Depends(require_auth)
 ):
-    """Create a new blog post"""
+    """Create a new blog post (requires authentication)"""
     try:
+        # Validate user permissions
+        if not validate_user_permissions(user.dict()):
+            raise HTTPException(status_code=403, detail="Insufficient permissions to create blog posts")
+        
         # Validate slug
         if not re.match(r'^[a-z0-9-]+$', post_data.slug):
             raise HTTPException(
@@ -180,52 +174,47 @@ async def update_blog_post(
     post_data: BlogPostUpdate,
     user: AuthUser = Depends(require_auth)
 ):
-    """Update an existing blog post"""
+    """Update an existing blog post (requires authentication)"""
     try:
-        # Get existing post
+        # Validate user permissions
+        if not validate_user_permissions(user.dict()):
+            raise HTTPException(status_code=403, detail="Insufficient permissions to update blog posts")
+        
+        # Check if post exists
         existing_content = supabase_service.get_blog_post_content(slug)
         if not existing_content:
             raise HTTPException(status_code=404, detail="Blog post not found")
         
-        updated_content = existing_content
+        # Parse existing metadata
+        existing_metadata = supabase_service.parse_blog_post_metadata(existing_content)
+        
+        # Update frontmatter
         now = datetime.now().isoformat()
+        updated_title = post_data.title if post_data.title is not None else existing_metadata.get("title", "Untitled")
+        updated_image = post_data.image if post_data.image is not None else existing_metadata.get("image", "")
+        updated_content = post_data.content if post_data.content is not None else existing_content
         
-        # Update fields if provided
-        if post_data.title is not None:
-            updated_content = update_frontmatter_field(updated_content, "title", post_data.title)
+        frontmatter = f"""---
+title: {updated_title}
+created_at: {existing_metadata.get("created_at", now)}
+updated_at: {now}
+image: {updated_image}
+---
+
+{updated_content.split('---', 2)[-1].strip() if '---' in updated_content else updated_content}"""
         
-        if post_data.image is not None:
-            updated_content = update_frontmatter_field(updated_content, "image", post_data.image)
-        
-        # Always update the updated_at timestamp
-        updated_content = update_frontmatter_field(updated_content, "updated_at", now)
-        
-        # Update content if provided
-        if post_data.content is not None:
-            # Extract frontmatter and replace body
-            if updated_content.startswith("---"):
-                end_index = updated_content.find("---", 3)
-                if end_index != -1:
-                    frontmatter_part = updated_content[:end_index + 3]
-                    updated_content = f"{frontmatter_part}\n\n{post_data.content}"
-            else:
-                updated_content = post_data.content
-        
-        # Upload updated content
-        success = supabase_service.upload_blog_post(slug, updated_content)
+        # Upload to Supabase
+        success = supabase_service.upload_blog_post(slug, frontmatter)
         if not success:
             raise HTTPException(status_code=500, detail="Failed to update blog post")
         
-        # Parse and return updated post
-        metadata = supabase_service.parse_blog_post_metadata(updated_content)
-        
         return BlogPost(
             slug=slug,
-            title=metadata.get("title", "Untitled"),
-            created_at=metadata.get("created_at", now),
-            updated_at=metadata.get("updated_at", now),
-            image=metadata.get("image", ""),
-            content=updated_content
+            title=updated_title,
+            created_at=existing_metadata.get("created_at", now),
+            updated_at=now,
+            image=updated_image,
+            content=frontmatter
         )
     
     except HTTPException:
@@ -238,11 +227,21 @@ async def delete_blog_post(
     slug: str,
     user: AuthUser = Depends(require_auth)
 ):
-    """Delete a blog post"""
+    """Delete a blog post (requires authentication)"""
     try:
+        # Validate user permissions
+        if not validate_user_permissions(user.dict()):
+            raise HTTPException(status_code=403, detail="Insufficient permissions to delete blog posts")
+        
+        # Check if post exists
+        existing_content = supabase_service.get_blog_post_content(slug)
+        if not existing_content:
+            raise HTTPException(status_code=404, detail="Blog post not found")
+        
+        # Delete from Supabase
         success = supabase_service.delete_blog_post(slug)
         if not success:
-            raise HTTPException(status_code=404, detail="Blog post not found")
+            raise HTTPException(status_code=500, detail="Failed to delete blog post")
         
         return {"message": f"Blog post '{slug}' deleted successfully"}
     
@@ -267,8 +266,8 @@ async def verify_auth_token(token_data: AuthToken):
         raise HTTPException(status_code=500, detail=f"Token verification failed: {str(e)}")
 
 @blog_router.get("/posts-metadata", response_model=List[BlogPostMetadata])
-async def get_blog_posts_metadata():
-    """Get blog posts metadata only (without content)"""
+async def get_blog_posts_metadata(current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """Get blog posts metadata only (without content) (public endpoint)"""
     try:
         post_slugs = supabase_service.list_blog_posts()
         posts_metadata: List[BlogPostMetadata] = []

@@ -1,7 +1,7 @@
 import os
 import jwt
 from typing import Optional, Dict, Any
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from supabase import create_client, Client
 
 async def get_credentials_from_token(token: str) -> Optional[Dict[str, Any]]:
@@ -38,19 +38,13 @@ async def get_credentials_from_token(token: str) -> Optional[Dict[str, Any]]:
         print(f"Token verification failed: {e}")
         return None
 
-async def verify_user_access(token: str, required_role: str = "authenticated") -> Dict[str, Any]:
-    """
-    Verify user has required access level
-    """
-    credentials = await get_credentials_from_token(token)
-    
-    if not credentials:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
-    user_role = credentials.get("role", "")
-    
-    # Basic role checking (you can expand this logic)
-    if required_role == "admin" and user_role != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
-    return credentials
+async def get_current_user(request: Request) -> dict:
+    """Get the current authenticated user from request state"""
+    user = getattr(request.state, 'current_user', None)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return user
+
+async def get_current_user_optional(request: Request) -> Optional[dict]:
+    """Get the current user if authenticated, None otherwise"""
+    return getattr(request.state, 'current_user', None)

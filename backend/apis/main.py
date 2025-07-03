@@ -1,16 +1,23 @@
 import os
-from typing import Any
+from typing import Any, Optional
 from dotenv import load_dotenv
 from datetime import datetime, timezone
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
+import logging
 
 from routers.expense_tracker import expense_items, expenses, groups, users, incomes, income_sources
 from routers.blog import blog_router
+from utils.auth import get_credentials_from_token
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Dradic Technologies API",
@@ -39,6 +46,94 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
+# Security scheme
+security = HTTPBearer()
+
+# Paths that don't require authentication
+EXCLUDED_PATHS = {
+    "/",
+    "/health",
+    "/docs",
+    "/redoc",
+    "/openapi.json",
+}
+
+# Paths that allow optional authentication (like public blog posts)
+OPTIONAL_AUTH_PATHS = {
+    "/api/blog/posts",
+    "/api/blog/posts-metadata",
+}
+
+async def get_current_user_global(request: Request) -> Optional[dict]:
+    """Global authentication dependency that checks all requests"""
+    path = request.url.path
+    
+    # Skip authentication for excluded paths
+    if path in EXCLUDED_PATHS:
+        return None
+    
+    # Skip auth for specific blog post paths (if they're individual posts)
+    if path.startswith("/api/blog/posts/") and request.method == "GET":
+        return None
+    
+    # Get authorization header
+    authorization = request.headers.get("Authorization")
+    
+    # For optional auth paths, don't require auth but try to get user if present
+    if path in OPTIONAL_AUTH_PATHS and request.method == "GET":
+        if not authorization:
+            return None
+        try:
+            token = authorization.replace("Bearer ", "")
+            user_info = await get_credentials_from_token(token)
+            return user_info
+        except Exception as e:
+            logger.warning(f"Optional auth failed for {path}: {e}")
+            return None
+    
+    # For all other API paths, require authentication
+    if path.startswith("/api/"):
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        
+        try:
+            token = authorization.replace("Bearer ", "")
+            user_info = await get_credentials_from_token(token)
+            if not user_info:
+                raise HTTPException(status_code=401, detail="Invalid or expired token")
+            return user_info
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Authentication error for {path}: {e}")
+            raise HTTPException(status_code=401, detail="Authentication failed")
+    
+    return None
+
+# Add authentication middleware
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    """Middleware to handle authentication globally"""
+    try:
+        # Get current user (this will raise HTTPException if auth fails)
+        user = await get_current_user_global(request)
+        
+        # Store user info in request state for use in endpoints
+        request.state.current_user = user
+        
+        response = await call_next(request)
+        return response
+    except HTTPException as http_exc:
+        return JSONResponse(
+            status_code=http_exc.status_code,
+            content={"detail": http_exc.detail}
+        )
+    except Exception as exc:
+        logger.error(f"Middleware error: {exc}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error"}
+        )
 
 # Add error handling middleware
 @app.middleware("http")
@@ -46,6 +141,7 @@ async def errors_handling(request: Any, call_next):
     try:
         return await call_next(request)
     except Exception as exc:
+        logger.error(f"Unhandled error: {exc}")
         return JSONResponse(
             status_code=500,
             content={"detail": str(exc)},
@@ -61,7 +157,6 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
-
 
 # Include routers
 app.include_router(

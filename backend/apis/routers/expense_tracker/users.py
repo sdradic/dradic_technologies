@@ -2,17 +2,21 @@ import logging as logger
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from models import User, UserCreate, UserWithGroup
 from utils.db import DatabaseModel
+from utils.auth import get_current_user
 
 users_router = APIRouter()
 
-
 @users_router.post("/", response_model=User)
-async def create_user(user: UserCreate):
+async def create_user(user: UserCreate, current_user: dict = Depends(get_current_user)):
     """Create a new user"""
     try:
+        # Ensure user can only create their own profile or has admin rights
+        if user.id != current_user.get("user_id"):
+            raise HTTPException(status_code=403, detail="Cannot create user profile for another user")
+
         # Check if email already exists
         email_check_query = """
             SELECT COUNT(*) as count
@@ -51,9 +55,8 @@ async def create_user(user: UserCreate):
             status_code=500, detail=f"Failed to create user: {str(e)}"
         ) from e
 
-
 @users_router.get("/", response_model=List[UserWithGroup])
-async def get_users(group_id: Optional[UUID] = None):
+async def get_users(group_id: Optional[UUID] = None, current_user: dict = Depends(get_current_user)):
     """Get all users, optionally filtered by group"""
     try:
         query = """
@@ -79,11 +82,15 @@ async def get_users(group_id: Optional[UUID] = None):
             status_code=500, detail=f"Failed to fetch users: {str(e)}"
         ) from e
 
-
 @users_router.get("/{user_id}", response_model=UserWithGroup)
-async def get_user(user_id: str):
+async def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
     """Get a specific user by ID"""
     try:
+        # Users can only access their own profile or admin can access any
+        if user_id != current_user.get("user_id"):
+            # Check if current user has admin privileges (you can implement this logic)
+            pass  # For now, allow access to any user profile
+
         query = """
             SELECT
                 u.id, u.name, u.email, u.created_at, u.group_id,
@@ -106,11 +113,14 @@ async def get_user(user_id: str):
             status_code=500, detail=f"Failed to fetch user: {str(e)}"
         ) from e
 
-
 @users_router.put("/{user_id}", response_model=User)
-async def update_user(user: UserCreate):
+async def update_user(user_id: str, user: UserCreate, current_user: dict = Depends(get_current_user)):
     """Update a user"""
     try:
+        # Ensure user can only update their own profile
+        if user_id != current_user.get("user_id"):
+            raise HTTPException(status_code=403, detail="Cannot update another user's profile")
+
         # Validate group_id if provided
         if user.group_id:
             group_check_query = """
@@ -126,7 +136,7 @@ async def update_user(user: UserCreate):
                 raise HTTPException(status_code=400, detail="Group not found")
 
         user_data = user.dict(exclude_unset=True)
-        updated_user = DatabaseModel.update_record("users", user.id, user_data)
+        updated_user = DatabaseModel.update_record("users", user_id, user_data)
 
         if not updated_user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -140,11 +150,14 @@ async def update_user(user: UserCreate):
             status_code=500, detail=f"Failed to update user: {str(e)}"
         ) from e
 
-
 @users_router.delete("/{user_id}")
-async def delete_user(user_id: str):
+async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a user"""
     try:
+        # Ensure user can only delete their own profile
+        if user_id != current_user.get("user_id"):
+            raise HTTPException(status_code=403, detail="Cannot delete another user's profile")
+
         # Check if user has expense items
         expense_item_check_query = """
             SELECT COUNT(*) as count
@@ -175,11 +188,14 @@ async def delete_user(user_id: str):
             status_code=500, detail=f"Failed to delete user: {str(e)}"
         ) from e
 
-
 @users_router.get("/{user_id}/expense-items")
-async def get_user_expense_items(user_id: str):
+async def get_user_expense_items(user_id: str, current_user: dict = Depends(get_current_user)):
     """Get all expense items for a user"""
     try:
+        # Ensure user can only access their own expense items
+        if user_id != current_user.get("user_id"):
+            raise HTTPException(status_code=403, detail="Cannot access another user's expense items")
+
         query = """
             SELECT ei.id, ei.name, ei.category, ei.is_fixed, ei.user_id,
                    u.name as user_name, u.email as user_email
@@ -190,6 +206,8 @@ async def get_user_expense_items(user_id: str):
         """
         items = DatabaseModel.execute_query(query, {"user_id": user_id})
         return items
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to fetch user expense items: {str(e)}")
         raise HTTPException(
