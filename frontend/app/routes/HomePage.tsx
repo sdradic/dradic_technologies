@@ -9,8 +9,8 @@ export default function HomePage() {
   return (
     <div className="inverse-gradient-background min-h-screen flex flex-col justify-between">
       <Navbar />
-      <div className="flex flex-col md:flex-row">
-        <div className="flex flex-col w-full justify-center items-center md:items-start px-4 md:px-8">
+      <div className="flex flex-col md:flex-row max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col w-full justify-center items-center md:items-start">
           <SectionHeader
             title="Innovating Electronics & IoT Solutions"
             className="text-center md:text-left"
@@ -26,7 +26,7 @@ export default function HomePage() {
           </button>
         </div>
         {/* Right Side: Chip SVG Illustration */}
-        <div className="hidden md:flex flex-1 items-center justify-center px-4 md:px-8">
+        <div className="hidden md:flex flex-1 items-center justify-center">
           <ChipSVG className="w-96 h-96" />
         </div>
       </div>
