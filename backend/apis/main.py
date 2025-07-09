@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.security import HTTPBearer
 import logging
 
@@ -156,6 +156,12 @@ async def errors_handling(request: Any, call_next):
 @app.get("/")
 async def root():
     return {"message": "Welcome to Dradic Technologies Unified API"}
+
+# Favicon endpoint to prevent 404 errors
+@app.get("/favicon.ico")
+async def favicon():
+    """Return an empty response for favicon requests to prevent 404 errors"""
+    return Response(status_code=204)
 
 # Health check endpoint
 @app.get("/health")
