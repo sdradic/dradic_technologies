@@ -1,0 +1,67 @@
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+
+import "./app.css";
+import Loader from "./components/Loader";
+import { AuthProvider } from "./contexts/AuthContext";
+
+export function HydrateFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
+      <Loader showText={true} />
+    </div>
+  );
+}
+
+export function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className="inverse-gradient-background min-h-screen">
+      <head>
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          .fade-enter {
+            opacity: 0;
+          }
+          .fade-enter-active {
+            opacity: 1;
+            transition: opacity 300ms ease-in;
+          }
+          `}</style>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="description"
+          content="Dradic Blog CMS is a CMS for the Dradic Blog."
+        />
+        <meta
+          name="keywords"
+          content="Dradic Technologies, Dradic, Technologies, IoT, Electronics, Embedded Systems, Hardware, Software, Blog, CMS"
+        />
+        <meta name="title" content="Dradic Blog CMS" />
+        <Meta />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap"
+          rel="stylesheet"
+        ></link>
+        <Links />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return (
+    <RootLayout>
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
+    </RootLayout>
+  );
+}
