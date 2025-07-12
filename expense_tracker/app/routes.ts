@@ -4,7 +4,6 @@ export default [
   route("*", "routes/404.tsx", { index: true }),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
-  route("signup", "routes/signup.tsx"),
   route("", "routes/_layout.tsx", [
     route("", "routes/dashboard.tsx"),
     route("about", "routes/about.tsx"),

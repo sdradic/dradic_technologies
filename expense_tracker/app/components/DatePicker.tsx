@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { CalendarIcon, LeftArrowIcon, RightArrowIcon } from "./Icons";
 
 interface DatePickerProps {
   value: string;
@@ -21,6 +22,7 @@ export const DatePicker = ({
   const [selectedDate, setSelectedDate] = useState<Date>(
     value ? new Date(value) : new Date()
   );
+  const [shouldFlip, setShouldFlip] = useState<boolean>(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +38,30 @@ export const DatePicker = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const checkPosition = () => {
+    if (datePickerRef.current) {
+      const rect = datePickerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 280; // Approximate height of the calendar dropdown
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      // If there's not enough space below but enough space above, flip the dropdown
+      setShouldFlip(spaceBelow < dropdownHeight && spaceAbove > dropdownHeight);
+    }
+  };
+
+  const handleToggle = () => {
+    if (disabled) return;
+
+    if (!isOpen) {
+      // Check position before opening
+      setTimeout(checkPosition, 0);
+    }
+
+    setIsOpen(!isOpen);
+  };
 
   const formatDate = (date: Date) => {
     return date.toISOString().split("T")[0];
@@ -73,7 +99,7 @@ export const DatePicker = ({
             isSelected
               ? "bg-primary-600 text-white"
               : "hover:bg-gray-100 dark:hover:bg-gray-700"
-          } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          } ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           onClick={() => !isDisabled && handleDateSelect(date)}
           disabled={isDisabled}
         >
@@ -91,33 +117,27 @@ export const DatePicker = ({
       ref={datePickerRef}
     >
       <div
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className={`w-full px-4 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
           disabled ? "cursor-not-allowed" : "cursor-pointer"
         }`}
       >
         <div className="flex items-center justify-between">
           <span className="block truncate">{value || "Select a date"}</span>
-          <svg
+          <CalendarIcon
             className={`w-5 h-5 ml-2 transition-transform duration-200 ${
               isOpen ? "transform rotate-180" : ""
             }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+          />
         </div>
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
+        <div
+          className={`absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg ${
+            shouldFlip ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
+        >
           <div className="p-2">
             <div className="flex justify-between items-center mb-2">
               <button
@@ -127,22 +147,10 @@ export const DatePicker = ({
                   newDate.setMonth(newDate.getMonth() - 1);
                   setSelectedDate(newDate);
                 }}
-                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 disabled={disabled}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
+                <LeftArrowIcon className="w-5 h-5" />
               </button>
               <div className="text-sm ">
                 {selectedDate.toLocaleString("default", {
@@ -157,22 +165,10 @@ export const DatePicker = ({
                   newDate.setMonth(newDate.getMonth() + 1);
                   setSelectedDate(newDate);
                 }}
-                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 disabled={disabled}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                <RightArrowIcon className="w-5 h-5" />
               </button>
             </div>
             <div className="grid grid-cols-7 gap-1">

@@ -4,6 +4,7 @@ import { TallyUpLogo } from "~/components/Icons";
 import { useTheme } from "~/contexts/ThemeContext";
 import { useState, useEffect } from "react";
 import { ErrorXIcon } from "~/components/Icons";
+import Loader from "~/components/Loader";
 
 export default function Login() {
   const { login, handleGuestLogin, isLoading, isAuthenticated } = useAuth();
@@ -111,42 +112,41 @@ export default function Login() {
               />
             </div>
           </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative cursor-pointer w-full flex justify-center py-2 px-4 border border-transparent text-sm  rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className={`btn-primary-long dark:text-white ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader
+                loaderSize={[4, 4]}
+                loaderColor="border-white dark:border-primary-600"
+              />
+            ) : (
+              "Sign in"
+            )}
+          </button>
         </form>
         <div className="flex flex-row w-full items-center justify-center gap-4 mt-2">
           <div className="separator"></div>
           <div className="text-sm text-gray-500 dark:text-gray-500">Or</div>
           <div className="separator"></div>
         </div>
-        <div
-          className="btn-secondary-long mt-6 mb-4"
+        <button
+          className={`btn-secondary-long ${
+            isGuestLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={isGuestLoading}
           onClick={handleGuest}
-          style={{
-            cursor: isLoading ? "not-allowed" : "pointer",
-            opacity: isLoading ? 0.7 : 1,
-          }}
         >
-          {isGuestLoading ? "Loading..." : "Continue as guest"}
-        </div>
-        <div className="flex flex-row items-center justify-center gap-2 mb-2">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Don't have an account?
-          </div>
-          <a
-            href="/signup"
-            className="text-sm text-primary-500 dark:text-dark-100 cursor-pointer hover:text-primary-600 dark:hover:text-dark-50"
-          >
-            Sign up
-          </a>
-        </div>
+          {isGuestLoading ? (
+            <Loader loaderSize={[4, 4]} />
+          ) : (
+            "Continue as guest"
+          )}
+        </button>
       </div>
     </div>
   );

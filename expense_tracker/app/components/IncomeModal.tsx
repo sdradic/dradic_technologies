@@ -279,7 +279,7 @@ const IncomeModal = ({
                 <button
                   type="button"
                   onClick={() => setShowCreateSource(true)}
-                  className="w-full flex items-center justify-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm cursor-pointer"
+                  className="btn-secondary-long"
                   disabled={isLoading}
                 >
                   <PlusIconOutline className="w-4 h-4" />
@@ -287,7 +287,7 @@ const IncomeModal = ({
                 </button>
               </div>
             ) : (
-              <div className="space-y-3 p-3 border border-gray-200 rounded-lg">
+              <div className="space-y-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <div>
                   <label className="block text-sm text-gray-500 mb-1">
                     Source Name *
