@@ -9,7 +9,7 @@
     "expense_tracker"
   ],
   "scripts": {
-    "backend:dev": "cd unified_backend/apis && bash run_local.sh",
+    "backend:dev": "cd unified_backend/apis && uv run uvicorn main:app --reload",
     "backend:install": "cd unified_backend/apis && uv sync",
     "start": "./scripts/start.sh"
   },

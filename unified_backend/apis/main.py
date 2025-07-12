@@ -21,18 +21,18 @@ app = FastAPI(
     version="1.0.0",
 )
 
-DRADIC_ENV = os.getenv("DRADIC__ENV")
+DRADIC_ENV = os.getenv("DRADIC__ENV", "DEV")
 
-if DRADIC_ENV != "LOCAL":
-    allowed_origins = [
-        "https://expense-tracker-kappa-livid.vercel.app",
-        "https://dradic-technologies.vercel.app",
-        "https://blog-cms-livid.vercel.app",
-    ]
-else:
-    allowed_origins = [
+allowed_origins = [
+    "https://expense-tracker-kappa-livid.vercel.app",
+    "https://dradic-technologies.vercel.app",
+    "https://blog-cms-livid.vercel.app",
+]
+
+if DRADIC_ENV == "LOCAL":
+    allowed_origins.extend([
         "http://localhost:3000",
-    ]
+    ])
 
 app.add_middleware(
     CORSMiddleware,

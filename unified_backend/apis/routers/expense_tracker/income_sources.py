@@ -18,7 +18,7 @@ async def create_income_source(source: IncomeSourceCreate, current_user: dict = 
     """Create a new income source"""
     try:
         # Ensure user can only create income sources for themselves
-        if source.user_id != current_user.get("user_id"):
+        if source.user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot create income source for another user")
 
         # Validate user exists
@@ -53,13 +53,13 @@ async def get_income_sources(
 ):
     """Get income sources with optional filters"""
     try:
-        # If user_id is specified, ensure it matches the current user
-        if user_id and user_id != current_user.get("user_id"):
+                # If user_id is specified, ensure it matches the current user
+        if user_id and user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's income sources")
-        
+
         # If no user_id is specified, default to current user's income sources
         if not user_id:
-            user_id = current_user.get("user_id")
+            user_id = current_user.get("uid")
 
         # Build the query with filters
         query = """
@@ -108,7 +108,7 @@ async def get_income_source(source_id: UUID, current_user: dict = Depends(get_cu
         source = sources[0]
         
         # Ensure user can only access their own income sources
-        if source["user_id"] != current_user.get("user_id"):
+        if source["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's income source")
 
         return IncomeSourceWithUser(**source)
@@ -133,11 +133,11 @@ async def update_income_source(source_id: UUID, source: IncomeSourceCreate, curr
         if not existing_sources:
             raise HTTPException(status_code=404, detail="Income source not found")
         
-        if existing_sources[0]["user_id"] != current_user.get("user_id"):
+        if existing_sources[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot update another user's income source")
 
         # Ensure the user_id in the update matches the current user
-        if source.user_id != current_user.get("user_id"):
+        if source.user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot change income source ownership")
 
         # Validate user exists if user_id is being changed
@@ -182,7 +182,7 @@ async def delete_income_source(source_id: UUID, current_user: dict = Depends(get
         if not existing_sources:
             raise HTTPException(status_code=404, detail="Income source not found")
         
-        if existing_sources[0]["user_id"] != current_user.get("user_id"):
+        if existing_sources[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot delete another user's income source")
 
         # Check if source has incomes
@@ -228,7 +228,7 @@ async def get_source_incomes(source_id: UUID, limit: int = 100, offset: int = 0,
         if not sources:
             raise HTTPException(status_code=404, detail="Income source not found")
         
-        if sources[0]["user_id"] != current_user.get("user_id"):
+        if sources[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's income source")
 
         query = """
@@ -264,7 +264,7 @@ async def get_source_incomes(source_id: UUID, limit: int = 100, offset: int = 0,
 async def get_categories(current_user: dict = Depends(get_current_user)):
     """Get all unique categories"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
 
         query = """
             SELECT DISTINCT category

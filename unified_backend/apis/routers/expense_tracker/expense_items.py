@@ -19,7 +19,7 @@ async def create_expense_item(item: ExpenseItemCreate, current_user: dict = Depe
     """Create a new expense item"""
     try:
         # Ensure user can only create expense items for themselves
-        if item.user_id != current_user.get("user_id"):
+        if item.user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot create expense item for another user")
 
         # Validate user exists
@@ -58,12 +58,12 @@ async def get_expense_items(
     """Get expense items with optional filters"""
     try:
         # If user_id is specified, ensure it matches the current user
-        if user_id and user_id != current_user.get("user_id"):
+        if user_id and user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's expense items")
         
         # If no user_id is specified, default to current user's items
         if not user_id:
-            user_id = current_user.get("user_id")
+            user_id = current_user.get("uid")
 
         # Build the query with filters
         query = """
@@ -127,7 +127,7 @@ async def get_expense_item(item_id: UUID, current_user: dict = Depends(get_curre
         item = items[0]
         
         # Ensure user can only access their own expense items
-        if item["user_id"] != current_user.get("user_id"):
+        if item["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's expense item")
 
         return ExpenseItemWithUser(**item)
@@ -152,11 +152,11 @@ async def update_expense_item(item_id: UUID, item: ExpenseItemCreate, current_us
         if not existing_items:
             raise HTTPException(status_code=404, detail="Expense item not found")
         
-        if existing_items[0]["user_id"] != current_user.get("user_id"):
+        if existing_items[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot update another user's expense item")
 
         # Ensure the user_id in the update matches the current user
-        if item.user_id != current_user.get("user_id"):
+        if item.user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot change expense item ownership")
 
         # Validate user exists if user_id is being changed
@@ -201,7 +201,7 @@ async def delete_expense_item(item_id: UUID, current_user: dict = Depends(get_cu
         if not existing_items:
             raise HTTPException(status_code=404, detail="Expense item not found")
         
-        if existing_items[0]["user_id"] != current_user.get("user_id"):
+        if existing_items[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot delete another user's expense item")
 
         # Check if item has expenses
@@ -247,7 +247,7 @@ async def get_item_expenses(item_id: UUID, limit: int = 100, offset: int = 0, cu
         if not items:
             raise HTTPException(status_code=404, detail="Expense item not found")
         
-        if items[0]["user_id"] != current_user.get("user_id"):
+        if items[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's expense item")
 
         query = """
@@ -283,12 +283,12 @@ async def get_categories(user_id: Optional[str] = None, current_user: dict = Dep
     """Get all unique categories"""
     try:
         # If user_id is specified, ensure it matches the current user
-        if user_id and user_id != current_user.get("user_id"):
+        if user_id and user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's categories")
         
         # If no user_id is specified, default to current user's categories
         if not user_id:
-            user_id = current_user.get("user_id")
+            user_id = current_user.get("uid")
 
         query = """
             SELECT DISTINCT category

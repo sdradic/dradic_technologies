@@ -33,7 +33,7 @@ async def create_expense(expense: ExpenseCreate, current_user: dict = Depends(ge
         if not item_result:
             raise HTTPException(status_code=400, detail="Expense item not found")
         
-        if item_result[0]["user_id"] != current_user.get("user_id"):
+        if item_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot create expense for another user's item")
 
         expense_data = expense.dict()
@@ -62,12 +62,12 @@ async def get_expenses(
     """Get expenses with optional filters"""
     try:
         # If user_id is specified, ensure it matches the current user
-        if user_id and user_id != current_user.get("user_id"):
+        if user_id and user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's expenses")
         
         # If no user_id is specified, default to current user's expenses
         if not user_id:
-            user_id = current_user.get("user_id")
+            user_id = current_user.get("uid")
 
         # Build the query with filters
         query = """
@@ -203,7 +203,7 @@ async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current
                 WHERE e.id = :expense_id
             """
             user_result = DatabaseModel.execute_query(user_check_query, {"expense_id": expense_id})
-            if user_result and user_result[0]["user_id"] != current_user.get("user_id"):
+            if user_result and user_result[0]["user_id"] != current_user.get("uid"):
                 raise HTTPException(status_code=403, detail="Cannot access another user's expense")
 
         return ExpenseWithDetails(**expense)
@@ -230,7 +230,7 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user:
         if not existing_result:
             raise HTTPException(status_code=404, detail="Expense not found")
         
-        if existing_result[0]["user_id"] != current_user.get("user_id"):
+        if existing_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot update another user's expense")
 
         # Validate expense item exists and belongs to current user if item_id is being changed
@@ -245,7 +245,7 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user:
             if not item_result:
                 raise HTTPException(status_code=400, detail="Expense item not found")
             
-            if item_result[0]["user_id"] != current_user.get("user_id"):
+            if item_result[0]["user_id"] != current_user.get("uid"):
                 raise HTTPException(status_code=403, detail="Cannot assign expense to another user's item")
 
         expense_data = expense.dict(exclude_unset=True)
@@ -280,7 +280,7 @@ async def delete_expense(expense_id: UUID, current_user: dict = Depends(get_curr
         if not existing_result:
             raise HTTPException(status_code=404, detail="Expense not found")
         
-        if existing_result[0]["user_id"] != current_user.get("user_id"):
+        if existing_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot delete another user's expense")
 
         deleted = DatabaseModel.delete_record("expenses", expense_id)
@@ -312,7 +312,7 @@ async def get_monthly_summary(
                 status_code=400, detail="Month must be between 1 and 12"
             )
 
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
 
         # Base query for monthly summary
         query = """
@@ -376,7 +376,7 @@ async def get_monthly_summary(
 async def get_currencies(current_user: dict = Depends(get_current_user)):
     """Get all unique currencies used in expenses"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         query = """
             SELECT DISTINCT e.currency

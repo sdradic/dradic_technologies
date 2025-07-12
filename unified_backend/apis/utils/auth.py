@@ -25,7 +25,7 @@ async def get_credentials_from_token(token: str) -> Optional[Dict[str, Any]]:
         
         if user:
             return {
-                "user_id": user.id,
+                "uid": user.id,
                 "email": user.email,
                 "name": user.user_metadata.get("name", ""),
                 "email_verified": user.email_confirmed_at is not None,

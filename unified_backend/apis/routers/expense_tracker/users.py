@@ -14,7 +14,7 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
     """Create a new user"""
     try:
         # Ensure user can only create their own profile or has admin rights
-        if user.id != current_user.get("user_id"):
+        if user.id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot create user profile for another user")
 
         # Check if email already exists
@@ -87,7 +87,7 @@ async def get_user(user_id: str, current_user: dict = Depends(get_current_user))
     """Get a specific user by ID"""
     try:
         # Users can only access their own profile or admin can access any
-        if user_id != current_user.get("user_id"):
+        if user_id != current_user.get("uid"):
             # Check if current user has admin privileges (you can implement this logic)
             pass  # For now, allow access to any user profile
 
@@ -118,7 +118,7 @@ async def update_user(user_id: str, user: UserCreate, current_user: dict = Depen
     """Update a user"""
     try:
         # Ensure user can only update their own profile
-        if user_id != current_user.get("user_id"):
+        if user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot update another user's profile")
 
         # Validate group_id if provided
@@ -155,7 +155,7 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     """Delete a user"""
     try:
         # Ensure user can only delete their own profile
-        if user_id != current_user.get("user_id"):
+        if user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot delete another user's profile")
 
         # Check if user has expense items
@@ -193,7 +193,7 @@ async def get_user_expense_items(user_id: str, current_user: dict = Depends(get_
     """Get all expense items for a user"""
     try:
         # Ensure user can only access their own expense items
-        if user_id != current_user.get("user_id"):
+        if user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's expense items")
 
         query = """

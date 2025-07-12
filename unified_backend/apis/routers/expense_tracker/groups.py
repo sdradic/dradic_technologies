@@ -26,7 +26,7 @@ async def create_group(group: GroupCreate, current_user: dict = Depends(get_curr
 async def get_groups(current_user: dict = Depends(get_current_user)):
     """Get all groups that the current user has access to"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Get groups that the user belongs to or all groups (you can customize this logic)
         query = """
@@ -48,7 +48,7 @@ async def get_groups(current_user: dict = Depends(get_current_user)):
 async def get_group(group_id: UUID, current_user: dict = Depends(get_current_user)):
     """Get a specific group by ID"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Check if user has access to this group
         access_query = """
@@ -75,7 +75,7 @@ async def get_group(group_id: UUID, current_user: dict = Depends(get_current_use
 async def update_group(group_id: UUID, group: GroupCreate, current_user: dict = Depends(get_current_user)):
     """Update a group"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Check if user has access to this group
         access_query = """
@@ -108,7 +108,7 @@ async def update_group(group_id: UUID, group: GroupCreate, current_user: dict = 
 async def delete_group(group_id: UUID, current_user: dict = Depends(get_current_user)):
     """Delete a group"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Check if user has access to this group
         access_query = """
@@ -156,7 +156,7 @@ async def delete_group(group_id: UUID, current_user: dict = Depends(get_current_
 async def get_group_users(group_id: UUID, current_user: dict = Depends(get_current_user)):
     """Get all users in a group"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Check if user has access to this group
         access_query = """

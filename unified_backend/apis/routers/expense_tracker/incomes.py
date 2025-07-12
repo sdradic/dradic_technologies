@@ -31,7 +31,7 @@ async def create_income(income: IncomeCreate, current_user: dict = Depends(get_c
         if not source_result:
             raise HTTPException(status_code=400, detail="Income source not found")
         
-        if source_result[0]["user_id"] != current_user.get("user_id"):
+        if source_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot create income for another user's source")
 
         income_data = income.dict()
@@ -57,13 +57,13 @@ async def get_incomes(
 ):
     """Get incomes with optional filters"""
     try:
-        # If user_id is specified, ensure it matches the current user
-        if user_id and user_id != current_user.get("user_id"):
+                # If user_id is specified, ensure it matches the current user
+        if user_id and user_id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot access another user's incomes")
-        
+
         # If no user_id is specified, default to current user's incomes
         if not user_id:
-            user_id = current_user.get("user_id")
+            user_id = current_user.get("uid")
 
         # Build the query with filters
         query = """
@@ -165,7 +165,7 @@ async def get_monthly_income_summary(
 ):
     """Get monthly income summary"""
     try:
-        user_id = current_user.get("user_id")
+        user_id = current_user.get("uid")
         
         # Build the query with filters
         query = """
@@ -251,7 +251,7 @@ async def get_income(income_id: str, current_user: dict = Depends(get_current_us
                 WHERE i.id = :income_id
             """
             user_result = DatabaseModel.execute_query(user_check_query, {"income_id": income_id})
-            if user_result and user_result[0]["user_id"] != current_user.get("user_id"):
+            if user_result and user_result[0]["user_id"] != current_user.get("uid"):
                 raise HTTPException(status_code=403, detail="Cannot access another user's income")
 
         return IncomeWithDetails(**income)
@@ -278,7 +278,7 @@ async def update_income(income_id: str, income: IncomeCreate, current_user: dict
         if not existing_result:
             raise HTTPException(status_code=404, detail="Income not found")
         
-        if existing_result[0]["user_id"] != current_user.get("user_id"):
+        if existing_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot update another user's income")
 
         # Validate income source exists and belongs to current user if source_id is being changed
@@ -293,7 +293,7 @@ async def update_income(income_id: str, income: IncomeCreate, current_user: dict
             if not source_result:
                 raise HTTPException(status_code=400, detail="Income source not found")
             
-            if source_result[0]["user_id"] != current_user.get("user_id"):
+            if source_result[0]["user_id"] != current_user.get("uid"):
                 raise HTTPException(status_code=403, detail="Cannot assign income to another user's source")
 
         income_data = income.dict(exclude_unset=True)
@@ -326,7 +326,7 @@ async def delete_income(income_id: str, current_user: dict = Depends(get_current
         if not existing_result:
             raise HTTPException(status_code=404, detail="Income not found")
         
-        if existing_result[0]["user_id"] != current_user.get("user_id"):
+        if existing_result[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot delete another user's income")
 
         deleted = DatabaseModel.delete_record("incomes", income_id)

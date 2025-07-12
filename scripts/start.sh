@@ -35,7 +35,7 @@ echo "✅ Ports are available"
 # Start backend in background
 echo "🔧 Starting backend server..."
 cd unified_backend/apis
-python -m uvicorn main:app --reload --port 8000 &
+uv run uvicorn main:app --reload --port 8000 &
 BACKEND_PID=$!
 cd ../..
 

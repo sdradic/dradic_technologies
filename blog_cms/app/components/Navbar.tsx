@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { useAuth } from "~/contexts/AuthContext";
 import { useNavigate } from "react-router";
-import { updateBlogPost, deleteBlogPost } from "~/modules/apis";
+import { updateBlogPost, createBlogPost, deleteBlogPost } from "~/modules/apis";
 
 interface NavbarProps {
   selectedPost: BlogPost | null;
@@ -63,7 +63,12 @@ export default function Navbar({
       title: tempTitle,
       content: content,
     };
-    toast.promise(updateBlogPost(updatedPost), {
+
+    const apiCall = isCreatingPost
+      ? createBlogPost(updatedPost)
+      : updateBlogPost(updatedPost);
+
+    toast.promise(apiCall, {
       loading: isCreatingPost ? "Creating post..." : "Updating post...",
       success: () => {
         handlePostCreation(post);
@@ -75,7 +80,7 @@ export default function Navbar({
           ? "Post created successfully"
           : "Post updated successfully";
       },
-      error: "Failed to update post",
+      error: isCreatingPost ? "Failed to create post" : "Failed to update post",
     });
     setIsLoading(false);
   };
