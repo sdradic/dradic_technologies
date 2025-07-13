@@ -44,9 +44,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           {posts && posts.length > 0 ? (
             posts.map((post: BlogPost) => (
               <NavLink key={post.slug} to={`/blog/${post.slug}`}>
-                <li className="flex flex-row gap-2 px-2 py-4 cursor-pointer">
+                <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer">
                   <img
-                    src={post.image || "blog_post_placeholder.png"}
+                    src={post.image || "/blog_post_placeholder.png"}
                     className="object-cover w-32 h-24 rounded-md"
                   />
                   <div className="flex flex-col gap-2 items-start justify-center">
@@ -54,7 +54,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                       {post.title}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {post.created_at}
+                      {new Date(post.created_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </li>
