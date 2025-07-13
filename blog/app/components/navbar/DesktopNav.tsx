@@ -16,7 +16,7 @@ const NavButton = ({
   onNavClick: (item: NavItem) => void;
 }) => (
   <button
-    className={`text-gray-800 dark:text-gray-200 hover:text-primary-600 cursor-pointer gap-2 px-2 py-1 rounded-md ${
+    className={`text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer gap-2 px-2 py-1 text-md rounded-md ${
       selectedPath === item.path
         ? "border-b-2 border-primary-600 rounded-none"
         : ""
@@ -33,7 +33,7 @@ export const DesktopNav = ({
   onNavClick,
 }: DesktopNavProps) => {
   return (
-    <div className="hidden md:flex space-x-4">
+    <div className="hidden md:flex gap-4">
       {navConfig.map((item) => (
         <NavButton
           key={item.label}

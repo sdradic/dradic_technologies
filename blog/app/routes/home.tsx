@@ -3,8 +3,6 @@ import type { Route } from "./+types/home";
 import { SimpleInput } from "~/components/SimpleInput";
 import { fetchBlogPosts } from "~/modules/api";
 import type { BlogPost } from "~/modules/types";
-import Loader from "~/components/Loader";
-import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,7 +23,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4">
       {/* Hero Section */}
       <div className="flex flex-col mt-4 justify-center items-center text-center mx-4 pt-4 pb-8">
-        <h1 className="text-3xl font-semibold">
+        <h1 className="text-4xl md:text-6xl font-semibold">
           Weekly <span className="text-primary-500">embedded</span> +{" "}
           <span className="text-primary-500">programing</span> tech insights and
           tutorials
@@ -42,11 +40,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <h2 className="font-semibold text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2">
           Latest content
         </h2>
-        <ul className="flex flex-col gap-4 mt-4">
+        <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700">
           {posts && posts.length > 0 ? (
             posts.map((post: BlogPost) => (
-              <NavLink key={post.slug} to={`/posts/${post.slug}`}>
-                <li className="flex flex-row gap-2 border-b border-gray-200 dark:border-gray-700 py-2 px-2 cursor-pointer">
+              <NavLink key={post.slug} to={`/blog/${post.slug}`}>
+                <li className="flex flex-row gap-2 px-2 py-4 cursor-pointer">
                   <img
                     src={post.image || "blog_post_placeholder.png"}
                     className="object-cover w-32 h-24 rounded-md"

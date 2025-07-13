@@ -10,14 +10,14 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+      className="transition-colors cursor-pointer"
       aria-label={`Switch to dark mode`}
       onClick={toggleTheme}
     >
       {theme === "light" ? (
-        <MoonIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />
+        <MoonIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
       ) : (
-        <SunIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />
+        <SunIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
       )}
     </button>
   );

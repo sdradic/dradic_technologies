@@ -1,5 +1,5 @@
 import type { NavConfig } from "./types";
-import { Logo } from "./Logo";
+import { DradicTechLogo } from "../Icons";
 
 interface SidebarProps {
   navConfig: NavConfig;
@@ -25,13 +25,20 @@ export const Sidebar = ({
         }`}
       >
         <div className="flex items-center justify-center mt-4">
-          <Logo />
+          <DradicTechLogo className="h-18 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-500" />
+          <div className="flex items-center">
+            <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
+            <div className="flex flex-col">
+              <span className="text-2xl font-semibold">Dradic</span>
+              <span className="text-sm text-gray-500">Technologies</span>
+            </div>
+          </div>
         </div>
         <div className="flex flex-col p-6 space-y-4">
           {navConfig.map((item) => (
             <button
               key={item.label}
-              className={`text-gray-800 dark:text-gray-200 text-left text-lg cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md p-2 ${
+              className={`text-gray-800 dark:text-gray-200 text-left text-md cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md p-2 ${
                 selectedPath === item.path
                   ? "border-b-2 border-primary-500 dark:border-primary-500 rounded-none"
                   : ""

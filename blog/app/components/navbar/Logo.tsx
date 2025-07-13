@@ -9,7 +9,7 @@ export const Logo = () => {
       className="flex items-center cursor-pointer"
       onClick={() => navigate("/")}
     >
-      <DradicTechLogo className="h-18 dark:stroke-primary-500 dark:fill-dark-500" />
+      <DradicTechLogo className="h-18 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-500" />
       <div className="hidden md:flex items-center">
         <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
         <div className="flex flex-col">

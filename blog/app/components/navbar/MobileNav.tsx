@@ -1,5 +1,4 @@
-import { MenuIcon, SearchIcon } from "../Icons";
-import { ThemeToggle } from "../ThemeToggle";
+import { MenuIcon } from "../Icons";
 
 interface MobileNavProps {
   isSidebarOpen: boolean;
@@ -13,13 +12,6 @@ export const MobileNav = ({
   return (
     <>
       <div className="flex flex-row items-center justify-end gap-2">
-        <ThemeToggle />
-        <div
-          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl p-2"
-          onClick={() => {}}
-        >
-          <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white" />
-        </div>
         <button
           className="flex md:hidden cursor-pointer"
           onClick={onToggleSidebar}
