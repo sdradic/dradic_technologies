@@ -217,6 +217,8 @@ class BlogPostMetadata(BaseModel):
     created_at: str
     updated_at: str
     image: Optional[str] = None
+    category: Optional[str] = None
+    author: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -231,6 +233,8 @@ class BlogPostCreate(BaseModel):
     title: str
     content: str
     image: Optional[str] = None
+    category: Optional[str] = None
+    author: Optional[str] = None
 
     class Config:
         from_attributes = True
