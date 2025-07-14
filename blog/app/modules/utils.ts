@@ -1,111 +1,12 @@
 import { marked } from "marked";
 import { renderMarkdownToHtml as enhancedRender } from "../components/markdown";
-import type { BlogPost, BlogPostMetadata, MarkdownMetadata } from "./types";
+import type { MarkdownMetadata } from "./types";
 
 // Configure marked for better parsing
 marked.use({
   breaks: true,
   gfm: true,
 });
-
-// Simple cache with localStorage fallback
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const CACHE_KEY = "blogCache";
-
-interface CacheData {
-  posts: BlogPost[];
-  metadata: BlogPostMetadata[];
-  timestamp: number;
-}
-
-// Unified cache management
-class BlogCache {
-  private cache: CacheData | null = null;
-
-  isValid(): boolean {
-    return (
-      this.cache !== null && Date.now() - this.cache.timestamp < CACHE_DURATION
-    );
-  }
-
-  get(): BlogPost[] | null {
-    if (this.isValid()) {
-      return this.cache!.posts;
-    }
-
-    // Try localStorage fallback
-    try {
-      const stored = localStorage.getItem(CACHE_KEY);
-      if (stored) {
-        const data: CacheData = JSON.parse(stored);
-        if (Date.now() - data.timestamp < CACHE_DURATION) {
-          this.cache = data;
-          return data.posts;
-        }
-      }
-    } catch (error) {
-      console.error("Error reading from localStorage:", error);
-    }
-
-    return null;
-  }
-
-  set(posts: BlogPost[]): void {
-    const metadata: BlogPostMetadata[] = posts.map(
-      ({ slug, title, created_at, updated_at, image, category, author }) => ({
-        slug,
-        title,
-        created_at,
-        updated_at,
-        image,
-        category,
-        author,
-      })
-    );
-
-    this.cache = { posts, metadata, timestamp: Date.now() };
-
-    // Save to localStorage
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(this.cache));
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-    }
-  }
-
-  clear(): void {
-    this.cache = null;
-    localStorage.removeItem(CACHE_KEY);
-  }
-
-  updatePost(updatedPost: BlogPost): void {
-    if (this.cache) {
-      const index = this.cache.posts.findIndex(
-        (post) => post.slug === updatedPost.slug
-      );
-      if (index !== -1) {
-        this.cache.posts[index] = updatedPost;
-        this.set(this.cache.posts);
-      }
-    }
-  }
-
-  addPost(newPost: BlogPost): void {
-    if (this.cache) {
-      this.cache.posts.push(newPost);
-      this.set(this.cache.posts);
-    }
-  }
-
-  removePost(slug: string): void {
-    if (this.cache) {
-      this.cache.posts = this.cache.posts.filter((post) => post.slug !== slug);
-      this.set(this.cache.posts);
-    }
-  }
-}
-
-export const blogCache = new BlogCache();
 
 // Simplified markdown parsing
 export function parseMarkdown(content: string): {

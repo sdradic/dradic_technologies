@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { localState } from "~/modules/LocalStateDrTech";
 
 type ThemeContextType = {
   theme: "light" | "dark";
@@ -12,11 +13,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Get theme from localStorage on mount
-    const savedTheme = localStorage.getItem("dradic-tech-theme") as
-      | "light"
-      | "dark"
-      | null;
+    // Get theme from LocalStateDrTech
+    const savedTheme = localState.getTheme() as "light" | "dark";
     const initialTheme = savedTheme || "light";
 
     setTheme(initialTheme);
@@ -27,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (mounted) {
       // Only apply theme to document after component is mounted
       document.documentElement.className = theme;
-      localStorage.setItem("dradic-tech-theme", theme);
+      localState.setTheme(theme);
     }
   }, [theme, mounted]);
 

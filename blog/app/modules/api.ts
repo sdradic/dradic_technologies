@@ -1,6 +1,6 @@
+import { localState } from "./LocalStateDrTech";
 import { supabase } from "./supabase";
 import type { BlogPost, BlogPostMetadata } from "./types";
-import { blogCache } from "./utils";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -85,9 +85,11 @@ export async function fetchPostContent(slug: string): Promise<string> {
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
     // Check cache first
-    const cachedPosts = blogCache.get();
-    if (cachedPosts) {
-      return cachedPosts;
+    if (localState.isCacheValid()) {
+      const cachedPosts = localState.getBlogPosts();
+      if (cachedPosts.length > 0) {
+        return cachedPosts;
+      }
     }
 
     // Fetch from API
@@ -97,20 +99,59 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
     const posts = response.posts;
 
     // Update cache
-    blogCache.set(posts);
+    localState.setBlogPosts(posts);
 
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-    return [];
+
+    // Return cached data if available
+    const cachedPosts = localState.getBlogPosts();
+    return cachedPosts;
   }
 }
 
 export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   try {
     // Check cache first
-    const cachedPosts = blogCache.get();
-    if (cachedPosts) {
+    if (localState.isCacheValid()) {
+      const cachedPosts = localState.getBlogPosts();
+      if (cachedPosts.length > 0) {
+        // Extract metadata from cached posts
+        return cachedPosts.map(
+          ({
+            slug,
+            title,
+            created_at,
+            updated_at,
+            image,
+            category,
+            author,
+          }) => ({
+            slug,
+            title,
+            created_at,
+            updated_at,
+            image,
+            category,
+            author,
+          })
+        );
+      }
+    }
+
+    // Fetch from API
+    const metadata: BlogPostMetadata[] = await apiRequest(
+      "/api/blog/posts-metadata"
+    );
+
+    return metadata;
+  } catch (error) {
+    console.error("Error loading blog posts metadata:", error);
+
+    // Return cached data if available
+    const cachedPosts = localState.getBlogPosts();
+    if (cachedPosts.length > 0) {
       return cachedPosts.map(
         ({ slug, title, created_at, updated_at, image, category, author }) => ({
           slug,
@@ -124,14 +165,6 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
       );
     }
 
-    // Fetch from API
-    const metadata: BlogPostMetadata[] = await apiRequest(
-      "/api/blog/posts-metadata"
-    );
-
-    return metadata;
-  } catch (error) {
-    console.error("Error loading blog posts metadata:", error);
     return [];
   }
 }

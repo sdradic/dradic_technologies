@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import NotFound from "./404";
 import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
+import { localState } from "~/modules/LocalStateDrTech";
 
 interface LoaderData {
   html: string;
@@ -31,7 +32,11 @@ export default function Post({ params }: Route.ComponentProps) {
         setIsLoading(true);
         let content = "";
 
-        if (
+        // Check local cache first
+        const cachedPost = localState.getPost(params.id);
+        if (cachedPost?.content) {
+          content = cachedPost.content;
+        } else if (
           postFromState?.content &&
           postFromState.content !== "Error loading content"
         ) {
@@ -40,6 +45,13 @@ export default function Post({ params }: Route.ComponentProps) {
         } else {
           // Fetch content from API
           content = await fetchPostContent(params.id);
+          // Cache the post for future use
+          if (content && postFromState) {
+            localState.setPost({
+              ...postFromState,
+              content,
+            });
+          }
         }
 
         if (!content) {
