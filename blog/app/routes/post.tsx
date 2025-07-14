@@ -18,6 +18,9 @@ interface LoaderData {
   };
 }
 
+const placeholderImage =
+  "https://aorsaqycwhnsrutvqtdx.supabase.co/storage/v1/object/sign/dradic-public-assets/blog-images/blog_post_placeholder.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81N2MyMzZkNi0xZDEyLTQ3OTYtOTljNi0yM2MyNjhjYmQ2MmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkcmFkaWMtcHVibGljLWFzc2V0cy9ibG9nLWltYWdlcy9ibG9nX3Bvc3RfcGxhY2Vob2xkZXIucG5nIiwiaWF0IjoxNzUyNDY4NzI2LCJleHAiOjE3NTMwNzM1MjZ9.QiDyhaKfI9sXIVLJDi-aPXXHMbh-uEws2gv6AMB66xM ";
+
 export default function Post({ params }: Route.ComponentProps) {
   const location = useLocation();
   const postFromState = location.state?.post;
@@ -97,7 +100,7 @@ export default function Post({ params }: Route.ComponentProps) {
         src={
           renderedPost.metadata.image
             ? renderedPost.metadata.image
-            : "/assets/blog_post_placeholder.png"
+            : placeholderImage
         }
         alt={renderedPost.metadata.title}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
