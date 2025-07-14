@@ -97,7 +97,7 @@ export default function Post({ params }: Route.ComponentProps) {
         src={
           renderedPost.metadata.image
             ? renderedPost.metadata.image
-            : "blog_post_placeholder.png"
+            : "/blog_post_placeholder.png"
         }
         alt={renderedPost.metadata.title}
         className="h-48 md:h-96  rounded-xl object-cover my-4"

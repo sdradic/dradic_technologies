@@ -11,16 +11,26 @@ export function ThemeToggle() {
   }, [theme]);
 
   return (
-    <button
-      className="transition-colors cursor-pointer"
-      aria-label={`Switch to dark mode`}
+    <div
       onClick={toggleTheme}
+      className="flex items-center justify-between w-14 h-6 p-1 rounded-full cursor-pointer border border-gray-500 dark:border-gray-400"
     >
-      {theme === "light" ? (
-        <MoonIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
-      ) : (
-        <SunIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
-      )}
-    </button>
+      <div
+        className={`
+        flex justify-center items-center w-1/2 h-full rounded-full
+        ${theme === "light" ? "bg-yellow-50" : ""}
+      `}
+      >
+        <SunIcon className="w-3 h-3 fill-yellow-400 stroke-yellow-500" />
+      </div>
+      <div
+        className={`
+        flex justify-center items-center w-1/2 h-full rounded-full
+        ${theme === "dark" ? "bg-[#18196F]" : ""}
+      `}
+      >
+        <MoonIcon className="w-3 h-3 fill-gray-400 stroke-gray-500" />
+      </div>
+    </div>
   );
 }

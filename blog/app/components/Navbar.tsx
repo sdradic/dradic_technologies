@@ -7,13 +7,14 @@ import type { NavConfig } from "./navbar/types";
 import { Logo } from "./navbar/Logo";
 import { SearchIcon } from "./Icons";
 import { ThemeToggle } from "./ThemeToggle";
+import { SearchModal } from "./SearchModal";
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const selectedPath = location.pathname;
-
   const navConfig: NavConfig = [
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
@@ -36,7 +37,10 @@ export default function Navbar() {
           />
 
           <ThemeToggle />
-          <div className="cursor-pointer rounded-xl p-2" onClick={() => {}}>
+          <div
+            className="cursor-pointer rounded-xl p-2"
+            onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+          >
             <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
           </div>
           <MobileNav
@@ -55,6 +59,10 @@ export default function Navbar() {
         isOpen={isSidebarOpen}
         onNavClick={handleNavClick}
         onClose={() => setIsSidebarOpen(false)}
+      />
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
       />
     </>
   );

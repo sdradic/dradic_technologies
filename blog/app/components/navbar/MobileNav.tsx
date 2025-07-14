@@ -18,7 +18,7 @@ export const MobileNav = ({
         >
           <MenuIcon
             isSidebarOpen={isSidebarOpen}
-            className="w-8 h-8 stroke-gray-500 dark:stroke-gray-400"
+            className="w-8 h-8 stroke-1 stroke-gray-500 dark:stroke-white"
           />
         </button>
       </div>
