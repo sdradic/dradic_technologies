@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { renderMarkdownToHtml as enhancedRender } from "../components/markdown";
 import type { BlogPost, BlogPostMetadata, MarkdownMetadata } from "./types";
 
 // Configure marked for better parsing
@@ -7,169 +8,110 @@ marked.use({
   gfm: true,
 });
 
-// Cache configuration
+// Simple cache with localStorage fallback
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const POSTS_METADATA_KEY = "localStoredBlogMetadata";
-const BLOG_POSTS_KEY = "localStoredBlogPosts";
+const CACHE_KEY = "blogCache";
 
-// Module-level cache
-let cachedPostsMetadata: BlogPostMetadata[] | null = null;
-let cachedBlogPosts: BlogPost[] | null = null;
-let lastFetchTime = 0;
-
-// Cache validity check
-export function isCacheValid(): boolean {
-  const now = Date.now();
-  return now - lastFetchTime < CACHE_DURATION;
+interface CacheData {
+  posts: BlogPost[];
+  metadata: BlogPostMetadata[];
+  timestamp: number;
 }
 
-// Blog Posts Metadata Cache Management
-export function getCachedPostsMetadata(
-  force: boolean = false
-): BlogPostMetadata[] | null {
-  if (!force && cachedPostsMetadata && isCacheValid()) {
-    return cachedPostsMetadata;
-  }
-  return null;
-}
+// Unified cache management
+class BlogCache {
+  private cache: CacheData | null = null;
 
-export function setCachedPostsMetadata(metadata: BlogPostMetadata[]): void {
-  cachedPostsMetadata = metadata;
-  lastFetchTime = Date.now();
-  handleSaveLocalStoredBlogMetadata(metadata);
-}
-
-// Blog Posts Cache Management
-export function getCachedBlogPosts(force: boolean = false): BlogPost[] | null {
-  if (!force && cachedBlogPosts && isCacheValid()) {
-    return cachedBlogPosts;
-  }
-  return null;
-}
-
-export function setCachedBlogPosts(posts: BlogPost[]): void {
-  cachedBlogPosts = posts;
-  lastFetchTime = Date.now();
-
-  // Save full posts to localStorage
-  try {
-    localStorage.setItem(BLOG_POSTS_KEY, JSON.stringify(posts));
-  } catch (error) {
-    console.error("Error saving blog posts to localStorage:", error);
-  }
-
-  // Save metadata to localStorage for offline access
-  const postsMetadata: BlogPostMetadata[] = posts.map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    created_at: post.created_at,
-    updated_at: post.updated_at,
-    image: post.image,
-    category: post.category,
-    author: post.author,
-  }));
-  handleSaveLocalStoredBlogMetadata(postsMetadata);
-}
-
-// LocalStorage retrieval functions
-export function getLocalStoredBlogMetadata(): BlogPostMetadata[] | null {
-  try {
-    const stored = localStorage.getItem(POSTS_METADATA_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error retrieving blog metadata from localStorage:", error);
-    return null;
-  }
-}
-
-export function getLocalStoredBlogPosts(): BlogPost[] | null {
-  try {
-    const stored = localStorage.getItem(BLOG_POSTS_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error retrieving blog posts from localStorage:", error);
-    return null;
-  }
-}
-
-// Fallback function for when API fails
-export function getBlogPostsFallback(): BlogPost[] {
-  // Try cached data first
-  if (cachedBlogPosts) {
-    return cachedBlogPosts;
-  }
-
-  // Try full posts from localStorage
-  const localPosts = getLocalStoredBlogPosts();
-  if (localPosts) {
-    return localPosts;
-  }
-
-  // Fall back to metadata only (without content)
-  const localMetadata = getLocalStoredBlogMetadata();
-  if (localMetadata) {
-    return localMetadata.map((post) => ({
-      ...post,
-      content: "", // No content available from localStorage metadata
-    }));
-  }
-
-  return [];
-}
-
-// Fallback function for metadata when API fails
-export function getPostsMetadataFallback(): BlogPostMetadata[] {
-  // Try cached data first
-  if (cachedPostsMetadata) {
-    return cachedPostsMetadata;
-  }
-
-  // Fall back to localStorage
-  const localMetadata = getLocalStoredBlogMetadata();
-  return localMetadata || [];
-}
-
-// Clear cache (useful for testing or forced refresh)
-export function clearBlogCache(): void {
-  cachedPostsMetadata = null;
-  cachedBlogPosts = null;
-  lastFetchTime = 0;
-}
-
-// Update cache when posts are modified
-export function updateBlogPostInCache(updatedPost: BlogPost): void {
-  if (cachedBlogPosts) {
-    const index = cachedBlogPosts.findIndex(
-      (post) => post.slug === updatedPost.slug
+  isValid(): boolean {
+    return (
+      this.cache !== null && Date.now() - this.cache.timestamp < CACHE_DURATION
     );
-    if (index !== -1) {
-      cachedBlogPosts[index] = updatedPost;
-      setCachedBlogPosts(cachedBlogPosts);
+  }
+
+  get(): BlogPost[] | null {
+    if (this.isValid()) {
+      return this.cache!.posts;
+    }
+
+    // Try localStorage fallback
+    try {
+      const stored = localStorage.getItem(CACHE_KEY);
+      if (stored) {
+        const data: CacheData = JSON.parse(stored);
+        if (Date.now() - data.timestamp < CACHE_DURATION) {
+          this.cache = data;
+          return data.posts;
+        }
+      }
+    } catch (error) {
+      console.error("Error reading from localStorage:", error);
+    }
+
+    return null;
+  }
+
+  set(posts: BlogPost[]): void {
+    const metadata: BlogPostMetadata[] = posts.map(
+      ({ slug, title, created_at, updated_at, image, category, author }) => ({
+        slug,
+        title,
+        created_at,
+        updated_at,
+        image,
+        category,
+        author,
+      })
+    );
+
+    this.cache = { posts, metadata, timestamp: Date.now() };
+
+    // Save to localStorage
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(this.cache));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
+  }
+
+  clear(): void {
+    this.cache = null;
+    localStorage.removeItem(CACHE_KEY);
+  }
+
+  updatePost(updatedPost: BlogPost): void {
+    if (this.cache) {
+      const index = this.cache.posts.findIndex(
+        (post) => post.slug === updatedPost.slug
+      );
+      if (index !== -1) {
+        this.cache.posts[index] = updatedPost;
+        this.set(this.cache.posts);
+      }
+    }
+  }
+
+  addPost(newPost: BlogPost): void {
+    if (this.cache) {
+      this.cache.posts.push(newPost);
+      this.set(this.cache.posts);
+    }
+  }
+
+  removePost(slug: string): void {
+    if (this.cache) {
+      this.cache.posts = this.cache.posts.filter((post) => post.slug !== slug);
+      this.set(this.cache.posts);
     }
   }
 }
 
-// Add new post to cache
-export function addBlogPostToCache(newPost: BlogPost): void {
-  if (cachedBlogPosts) {
-    cachedBlogPosts.push(newPost);
-    setCachedBlogPosts(cachedBlogPosts);
-  }
-}
+export const blogCache = new BlogCache();
 
-// Remove post from cache
-export function removeBlogPostFromCache(slug: string): void {
-  if (cachedBlogPosts) {
-    cachedBlogPosts = cachedBlogPosts.filter((post) => post.slug !== slug);
-    setCachedBlogPosts(cachedBlogPosts);
-  }
-}
-
+// Simplified markdown parsing
 export function parseMarkdown(content: string): {
   metadata: MarkdownMetadata;
   body: string;
 } {
-  // Split content into frontmatter and body
   const parts = content.split("---");
 
   if (parts.length < 3) {
@@ -179,7 +121,6 @@ export function parseMarkdown(content: string): {
   const frontmatter = parts[1].trim();
   const body = parts.slice(2).join("---").trim();
 
-  // Parse frontmatter
   const metadata: MarkdownMetadata = {
     title: "",
     created_at: "",
@@ -188,44 +129,37 @@ export function parseMarkdown(content: string): {
     author: "",
   };
 
-  const frontmatterLines = frontmatter.split("\n");
-  frontmatterLines.forEach((line) => {
+  frontmatter.split("\n").forEach((line) => {
     const [key, value] = line.split(":").map((part) => part.trim());
     if (key && value && key in metadata) {
       metadata[key as keyof MarkdownMetadata] = value;
     }
   });
 
-  return {
-    metadata,
-    body,
-  };
+  return { metadata, body };
 }
 
 export async function renderMarkdownToHtml(content: string): Promise<string> {
   try {
     let markdownBody = content;
 
-    // Check if content has frontmatter (starts with ---)
+    // Extract body if content has frontmatter
     if (content.trim().startsWith("---")) {
       try {
-        // Try to parse frontmatter and get the body
         const { body } = parseMarkdown(content);
         markdownBody = body;
-      } catch (error) {
-        // If frontmatter parsing fails, try to extract content after the second ---
+      } catch {
+        // Fallback: extract content after second ---
         const lines = content.split("\n");
-        let inFrontmatter = false;
         let frontmatterEnded = false;
         const bodyLines: string[] = [];
 
         for (const line of lines) {
           if (line.trim() === "---") {
-            if (!inFrontmatter) {
-              inFrontmatter = true;
+            if (frontmatterEnded) {
+              bodyLines.push(line);
             } else {
               frontmatterEnded = true;
-              continue;
             }
           } else if (frontmatterEnded) {
             bodyLines.push(line);
@@ -236,22 +170,10 @@ export async function renderMarkdownToHtml(content: string): Promise<string> {
       }
     }
 
-    // Convert markdown to HTML
-    const html = await marked.parse(markdownBody);
-    return html;
+    // Use the enhanced markdown renderer
+    return await enhancedRender(markdownBody);
   } catch (error) {
     console.error("Failed to render markdown to HTML:", error);
-    // Return the original content as HTML if parsing completely fails
-    const fallbackHtml = await marked.parse(content);
-    return fallbackHtml;
-  }
-}
-
-export function handleSaveLocalStoredBlogMetadata(posts: BlogPostMetadata[]) {
-  try {
-    localStorage.setItem(POSTS_METADATA_KEY, JSON.stringify(posts));
-  } catch (error) {
-    console.error("Error saving local stored blog metadata:", error);
-    throw error;
+    return await marked.parse(content);
   }
 }

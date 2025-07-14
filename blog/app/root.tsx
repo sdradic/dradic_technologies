@@ -12,15 +12,19 @@ import "./app.css";
 import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
+import { Suspense, useEffect } from "react";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 export function HydrateFallback() {
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader />
+    <ThemeProvider>
+      <div>
+        <Navbar />
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <Loader />
+        </div>
       </div>
-    </>
+    </ThemeProvider>
   );
 }
 
@@ -57,11 +61,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <div>
-      <Navbar />
-      <Outlet />
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div>
+        <Navbar />
+        <Suspense fallback={<Loader />}>
+          <Outlet />
+        </Suspense>
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }
 

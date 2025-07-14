@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { MoonIcon, SunIcon } from "./Icons";
+import { useTheme } from "~/context/ThemeContext";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState("light");
+  const { theme, toggleTheme } = useTheme();
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
+  useEffect(() => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+  }, [theme]);
 
   return (
     <button

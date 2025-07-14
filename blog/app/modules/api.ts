@@ -1,13 +1,6 @@
 import { supabase } from "./supabase";
 import type { BlogPost, BlogPostMetadata } from "./types";
-import {
-  getBlogPostsFallback,
-  getCachedBlogPosts,
-  getCachedPostsMetadata,
-  getPostsMetadataFallback,
-  setCachedBlogPosts,
-  setCachedPostsMetadata,
-} from "./utils";
+import { blogCache } from "./utils";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -89,12 +82,10 @@ export async function fetchPostContent(slug: string): Promise<string> {
   }
 }
 
-export async function fetchBlogPosts(
-  force: boolean = false
-): Promise<BlogPost[]> {
+export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
     // Check cache first
-    const cachedPosts = getCachedBlogPosts(force);
+    const cachedPosts = blogCache.get();
     if (cachedPosts) {
       return cachedPosts;
     }
@@ -106,23 +97,31 @@ export async function fetchBlogPosts(
     const posts = response.posts;
 
     // Update cache
-    setCachedBlogPosts(posts);
+    blogCache.set(posts);
 
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-    return getBlogPostsFallback();
+    return [];
   }
 }
 
-export async function fetchPostsMetadata(
-  force: boolean = false
-): Promise<BlogPostMetadata[]> {
+export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   try {
     // Check cache first
-    const cachedMetadata = getCachedPostsMetadata(force);
-    if (cachedMetadata) {
-      return cachedMetadata;
+    const cachedPosts = blogCache.get();
+    if (cachedPosts) {
+      return cachedPosts.map(
+        ({ slug, title, created_at, updated_at, image, category, author }) => ({
+          slug,
+          title,
+          created_at,
+          updated_at,
+          image,
+          category,
+          author,
+        })
+      );
     }
 
     // Fetch from API
@@ -130,13 +129,10 @@ export async function fetchPostsMetadata(
       "/api/blog/posts-metadata"
     );
 
-    // Update cache
-    setCachedPostsMetadata(metadata);
-
     return metadata;
   } catch (error) {
     console.error("Error loading blog posts metadata:", error);
-    return getPostsMetadataFallback();
+    return [];
   }
 }
 
