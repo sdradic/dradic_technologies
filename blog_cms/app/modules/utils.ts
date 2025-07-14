@@ -184,16 +184,15 @@ export function parseMarkdown(content: string): {
     image: "",
   };
 
-  const frontmatterLines = frontmatter.split("\n");
-  frontmatterLines.forEach((line) => {
-    const [key, value] = line.split(":").map((part) => part.trim());
-    if (key && value && key in metadata) {
-      metadata[key as keyof MarkdownMetadata] = value;
-    }
-  });
+  // Use regex-based parsing to handle values that may contain colons (like URLs)
+  const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "";
+  const created_at = frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() || "";
+  const image = frontmatter.match(/image:\s*(.*)/)?.[1]?.trim() || "";
+  const category = frontmatter.match(/category:\s*(.*)/)?.[1]?.trim() || "";
+  const author = frontmatter.match(/author:\s*(.*)/)?.[1]?.trim() || "";
 
   return {
-    metadata,
+    metadata: { title, created_at, image, category, author },
     body,
   };
 }

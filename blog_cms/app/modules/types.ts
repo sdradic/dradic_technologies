@@ -14,4 +14,6 @@ export interface MarkdownMetadata {
   title: string;
   created_at: string;
   image: string;
+  category?: string;
+  author?: string;
 }

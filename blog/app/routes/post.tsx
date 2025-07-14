@@ -6,6 +6,7 @@ import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
 import NotFound from "./404";
 import Loader from "~/components/Loader";
+import { placeholderImage } from "~/modules/store";
 
 interface LoaderData {
   html: string;
@@ -17,9 +18,6 @@ interface LoaderData {
     author?: string;
   };
 }
-
-const placeholderImage =
-  "https://aorsaqycwhnsrutvqtdx.supabase.co/storage/v1/object/sign/dradic-public-assets/blog-images/blog_post_placeholder.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81N2MyMzZkNi0xZDEyLTQ3OTYtOTljNi0yM2MyNjhjYmQ2MmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkcmFkaWMtcHVibGljLWFzc2V0cy9ibG9nLWltYWdlcy9ibG9nX3Bvc3RfcGxhY2Vob2xkZXIucG5nIiwiaWF0IjoxNzUyNDY4NzI2LCJleHAiOjE3NTMwNzM1MjZ9.QiDyhaKfI9sXIVLJDi-aPXXHMbh-uEws2gv6AMB66xM";
 
 export default function Post({ params }: Route.ComponentProps) {
   const location = useLocation();
@@ -82,7 +80,16 @@ export default function Post({ params }: Route.ComponentProps) {
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4">
       <div className="flex flex-row w-full mb-4 pt-4 items-center justify-center gap-2">
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
-          {renderedPost.metadata.created_at.split("T")[0]}
+          {new Date(renderedPost.metadata.created_at).toLocaleDateString(
+            "en-US",
+            {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          )}
         </p>
         <div className="w-1 h-1 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
