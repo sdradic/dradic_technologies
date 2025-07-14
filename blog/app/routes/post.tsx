@@ -7,13 +7,14 @@ import { useEffect, useState } from "react";
 import NotFound from "./404";
 import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
-import { localState } from "~/modules/LocalStateDrTech";
+import { localState } from "~/modules/utils";
 
 interface LoaderData {
   html: string;
   metadata: {
     title: string;
     created_at: string;
+    updated_at: string;
     image?: string;
     category?: string;
     author?: string;
@@ -94,13 +95,19 @@ export default function Post({ params }: Route.ComponentProps) {
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
           {new Date(renderedPost.metadata.created_at).toLocaleDateString(
             "en-US",
-            {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }
+            window.innerWidth > 768
+              ? {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              : {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
           )}
         </p>
         <div className="w-1 h-1 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
@@ -112,9 +119,22 @@ export default function Post({ params }: Route.ComponentProps) {
           {renderedPost.metadata.author || "Dusan Radic"}
         </p>
       </div>
-      <span className="text-3xl md:text-4xl font-bold text-center mb-4">
+      <span className="text-3xl md:text-4xl font-bold text-center mb-2">
         {renderedPost.metadata.title}
       </span>
+      <p className="text-gray-500 dark:text-gray-400 text-md md:text-sm text-center text-xs">
+        Last updated:{" "}
+        {new Date(renderedPost.metadata.updated_at).toLocaleDateString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        )}
+      </p>
       <img
         src={
           renderedPost.metadata.image

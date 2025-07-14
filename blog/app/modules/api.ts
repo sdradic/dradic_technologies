@@ -1,6 +1,6 @@
-import { localState } from "./LocalStateDrTech";
 import { supabase } from "./supabase";
 import type { BlogPost, BlogPostMetadata } from "./types";
+import { localState } from "./utils";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
