@@ -6,7 +6,7 @@ export default function About() {
       <div className="flex flex-col justify-center items-center md:flex-row md:justify-evenly my-8 text-center px-8 gap-8">
         <div className="flex flex-col items-center md:items-start gap-4">
           <img
-            src="/dusan.jpeg"
+            src="/assets/dusan.jpeg"
             alt="Dradic"
             className="w-24 h-24 rounded-full"
           />

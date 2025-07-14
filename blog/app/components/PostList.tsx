@@ -27,7 +27,7 @@ export function PostsList() {
           <NavLink key={post.slug} to={`/blog/${post.slug}`}>
             <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-500 rounded-lg">
               <img
-                src={post?.image || "/blog_post_placeholder.png"}
+                src={post?.image || "/assets/blog_post_placeholder.png"}
                 className="object-cover w-32 h-24 rounded-md"
               />
               <div className="flex flex-col gap-2 items-start justify-center">

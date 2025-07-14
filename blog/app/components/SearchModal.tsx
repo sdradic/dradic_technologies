@@ -121,7 +121,9 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                           onClick={onClose}
                         >
                           <img
-                            src={post?.image || "/blog_post_placeholder.png"}
+                            src={
+                              post?.image || "/assets/blog_post_placeholder.png"
+                            }
                             alt={post.title}
                             className="object-cover w-32 h-24 rounded-md"
                           />
