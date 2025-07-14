@@ -8,6 +8,8 @@ interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+const placeholderImage =
+  "https://aorsaqycwhnsrutvqtdx.supabase.co/storage/v1/object/sign/dradic-public-assets/blog-images/blog_post_placeholder.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81N2MyMzZkNi0xZDEyLTQ3OTYtOTljNi0yM2MyNjhjYmQ2MmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkcmFkaWMtcHVibGljLWFzc2V0cy9ibG9nLWltYWdlcy9ibG9nX3Bvc3RfcGxhY2Vob2xkZXIucG5nIiwiaWF0IjoxNzUyNDY4NzI2LCJleHAiOjE3NTMwNzM1MjZ9.QiDyhaKfI9sXIVLJDi-aPXXHMbh-uEws2gv6AMB66xM";
 
 export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -121,9 +123,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                           onClick={onClose}
                         >
                           <img
-                            src={
-                              post?.image || "/assets/blog_post_placeholder.png"
-                            }
+                            src={post?.image || placeholderImage}
                             alt={post.title}
                             className="object-cover w-32 h-24 rounded-md"
                           />
