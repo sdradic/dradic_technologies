@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   MDXEditor,
   headingsPlugin,
@@ -45,6 +45,7 @@ export default function MDXEditorComponent({
 }: MDXEditorProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const editorRef = useRef<any>(null);
 
   // Ensure selectedPost is not undefined
@@ -59,8 +60,8 @@ export default function MDXEditorComponent({
     author: "",
   };
 
-  // Generate frontmatter from post metadata
-  const generateFrontmatter = () => {
+  // Memoize frontmatter generation to prevent infinite loops
+  const currentFrontmatter = useMemo(() => {
     const now = new Date().toISOString();
     return `---
 title: ${safeSelectedPost.title || "New Post"}
@@ -72,22 +73,12 @@ author: ${safeSelectedPost.author || ""}
 ---
 
 `;
-  };
-
-  // Update frontmatter when selectedPost changes
-  useEffect(() => {
-    if (selectedPostContent && selectedPostContent.trim().startsWith("---")) {
-      // If content already has frontmatter, update it with new metadata
-      const bodyContent = getContentWithoutFrontmatter(selectedPostContent);
-      const newContentWithFrontmatter = generateFrontmatter() + bodyContent;
-      setSelectedPostContent(newContentWithFrontmatter);
-    }
   }, [
     safeSelectedPost.title,
+    safeSelectedPost.created_at,
     safeSelectedPost.image,
     safeSelectedPost.category,
     safeSelectedPost.author,
-    safeSelectedPost.updated_at,
   ]);
 
   // Get content without frontmatter for the editor
@@ -105,37 +96,68 @@ author: ${safeSelectedPost.author || ""}
 
   // Get content with frontmatter for saving
   const getContentWithFrontmatter = (bodyContent: string) => {
-    return generateFrontmatter() + bodyContent;
+    return currentFrontmatter + bodyContent;
   };
 
+  // Handle client-side mounting
   useEffect(() => {
-    setMounted(true);
+    // Use a small delay to ensure proper hydration
+    const timer = setTimeout(() => {
+      setIsClient(true);
+      setMounted(true);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  // Apply dark mode styles to the editor
+  // Apply dark mode styles to the editor (only on client)
   useEffect(() => {
-    if (mounted) {
-      const editorElement = document.querySelector(
-        '[data-testid="mdxeditor-root"]'
-      );
-      if (editorElement) {
-        if (theme === "dark") {
-          editorElement.classList.add("dark");
-          document.documentElement.classList.add("dark");
-        } else {
-          editorElement.classList.remove("dark");
-          document.documentElement.classList.remove("dark");
+    if (mounted && isClient) {
+      // Use a timeout to ensure DOM is ready
+      const timeoutId = setTimeout(() => {
+        const editorElement = document.querySelector(
+          '[data-testid="mdxeditor-root"]'
+        );
+        if (editorElement) {
+          if (theme === "dark") {
+            editorElement.classList.add("dark");
+            document.documentElement.classList.add("dark");
+          } else {
+            editorElement.classList.remove("dark");
+            document.documentElement.classList.remove("dark");
+          }
         }
-      }
-    }
-  }, [theme, mounted]);
+      }, 100);
 
-  if (!mounted) {
+      return () => clearTimeout(timeoutId);
+    }
+  }, [theme, mounted, isClient]);
+
+  // Show loading state during SSR or before mounting
+  if (!mounted || !isClient) {
     return (
       <div className="flex flex-col px-2 w-full lg:max-h-full max-h-96 min-h-96">
         <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
         <div className="w-full rounded-md flex-1 bg-white dark:bg-gray-800 h-full lg:min-h-[calc(100vh-210px)] animate-pulse">
           <div className="h-full bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Safety check for content
+  const safeContent = selectedPostContent || "";
+  const editorContent = getContentWithoutFrontmatter(safeContent);
+
+  // Additional safety check to prevent rendering issues
+  if (!selectedPost || typeof selectedPost !== "object") {
+    return (
+      <div className="flex flex-col px-2 w-full lg:max-h-full max-h-96 min-h-96">
+        <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
+        <div className="w-full rounded-md flex-1 bg-white dark:bg-gray-800 h-full lg:min-h-[calc(100vh-210px)]">
+          <div className="h-full flex items-center justify-center text-gray-500">
+            Invalid post data
+          </div>
         </div>
       </div>
     );
@@ -149,7 +171,7 @@ author: ${safeSelectedPost.author || ""}
           <div className="w-full rounded-md flex-1 h-full lg:min-h-[calc(100vh-210px)] border border-gray-300 dark:border-gray-600">
             <MDXEditor
               ref={editorRef}
-              markdown={getContentWithoutFrontmatter(selectedPostContent)}
+              markdown={editorContent}
               onChange={(newContent) => {
                 const contentWithFrontmatter =
                   getContentWithFrontmatter(newContent);

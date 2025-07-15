@@ -3,7 +3,7 @@ import { fetchPostContent } from "~/modules/apis";
 import type { Route } from "./+types/post";
 import { renderMarkdownToHtml, parseMarkdown } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import NotFound from "./404";
 import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
@@ -51,6 +51,34 @@ export default function Post({ params }: Route.ComponentProps) {
     "Education",
     "Other",
   ];
+
+  // Memoize the selectedPost object to prevent unnecessary re-renders
+  const memoizedSelectedPost = useMemo(() => {
+    return (
+      postFromState || {
+        slug: params.id,
+        title: postTitle,
+        content: postContent,
+        created_at:
+          renderedPost?.metadata?.created_at || new Date().toISOString(),
+        updated_at:
+          renderedPost?.metadata?.updated_at || new Date().toISOString(),
+        image: postImage,
+        category: postCategory,
+        author: postAuthor,
+      }
+    );
+  }, [
+    postFromState,
+    params.id,
+    postTitle,
+    postContent,
+    renderedPost?.metadata?.created_at,
+    renderedPost?.metadata?.updated_at,
+    postImage,
+    postCategory,
+    postAuthor,
+  ]);
 
   useEffect(() => {
     const loadPost = async () => {
@@ -383,22 +411,7 @@ author: ${postAuthor || ""}
           {/* Editor */}
           <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto border border-gray-300 dark:border-gray-600">
             <MDXEditorComponent
-              selectedPost={
-                postFromState || {
-                  slug: params.id,
-                  title: postTitle,
-                  content: postContent,
-                  created_at:
-                    renderedPost?.metadata?.created_at ||
-                    new Date().toISOString(),
-                  updated_at:
-                    renderedPost?.metadata?.updated_at ||
-                    new Date().toISOString(),
-                  image: postImage,
-                  category: postCategory,
-                  author: postAuthor,
-                }
-              }
+              selectedPost={memoizedSelectedPost}
               selectedPostContent={postContent}
               setSelectedPostContent={setPostContent}
             />

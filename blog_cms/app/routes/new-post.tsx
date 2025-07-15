@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
 import { localState } from "~/modules/utils";
@@ -63,6 +63,18 @@ author: ${postAuthor || ""}
     category: postCategory,
     author: postAuthor,
   };
+
+  // Memoize the selectedPost object to prevent unnecessary re-renders
+  const selectedPost = useMemo(
+    () => ({
+      ...defaultPost,
+      title: postTitle,
+      image: postImage,
+      category: postCategory,
+      author: postAuthor,
+    }),
+    [postTitle, postImage, postCategory, postAuthor, defaultPost]
+  );
 
   const handleSave = async () => {
     if (!postTitle.trim()) {
@@ -230,13 +242,7 @@ author: ${postAuthor || ""}
       {/* Editor */}
       <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto border border-gray-300 dark:border-gray-600">
         <MDXEditorComponent
-          selectedPost={{
-            ...defaultPost,
-            title: postTitle,
-            image: postImage,
-            category: postCategory,
-            author: postAuthor,
-          }}
+          selectedPost={selectedPost}
           selectedPostContent={postContent}
           setSelectedPostContent={setPostContent}
         />

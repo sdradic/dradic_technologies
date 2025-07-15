@@ -10,13 +10,11 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 export function HydrateFallback() {
   return (
     <RootLayout>
-      <AuthProvider>
-        <ThemeProvider>
-          <div className="flex flex-col items-center justify-center">
-            <Loader />
-          </div>
-        </ThemeProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <div className="flex flex-col items-center justify-center">
+          <Loader />
+        </div>
+      </ThemeProvider>
     </RootLayout>
   );
 }

@@ -1,15 +1,13 @@
 import { useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Toaster, toast } from "react-hot-toast";
 import Loader from "~/components/Loader";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { DradicTechLogo } from "~/components/Icons";
 
 export default function Login() {
   return (
-    <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16 h-screen">
-      <Toaster position="top-center" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
       <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
         <FormHeader />
         <FormComponent />
@@ -61,27 +59,16 @@ function FormComponent() {
   }, [isAuthLoading, isAuthenticated, navigate]);
 
   if (isCheckingAuth || isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
-    );
+    return null;
   }
 
   const handleLogin = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      toast.promise(login(email, password), {
-        loading: "Signing in...",
-        success: () => {
-          navigate("/");
-          return "Successfully signed in!";
-        },
-        error:
-          "Failed to sign in. Please check your credentials and try again.",
-      });
+      await login(email, password);
+      navigate("/");
     } catch (err) {
-      toast.error(
+      console.error(
         "Failed to sign in. Please check your credentials and try again."
       );
     } finally {
@@ -92,7 +79,6 @@ function FormComponent() {
   const handleGuest = (isLoggingIn: boolean) => {
     handleGuestLogin(isLoggingIn);
     navigate("/");
-    toast.success("Logged in as guest");
   };
   return (
     <>
