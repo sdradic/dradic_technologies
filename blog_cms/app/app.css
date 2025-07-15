@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./components/markdown/markdown.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer components {
@@ -19,217 +20,61 @@
   }
 
   .btn-secondary-long {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center items-center border border-primary-400 hover:border-primary-600 rounded-md text-sm font-medium cursor-pointer text-primary-400 hover:text-primary-600 dark:border-dark-300 dark:hover:border-dark-200 dark:text-dark-100 dark:hover:text-dark-50;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center items-center border border-primary-400 hover:border-primary-600 rounded-md text-sm font-medium cursor-pointer text-primary-400 hover:text-primary-600 dark:border-dark-200 dark:hover:border-dark-100 dark:text-white  dark:bg-dark-300 dark:hover:bg-dark-200;
   }
 
   .separator {
     @apply w-full h-px bg-gray-300 dark:bg-dark-400;
-  }
+  }}
 
-  /* Markdown content styling */
-  .markdown-content {
-    @apply text-left;
-  }
 
-  .markdown-content h1 {
-    @apply text-3xl font-bold mb-6 mt-8 text-gray-900 border-b border-gray-200 pb-2;
-  }
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
 
-  .markdown-content h2 {
-    @apply text-2xl font-semibold mb-4 mt-6 text-gray-800;
-  }
+html,
+body {
+  @apply bg-white dark:bg-dark-500 text-black dark:text-white;
 
-  .markdown-content h3 {
-    @apply text-xl font-semibold mb-3 mt-5 text-gray-800;
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
   }
+}
 
-  .markdown-content h4 {
-    @apply text-lg font-semibold mb-2 mt-4 text-gray-800;
-  }
+nav {
+  @apply bg-white dark:bg-dark;
+}
 
-  .markdown-content h5 {
-    @apply text-base font-semibold mb-2 mt-3 text-gray-800;
-  }
-
-  .markdown-content h6 {
-    @apply text-sm font-semibold mb-2 mt-3 text-gray-800;
-  }
-
-  .markdown-content p {
-    @apply mb-4 text-gray-700 leading-7;
-  }
-
-  .markdown-content ul {
-    @apply mb-4 pl-6 space-y-2;
-  }
-
-  .markdown-content ol {
-    @apply mb-4 pl-6 space-y-2;
-  }
-
-  .markdown-content li {
-    @apply text-gray-700 leading-6;
-  }
-
-  .markdown-content ul li {
-    @apply list-disc;
-  }
-
-  .markdown-content ol li {
-    @apply list-decimal;
-  }
-
-  .markdown-content blockquote {
-    @apply border-l-4 border-gray-300 pl-4 py-2 mb-4 italic text-gray-600 bg-gray-50;
-  }
-
-  .markdown-content code {
-    @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-800;
-  }
-
-  .markdown-content pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
-  }
-
-  .markdown-content pre code {
-    @apply bg-transparent px-0 py-0 text-gray-100;
-  }
-
-  .markdown-content a {
-    @apply text-primary-600 hover:text-primary-800 underline;
-  }
-
-  .markdown-content img {
-    @apply max-w-full h-auto rounded-lg mb-4;
-  }
-
-  .markdown-content table {
-    @apply w-full border-collapse border border-gray-300 mb-4;
-  }
-
-  .markdown-content th {
-    @apply border border-gray-300 px-4 py-2 bg-gray-100 font-semibold text-left;
-  }
-
-  .markdown-content td {
-    @apply border border-gray-300 px-4 py-2;
-  }
-
-  .markdown-content hr {
-    @apply border-0 border-t border-gray-300 my-8;
-  }
+.separator {
+  @apply w-full h-0.5 bg-gray-200 dark:bg-dark-300;
 }
 
 @theme {
   /* Light mode colors (shades of cyan) */
-  --color-primary-50: oklch(0.97 0.03 200);
-  --color-primary-100: oklch(0.94 0.05 200); 
-  --color-primary-200: oklch(0.88 0.08 200);
-  --color-primary-300: oklch(0.82 0.10 200);
-  --color-primary-400: oklch(0.76 0.11 200);
-  --color-primary-500: oklch(0.72 0.11 200);
-  /* Base color */
-  --color-primary-600: oklch(0.63 0.12 200);
-  --color-primary-700: oklch(0.56 0.13 200);
-  --color-primary-800: oklch(0.50 0.14 200);
-  --color-primary-900: oklch(0.44 0.15 200);
-
-  /* Dark mode colors (refined neutral black/gray scale) */
-  --color-dark-50: oklch(0.85 0.01 250);
-  --color-dark-100: oklch(0.75 0.01 250);
-  --color-dark-200: oklch(0.65 0.01 250);
-  --color-dark-300: oklch(0.55 0.01 250);
-  --color-dark-400: oklch(0.45 0.01 250);
-  --color-dark-500: oklch(0.35 0.01 250);
-  --color-dark-600: oklch(0.30 0.01 250);
-  --color-dark-700: oklch(0.25 0.01 250);
-  --color-dark-800: oklch(0.20 0.01 250);
-  --color-dark-900: oklch(0.15 0.01 250);
+  --color-primary-50: #E6FBFC;
+  --color-primary-100: #CCF7F8;
+  --color-primary-200: #99EFF1;
+  --color-primary-300: #66E7EA;
+  --color-primary-400: #33DFE3;
+  --color-primary-500: #00BEC4;
+  --color-primary-600: #009BA0;
+  --color-primary-700: #007477;
+  --color-primary-800: #004D4F;
+  --color-primary-900: #002627;
+  /* dark mode colors (obsidian) */
+  --color-dark: #1A1A1A;
+  --color-dark-50: #4D4D4D;
+  --color-dark-100: #404040;
+  --color-dark-200: #333333;
+  --color-dark-300: #2B2B2B;
+  --color-dark-400: #232323;
+  --color-dark-500: #1A1A1A;
+  --color-dark-600: #141414;
+  --color-dark-700: #0D0D0D;
+  --color-dark-800: #070707;
+  --color-dark-900: #000000;
 }
 
-body {
-  font-family: 'Roboto Serif', serif;
-}
-
-main {
-  text-align: center;
-  margin: 0 auto;
-}
-
-/* Remove arrows/spinners from number inputs */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-input {
-  @apply w-full p-2 border rounded-lg border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-}
-
-textarea {
-  @apply w-full p-2 border rounded-lg resize-none overflow-auto border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-}
-
-label {
-  @apply block text-sm font-medium mb-1 text-left ml-1;
-}
-.scrollbar-none {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari and Opera */
-}
-
-@media (min-width: 480px) {
-  h1 {
-    max-width: none;
-  }
-}
-p {
-  max-width: 100%;
-  text-wrap: balance;
-  color: #6b7280;
-}
-
-.gradient-background {
-  background: linear-gradient(to bottom, #7CBCC2, #ffffff);
-}
-
-.inverse-gradient-background {
-  background: linear-gradient(to bottom, #ffffff, #7CBCC2);
-}
-
-.nav-background {
-  background: transparent;
-  backdrop-filter: blur(10px);
-}
-
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
-.duration-600 {
-  transition-duration: 600ms;
-}
+/* Import markdown styles */
+@import "./components/markdown/markdown.css";

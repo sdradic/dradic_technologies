@@ -77,6 +77,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.50.3
         version: 2.50.5
+      dompurify:
+        specifier: ^3.2.6
+        version: 3.2.6
       frontmatter:
         specifier: ^0.0.3
         version: 0.0.3

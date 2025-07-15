@@ -1,34 +1,24 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import "./app.css";
-import Loader from "./components/Loader";
+import Loader from "~/components/Loader";
 import { AuthProvider } from "./contexts/AuthContext";
+import Footer from "~/components/Footer";
+import Navbar from "~/components/Navbar";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 export function HydrateFallback() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
-      <Loader showText={true} />
+    <div className="flex flex-col items-center justify-center">
+      <Loader />
     </div>
   );
 }
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="inverse-gradient-background min-h-screen">
+    <html lang="en">
       <head>
-        <style>{`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          .fade-enter {
-            opacity: 0;
-          }
-          .fade-enter-active {
-            opacity: 1;
-            transition: opacity 300ms ease-in;
-          }
-          `}</style>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
@@ -60,7 +50,11 @@ export default function App() {
   return (
     <RootLayout>
       <AuthProvider>
-        <Outlet />
+        <ThemeProvider>
+          <Navbar />
+          <Outlet />
+          <Footer />
+        </ThemeProvider>
       </AuthProvider>
     </RootLayout>
   );

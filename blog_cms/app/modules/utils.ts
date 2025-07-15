@@ -1,5 +1,10 @@
 import { marked } from "marked";
-import type { BlogPost, BlogPostMetadata, MarkdownMetadata } from "./types";
+import { renderMarkdownToHtml as enhancedRender } from "../components/markdown";
+import type { BlogPost, MarkdownMetadata } from "./types";
+
+// ******************************************************
+//  MARKDOWN UTILS
+// ******************************************************
 
 // Configure marked for better parsing
 marked.use({
@@ -7,167 +12,11 @@ marked.use({
   gfm: true,
 });
 
-// Cache configuration
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const POSTS_METADATA_KEY = "localStoredBlogMetadata";
-const BLOG_POSTS_KEY = "localStoredBlogPosts";
-
-// Module-level cache
-let cachedPostsMetadata: BlogPostMetadata[] | null = null;
-let cachedBlogPosts: BlogPost[] | null = null;
-let lastFetchTime = 0;
-
-// Cache validity check
-export function isCacheValid(): boolean {
-  const now = Date.now();
-  return now - lastFetchTime < CACHE_DURATION;
-}
-
-// Blog Posts Metadata Cache Management
-export function getCachedPostsMetadata(
-  force: boolean = false
-): BlogPostMetadata[] | null {
-  if (!force && cachedPostsMetadata && isCacheValid()) {
-    return cachedPostsMetadata;
-  }
-  return null;
-}
-
-export function setCachedPostsMetadata(metadata: BlogPostMetadata[]): void {
-  cachedPostsMetadata = metadata;
-  lastFetchTime = Date.now();
-  handleSaveLocalStoredBlogMetadata(metadata);
-}
-
-// Blog Posts Cache Management
-export function getCachedBlogPosts(force: boolean = false): BlogPost[] | null {
-  if (!force && cachedBlogPosts && isCacheValid()) {
-    return cachedBlogPosts;
-  }
-  return null;
-}
-
-export function setCachedBlogPosts(posts: BlogPost[]): void {
-  cachedBlogPosts = posts;
-  lastFetchTime = Date.now();
-
-  // Save full posts to localStorage
-  try {
-    localStorage.setItem(BLOG_POSTS_KEY, JSON.stringify(posts));
-  } catch (error) {
-    console.error("Error saving blog posts to localStorage:", error);
-  }
-
-  // Save metadata to localStorage for offline access
-  const postsMetadata: BlogPostMetadata[] = posts.map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    created_at: post.created_at,
-    updated_at: post.updated_at,
-    image: post.image,
-  }));
-  handleSaveLocalStoredBlogMetadata(postsMetadata);
-}
-
-// LocalStorage retrieval functions
-export function getLocalStoredBlogMetadata(): BlogPostMetadata[] | null {
-  try {
-    const stored = localStorage.getItem(POSTS_METADATA_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error retrieving blog metadata from localStorage:", error);
-    return null;
-  }
-}
-
-export function getLocalStoredBlogPosts(): BlogPost[] | null {
-  try {
-    const stored = localStorage.getItem(BLOG_POSTS_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error retrieving blog posts from localStorage:", error);
-    return null;
-  }
-}
-
-// Fallback function for when API fails
-export function getBlogPostsFallback(): BlogPost[] {
-  // Try cached data first
-  if (cachedBlogPosts) {
-    return cachedBlogPosts;
-  }
-
-  // Try full posts from localStorage
-  const localPosts = getLocalStoredBlogPosts();
-  if (localPosts) {
-    return localPosts;
-  }
-
-  // Fall back to metadata only (without content)
-  const localMetadata = getLocalStoredBlogMetadata();
-  if (localMetadata) {
-    return localMetadata.map((post) => ({
-      ...post,
-      content: "", // No content available from localStorage metadata
-    }));
-  }
-
-  return [];
-}
-
-// Fallback function for metadata when API fails
-export function getPostsMetadataFallback(): BlogPostMetadata[] {
-  // Try cached data first
-  if (cachedPostsMetadata) {
-    return cachedPostsMetadata;
-  }
-
-  // Fall back to localStorage
-  const localMetadata = getLocalStoredBlogMetadata();
-  return localMetadata || [];
-}
-
-// Clear cache (useful for testing or forced refresh)
-export function clearBlogCache(): void {
-  cachedPostsMetadata = null;
-  cachedBlogPosts = null;
-  lastFetchTime = 0;
-}
-
-// Update cache when posts are modified
-export function updateBlogPostInCache(updatedPost: BlogPost): void {
-  if (cachedBlogPosts) {
-    const index = cachedBlogPosts.findIndex(
-      (post) => post.slug === updatedPost.slug
-    );
-    if (index !== -1) {
-      cachedBlogPosts[index] = updatedPost;
-      setCachedBlogPosts(cachedBlogPosts);
-    }
-  }
-}
-
-// Add new post to cache
-export function addBlogPostToCache(newPost: BlogPost): void {
-  if (cachedBlogPosts) {
-    cachedBlogPosts.push(newPost);
-    setCachedBlogPosts(cachedBlogPosts);
-  }
-}
-
-// Remove post from cache
-export function removeBlogPostFromCache(slug: string): void {
-  if (cachedBlogPosts) {
-    cachedBlogPosts = cachedBlogPosts.filter((post) => post.slug !== slug);
-    setCachedBlogPosts(cachedBlogPosts);
-  }
-}
-
+// Simplified markdown parsing
 export function parseMarkdown(content: string): {
   metadata: MarkdownMetadata;
   body: string;
 } {
-  // Split content into frontmatter and body
   const parts = content.split("---");
 
   if (parts.length < 3) {
@@ -177,22 +26,16 @@ export function parseMarkdown(content: string): {
   const frontmatter = parts[1].trim();
   const body = parts.slice(2).join("---").trim();
 
-  // Parse frontmatter
-  const metadata: MarkdownMetadata = {
-    title: "",
-    created_at: "",
-    image: "",
-  };
-
   // Use regex-based parsing to handle values that may contain colons (like URLs)
   const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "";
   const created_at = frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() || "";
+  const updated_at = frontmatter.match(/updated_at:\s*(.*)/)?.[1]?.trim() || "";
   const image = frontmatter.match(/image:\s*(.*)/)?.[1]?.trim() || "";
   const category = frontmatter.match(/category:\s*(.*)/)?.[1]?.trim() || "";
   const author = frontmatter.match(/author:\s*(.*)/)?.[1]?.trim() || "";
 
   return {
-    metadata: { title, created_at, image, category, author },
+    metadata: { title, created_at, updated_at, image, category, author },
     body,
   };
 }
@@ -201,26 +44,23 @@ export async function renderMarkdownToHtml(content: string): Promise<string> {
   try {
     let markdownBody = content;
 
-    // Check if content has frontmatter (starts with ---)
+    // Extract body if content has frontmatter
     if (content.trim().startsWith("---")) {
       try {
-        // Try to parse frontmatter and get the body
         const { body } = parseMarkdown(content);
         markdownBody = body;
-      } catch (error) {
-        // If frontmatter parsing fails, try to extract content after the second ---
+      } catch {
+        // Fallback: extract content after second ---
         const lines = content.split("\n");
-        let inFrontmatter = false;
         let frontmatterEnded = false;
         const bodyLines: string[] = [];
 
         for (const line of lines) {
           if (line.trim() === "---") {
-            if (!inFrontmatter) {
-              inFrontmatter = true;
+            if (frontmatterEnded) {
+              bodyLines.push(line);
             } else {
               frontmatterEnded = true;
-              continue;
             }
           } else if (frontmatterEnded) {
             bodyLines.push(line);
@@ -231,22 +71,193 @@ export async function renderMarkdownToHtml(content: string): Promise<string> {
       }
     }
 
-    // Convert markdown to HTML
-    const html = await marked.parse(markdownBody);
-    return html;
+    // Use the enhanced markdown renderer
+    return await enhancedRender(markdownBody);
   } catch (error) {
     console.error("Failed to render markdown to HTML:", error);
-    // Return the original content as HTML if parsing completely fails
-    const fallbackHtml = await marked.parse(content);
-    return fallbackHtml;
+    return await marked.parse(content);
   }
 }
 
-export function handleSaveLocalStoredBlogMetadata(posts: BlogPostMetadata[]) {
+// ******************************************************
+//  LOCAL STORAGE UTILS
+// ******************************************************
+
+// LocalStorage structure
+interface LocalStateData {
+  theme: string;
+  blogPosts: BlogPost[];
+  timestamp: number;
+}
+
+// Default state
+const DEFAULT_STATE: LocalStateData = {
+  theme:
+    typeof window !== "undefined" &&
+    window?.matchMedia("(prefers-color-scheme: dark)")?.matches
+      ? "dark"
+      : "light",
+  blogPosts: [],
+  timestamp: Date.now(),
+};
+
+// Cache duration for blog data (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000;
+
+// Storage key
+const STORAGE_KEY = "dradic-tech-local-state";
+
+// Global state variable
+let state: LocalStateData | null = null;
+
+// Load state from localStorage
+function loadFromStorage(): void {
   try {
-    localStorage.setItem(POSTS_METADATA_KEY, JSON.stringify(posts));
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as LocalStateData;
+      // Validate the structure and merge with defaults
+      state = {
+        theme: parsed.theme || DEFAULT_STATE.theme,
+        blogPosts: Array.isArray(parsed.blogPosts)
+          ? parsed.blogPosts
+          : DEFAULT_STATE.blogPosts,
+        timestamp: parsed.timestamp || DEFAULT_STATE.timestamp,
+      };
+    } else {
+      state = { ...DEFAULT_STATE };
+    }
   } catch (error) {
-    console.error("Error saving local stored blog metadata:", error);
-    throw error;
+    console.error("Error loading local state:", error);
+    state = { ...DEFAULT_STATE };
   }
 }
+
+// Save state to localStorage
+function saveToStorage(): void {
+  try {
+    if (state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+  } catch (error) {
+    console.error("Error saving local state:", error);
+  }
+}
+
+// Initialize state on module load
+loadFromStorage();
+
+// Theme management
+export function getTheme(): string {
+  return state?.theme || DEFAULT_STATE.theme;
+}
+
+export function setTheme(theme: string): void {
+  if (state) {
+    state.theme = theme;
+    saveToStorage();
+  }
+}
+
+// Blog posts management
+export function getBlogPosts(): BlogPost[] {
+  if (!state) return [];
+
+  // Check if cache is still valid
+  if (Date.now() - state.timestamp < CACHE_DURATION) {
+    return state.blogPosts;
+  }
+
+  // Cache expired, clear posts
+  state.blogPosts = [];
+  saveToStorage();
+  return [];
+}
+
+export function setBlogPosts(posts: BlogPost[]): void {
+  if (state) {
+    state.blogPosts = posts;
+    state.timestamp = Date.now();
+    saveToStorage();
+  }
+}
+
+// Get a specific post
+export function getPost(slug: string): BlogPost | null {
+  const posts = getBlogPosts();
+  return posts.find((p) => p.slug === slug) || null;
+}
+
+// Get a specific post content
+export function getPostContent(slug: string): string | null {
+  const post = getPost(slug);
+  return post?.content || null;
+}
+
+// Set a specific post
+export function setPost(post: BlogPost): void {
+  if (state) {
+    const existingIndex = state.blogPosts.findIndex(
+      (p) => p.slug === post.slug
+    );
+    if (existingIndex !== -1) {
+      state.blogPosts[existingIndex] = post;
+    } else {
+      state.blogPosts.push(post);
+    }
+    state.timestamp = Date.now();
+    saveToStorage();
+  }
+}
+
+// Remove a specific post
+export function removePost(slug: string): void {
+  if (state) {
+    state.blogPosts = state.blogPosts.filter((p) => p.slug !== slug);
+    state.timestamp = Date.now();
+    saveToStorage();
+  }
+}
+
+// Clear all blog data
+export function clearBlogData(): void {
+  if (state) {
+    state.blogPosts = [];
+    state.timestamp = Date.now();
+    saveToStorage();
+  }
+}
+
+// Clear all data (including theme)
+export function clearAll(): void {
+  state = { ...DEFAULT_STATE };
+  saveToStorage();
+}
+
+// Check if cache is valid
+export function isCacheValid(): boolean {
+  if (!state) return false;
+  return Date.now() - state.timestamp < CACHE_DURATION;
+}
+
+// Get cache age in milliseconds
+export function getCacheAge(): number {
+  if (!state) return Infinity;
+  return Date.now() - state.timestamp;
+}
+
+// Export a convenience object
+export const localState = {
+  getTheme,
+  setTheme,
+  getBlogPosts,
+  setBlogPosts,
+  getPost,
+  getPostContent,
+  setPost,
+  removePost,
+  clearBlogData,
+  clearAll,
+  isCacheValid,
+  getCacheAge,
+};

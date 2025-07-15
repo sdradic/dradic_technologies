@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { BlogPost } from "~/modules/types";
 import { renderMarkdownToHtml } from "~/modules/utils";
-import { CloseXIcon, FullScreenIcon } from "./Icons";
+import { FullScreenIcon, XIcon } from "./Icons";
 import { useAuth } from "~/contexts/AuthContext";
 
 export default function MarkdownPreview({
@@ -106,7 +106,7 @@ export default function MarkdownPreview({
               <h1 className="text-2xl font-bold">Markdown Preview</h1>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1 bg-primary-400 text-white rounded-md hover:bg-primary-600 transition-colors text-sm cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1 bg-primary-400 rounded-md hover:bg-primary-600 transition-colors text-sm cursor-pointer"
                 title="View in full screen"
               >
                 <FullScreenIcon className="w-4 h-4 stroke-white" />
@@ -137,7 +137,7 @@ export default function MarkdownPreview({
                 className="flex items-center justify-center w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
                 title="Close full screen"
               >
-                <CloseXIcon className="w-5 h-5 stroke-gray-400" />
+                <XIcon className="w-5 h-5 stroke-gray-400" />
               </button>
             </div>
 

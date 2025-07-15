@@ -1,16 +1,6 @@
 import { supabase } from "./supabase";
 import type { BlogPost, BlogPostMetadata } from "./types";
-import {
-  addBlogPostToCache,
-  getBlogPostsFallback,
-  getCachedBlogPosts,
-  getCachedPostsMetadata,
-  getPostsMetadataFallback,
-  removeBlogPostFromCache,
-  setCachedBlogPosts,
-  setCachedPostsMetadata,
-  updateBlogPostInCache,
-} from "./utils";
+import { localState } from "./utils";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -92,14 +82,14 @@ export async function fetchPostContent(slug: string): Promise<string> {
   }
 }
 
-export async function fetchBlogPosts(
-  force: boolean = false
-): Promise<BlogPost[]> {
+export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
     // Check cache first
-    const cachedPosts = getCachedBlogPosts(force);
-    if (cachedPosts) {
-      return cachedPosts;
+    if (localState.isCacheValid()) {
+      const cachedPosts = localState.getBlogPosts();
+      if (cachedPosts.length > 0) {
+        return cachedPosts;
+      }
     }
 
     // Fetch from API
@@ -109,23 +99,45 @@ export async function fetchBlogPosts(
     const posts = response.posts;
 
     // Update cache
-    setCachedBlogPosts(posts);
+    localState.setBlogPosts(posts);
 
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-    return getBlogPostsFallback();
+
+    // Return cached data if available
+    const cachedPosts = localState.getBlogPosts();
+    return cachedPosts;
   }
 }
 
-export async function fetchPostsMetadata(
-  force: boolean = false
-): Promise<BlogPostMetadata[]> {
+export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   try {
     // Check cache first
-    const cachedMetadata = getCachedPostsMetadata(force);
-    if (cachedMetadata) {
-      return cachedMetadata;
+    if (localState.isCacheValid()) {
+      const cachedPosts = localState.getBlogPosts();
+      if (cachedPosts.length > 0) {
+        // Extract metadata from cached posts
+        return cachedPosts.map(
+          ({
+            slug,
+            title,
+            created_at,
+            updated_at,
+            image,
+            category,
+            author,
+          }) => ({
+            slug,
+            title,
+            created_at,
+            updated_at,
+            image,
+            category,
+            author,
+          })
+        );
+      }
     }
 
     // Fetch from API
@@ -133,75 +145,27 @@ export async function fetchPostsMetadata(
       "/api/blog/posts-metadata"
     );
 
-    // Update cache
-    setCachedPostsMetadata(metadata);
-
     return metadata;
   } catch (error) {
     console.error("Error loading blog posts metadata:", error);
-    return getPostsMetadataFallback();
-  }
-}
 
-export async function updateBlogPost(post: BlogPost): Promise<BlogPost> {
-  try {
-    const updatedPost: BlogPost = await apiRequest(
-      `/api/blog/posts/${post.slug}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({
-          title: post.title,
-          content: post.content,
-          image: post.image,
-        }),
-      }
-    );
+    // Return cached data if available
+    const cachedPosts = localState.getBlogPosts();
+    if (cachedPosts.length > 0) {
+      return cachedPosts.map(
+        ({ slug, title, created_at, updated_at, image, category, author }) => ({
+          slug,
+          title,
+          created_at,
+          updated_at,
+          image,
+          category,
+          author,
+        })
+      );
+    }
 
-    // Update cache
-    updateBlogPostInCache(updatedPost);
-
-    return updatedPost;
-  } catch (error) {
-    console.error(`Error updating post ${post.slug}:`, error);
-    throw error;
-  }
-}
-
-export async function createBlogPost(
-  post: Omit<BlogPost, "created_at" | "updated_at">
-): Promise<BlogPost> {
-  try {
-    const newPost: BlogPost = await apiRequest("/api/blog/posts", {
-      method: "POST",
-      body: JSON.stringify({
-        slug: post.slug,
-        title: post.title,
-        content: post.content,
-        image: post.image,
-      }),
-    });
-
-    // Add to cache
-    addBlogPostToCache(newPost);
-
-    return newPost;
-  } catch (error) {
-    console.error("Error creating post:", error);
-    throw error;
-  }
-}
-
-export async function deleteBlogPost(slug: string): Promise<void> {
-  try {
-    await apiRequest(`/api/blog/posts/${slug}`, {
-      method: "DELETE",
-    });
-
-    // Remove from cache
-    removeBlogPostFromCache(slug);
-  } catch (error) {
-    console.error(`Error deleting post ${slug}:`, error);
-    throw error;
+    return [];
   }
 }
 

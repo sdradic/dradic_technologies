@@ -74,6 +74,7 @@ export function useAuthStore() {
 
   const login = async (email: string, password: string) => {
     try {
+      if (email !== "sdradic95@gmail.com") throw new Error("Unauthorized");
       setIsLoading(true);
       setAuthError(null);
 

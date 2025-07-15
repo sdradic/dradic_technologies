@@ -23,7 +23,7 @@ export default function AppShell() {
   if (requiredAuth && isAuthenticated === false) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen inverse-gradient-background">
-        <Loader showText={true} />
+        <Loader />
       </div>
     );
   }
