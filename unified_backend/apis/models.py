@@ -244,6 +244,8 @@ class BlogPostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     image: Optional[str] = None
+    category: Optional[str] = None
+    author: Optional[str] = None
 
     class Config:
         from_attributes = True

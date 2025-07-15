@@ -4,112 +4,89 @@ import MDXEditorComponent from "~/components/MDXEditor";
 import { localState } from "~/modules/utils";
 import { SaveIcon, ChevronLeftIcon } from "~/components/Icons";
 import type { BlogPost } from "~/modules/types";
+import { v7 as uuidv7 } from "uuid";
+import { useAuth } from "~/contexts/AuthContext";
+import { createPost } from "~/modules/apis";
+import {
+  BLOG_CATEGORIES,
+  type BlogFormData,
+  createBlogPostFromForm,
+  validateBlogForm,
+  getDefaultFormData,
+} from "~/modules/utils";
+import { BlogPostForm } from "~/components/BlogPostForm";
 
 export default function NewPost() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [formData, setFormData] = useState<BlogFormData>(getDefaultFormData());
   const [postContent, setPostContent] = useState("");
-  const [postTitle, setPostTitle] = useState("");
-  const [postImage, setPostImage] = useState("");
-  const [postCategory, setPostCategory] = useState("");
-  const [postAuthor, setPostAuthor] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   // Initialize content with frontmatter when component mounts
   useEffect(() => {
     if (!postContent) {
-      setPostContent(generateFrontmatter());
+      setPostContent("");
     }
   }, []);
 
-  // Generate frontmatter with current form values
-  const generateFrontmatter = () => {
-    const now = new Date().toISOString();
-    return `---
-title: ${postTitle || "New Post"}
-created_at: ${now}
-updated_at: ${now}
-image: ${postImage || ""}
-category: ${postCategory || ""}
-author: ${postAuthor || ""}
----
-
-`;
-  };
-
-  // Predefined categories for dropdown
-  const categories = [
-    "Technology",
-    "Programming",
-    "IoT",
-    "Electronics",
-    "Embedded Systems",
-    "Hardware",
-    "Software",
-    "Tutorial",
-    "Project",
-    "Review",
-    "News",
-    "Education",
-    "Other",
-  ];
-
   const defaultPost: BlogPost = {
     slug: "",
-    title: postTitle || "New Post",
-    content: postContent || generateFrontmatter(),
+    title: formData.title || "New Post",
+    content: postContent,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    image: postImage,
-    category: postCategory,
-    author: postAuthor,
+    image: formData.image,
+    category: formData.category,
+    author: formData.author,
   };
 
   // Memoize the selectedPost object to prevent unnecessary re-renders
   const selectedPost = useMemo(
     () => ({
       ...defaultPost,
-      title: postTitle,
-      image: postImage,
-      category: postCategory,
-      author: postAuthor,
+      title: formData.title,
+      image: formData.image,
+      category: formData.category,
+      author: formData.author,
     }),
-    [postTitle, postImage, postCategory, postAuthor, defaultPost]
+    [
+      formData.title,
+      formData.image,
+      formData.category,
+      formData.author,
+      defaultPost,
+    ]
   );
 
   const handleSave = async () => {
-    if (!postTitle.trim()) {
-      alert("Please enter a title for your post");
+    if (!isAuthenticated) {
+      alert("You must be logged in to create posts");
       return;
     }
 
-    if (!postContent.trim()) {
-      alert("Please enter some content for your post");
+    // Validate form data
+    const validation = validateBlogForm({ ...formData, content: postContent });
+    if (!validation.isValid) {
+      alert(validation.errors.join("\n"));
       return;
     }
 
     setIsSaving(true);
     try {
-      // Create a slug from the title
-      const slug = postTitle
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+      console.log("Creating new post...");
 
-      // Ensure content has proper frontmatter
-      const contentWithFrontmatter = postContent.trim().startsWith("---")
-        ? postContent
-        : generateFrontmatter() + postContent;
+      // Generate UUID v7 for the slug
+      const slug = uuidv7();
 
-      const newPost: BlogPost = {
-        ...defaultPost,
-        slug,
-        title: postTitle,
-        content: contentWithFrontmatter,
-        image: postImage,
-        category: postCategory,
-        author: postAuthor,
-        updated_at: new Date().toISOString(),
-      };
+      // Create the blog post using the shared utility
+      const newPost = createBlogPostFromForm(
+        { ...formData, content: postContent },
+        slug
+      );
+
+      // Create the post via API
+      await createPost(newPost);
 
       // Save to local storage
       localState.setPost(newPost);
@@ -118,7 +95,11 @@ author: ${postAuthor || ""}
       navigate(`/${slug}`, { state: { post: newPost } });
     } catch (error) {
       console.error("Failed to save post:", error);
-      alert("Failed to save post. Please try again.");
+      alert(
+        `Failed to save post: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setIsSaving(false);
     }
@@ -147,97 +128,7 @@ author: ${postAuthor || ""}
       </div>
 
       {/* Metadata Form */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {/* Title Input */}
-        <div className="md:col-span-2">
-          <label
-            htmlFor="post-title"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Post Title *
-          </label>
-          <input
-            id="post-title"
-            type="text"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-            placeholder="Enter your post title..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            required
-          />
-        </div>
-
-        {/* Category Dropdown */}
-        <div>
-          <label
-            htmlFor="post-category"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Category
-          </label>
-          <select
-            id="post-category"
-            value={postCategory}
-            onChange={(e) => setPostCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="">Select a category...</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Author Input */}
-        <div>
-          <label
-            htmlFor="post-author"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Author
-          </label>
-          <input
-            id="post-author"
-            type="text"
-            value={postAuthor}
-            onChange={(e) => setPostAuthor(e.target.value)}
-            placeholder="Enter author name..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        {/* Image URL Input */}
-        <div className="md:col-span-2">
-          <label
-            htmlFor="post-image"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Featured Image URL
-          </label>
-          <input
-            id="post-image"
-            type="url"
-            value={postImage}
-            onChange={(e) => setPostImage(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          />
-          {postImage && (
-            <div className="mt-2">
-              <img
-                src={postImage}
-                alt="Preview"
-                className="w-32 h-24 object-cover rounded-md border border-gray-300 dark:border-gray-600"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      <BlogPostForm formData={formData} onFormDataChange={setFormData} />
 
       {/* Editor */}
       <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto border border-gray-300 dark:border-gray-600">

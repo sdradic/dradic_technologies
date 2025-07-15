@@ -1,5 +1,10 @@
-import { useLocation } from "react-router";
-import { fetchPostContent } from "~/modules/apis";
+import { useLocation, useNavigate } from "react-router";
+import {
+  createPost,
+  deletePost,
+  fetchPostContent,
+  updatePost,
+} from "~/modules/apis";
 import type { Route } from "./+types/post";
 import { renderMarkdownToHtml, parseMarkdown } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
@@ -10,6 +15,8 @@ import { placeholderImage } from "~/modules/store";
 import { localState } from "~/modules/utils";
 import { TrashIcon, SaveIcon } from "~/components/Icons";
 import MDXEditorComponent from "~/components/MDXEditor";
+import type { BlogPost } from "~/modules/types";
+import { useAuth } from "~/contexts/AuthContext";
 
 interface LoaderData {
   html: string;
@@ -34,6 +41,8 @@ export default function Post({ params }: Route.ComponentProps) {
   const [postImage, setPostImage] = useState("");
   const [postCategory, setPostCategory] = useState("");
   const [postAuthor, setPostAuthor] = useState("");
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   // Predefined categories for dropdown
   const categories = [
@@ -172,32 +181,55 @@ export default function Post({ params }: Route.ComponentProps) {
     return <NotFound />;
   }
 
-  return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4">
-      <div className="flex flex-row w-full mb-4 pt-4 items-center justify-evenly gap-2">
-        <button className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700">
-          <TrashIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
-          Delete
-        </button>
-        <button
-          className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700"
-          onClick={() => {
-            // Simple toggle first to test if the issue is with the save logic
-            if (!isEditing) {
-              setIsEditing(true);
-              return;
-            }
+  const handleDelete = async () => {
+    if (!isAuthenticated) {
+      alert("You must be logged in to delete posts");
+      return;
+    }
 
-            // Save logic only when exiting edit mode
-            console.log("Saving and exiting edit mode...");
-            const now = new Date().toISOString();
-            const frontmatter = `---
+    if (!confirm("Are you sure you want to delete this post?")) {
+      return;
+    }
+
+    try {
+      await deletePost(params.id);
+      localState.removePost(params.id);
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+      alert(
+        `Failed to delete post: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      alert("You must be logged in to save posts");
+      return;
+    }
+
+    try {
+      await updatePost(params.id, {
+        title: postTitle,
+        content: postContent,
+        image: postImage,
+        category: postCategory,
+        author: postAuthor,
+      } as BlogPost);
+
+      const now = new Date().toISOString();
+      const frontmatter = `---
 title: ${postTitle || "Untitled"}
 created_at: ${
-              postFromState?.created_at ||
-              renderedPost?.metadata?.created_at ||
-              now
-            }
+        postFromState?.created_at || renderedPost?.metadata?.created_at || now
+      }
 updated_at: ${now}
 image: ${postImage || ""}
 category: ${postCategory || ""}
@@ -206,59 +238,88 @@ author: ${postAuthor || ""}
 
 `;
 
-            const contentWithFrontmatter = postContent.trim().startsWith("---")
-              ? postContent
-              : frontmatter + postContent;
+      const contentWithFrontmatter = postContent.trim().startsWith("---")
+        ? postContent
+        : frontmatter + postContent;
 
-            const postToSave = {
-              slug: params.id,
-              title: postTitle,
-              content: contentWithFrontmatter,
-              created_at:
-                postFromState?.created_at ||
-                renderedPost?.metadata?.created_at ||
-                now,
-              updated_at: now,
-              image: postImage,
-              category: postCategory,
-              author: postAuthor,
-            };
+      const postToSave = {
+        slug: params.id,
+        title: postTitle,
+        content: contentWithFrontmatter,
+        created_at:
+          postFromState?.created_at ||
+          renderedPost?.metadata?.created_at ||
+          now,
+        updated_at: now,
+        image: postImage,
+        category: postCategory,
+        author: postAuthor,
+      };
 
-            localState.setPost(postToSave);
+      localState.setPost(postToSave);
 
-            // Reload the post content from localStorage to show updated data
-            const updatedPost = localState.getPost(params.id);
-            if (updatedPost) {
-              // Update the rendered post with new content
-              const updateRenderedPost = async () => {
-                try {
-                  const { metadata, body } = parseMarkdown(updatedPost.content);
-                  const html = await renderMarkdownToHtml(updatedPost.content);
+      // Reload the post content from localStorage to show updated data
+      const updatedPost = localState.getPost(params.id);
+      if (updatedPost) {
+        // Update the rendered post with new content
+        const updateRenderedPost = async () => {
+          try {
+            const { metadata, body } = parseMarkdown(updatedPost.content);
+            const html = await renderMarkdownToHtml(updatedPost.content);
 
-                  setRenderedPost({
-                    html,
-                    metadata,
-                  });
+            setRenderedPost({
+              html,
+              metadata,
+            });
 
-                  // Update form fields with new metadata
-                  setPostTitle(metadata.title || "");
-                  setPostImage(metadata.image || "");
-                  setPostCategory(metadata.category || "");
-                  setPostAuthor(metadata.author || "");
-                  setPostContent(updatedPost.content);
-                } catch (error) {
-                  console.error("Failed to reload post after save:", error);
-                }
-              };
-              updateRenderedPost();
-            }
+            // Update form fields with new metadata
+            setPostTitle(metadata.title || "");
+            setPostImage(metadata.image);
+            setPostCategory(metadata.category || "");
+            setPostAuthor(metadata.author || "");
+            setPostContent(updatedPost.content);
+          } catch (error) {
+            console.error("Failed to reload post after save:", error);
+          }
+        };
+        updateRenderedPost();
+      }
 
-            setIsEditing(false);
-          }}
-        >
-          <SaveIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
-          {isEditing ? "Save" : "Edit"}
-        </button>
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save post:", error);
+      // Show user-friendly error message
+      alert(
+        `Failed to save post: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
+  return (
+    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4">
+      <div className="flex flex-row w-full mb-4 pt-4 items-center justify-evenly gap-2">
+        {isAuthenticated && (
+          <button
+            className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700"
+            onClick={isEditing ? () => setIsEditing(false) : handleDelete}
+          >
+            {isEditing ? null : (
+              <TrashIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
+            )}
+            {isEditing ? "Cancel" : "Delete"}
+          </button>
+        )}
+        {isAuthenticated && (
+          <button
+            className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700"
+            onClick={isEditing ? handleSave : handleEdit}
+          >
+            <SaveIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
+            {isEditing ? "Save" : "Edit"}
+          </button>
+        )}
       </div>
       <div className="flex flex-row w-full mb-4 pt-4 items-center justify-center gap-2">
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
@@ -281,11 +342,11 @@ author: ${postAuthor || ""}
         </p>
         <div className="w-1 h-1 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
-          {renderedPost.metadata.category || "Education Path"}
+          {renderedPost.metadata.category}
         </p>
         <div className="w-1 h-1 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
-          {renderedPost.metadata.author || "Dusan Radic"}
+          {renderedPost.metadata.author}
         </p>
       </div>
       <span className="text-3xl md:text-4xl font-bold text-center mb-2">
@@ -305,11 +366,7 @@ author: ${postAuthor || ""}
         )}
       </p>
       <img
-        src={
-          renderedPost.metadata.image
-            ? renderedPost.metadata.image
-            : placeholderImage
-        }
+        src={renderedPost.metadata.image && placeholderImage}
         alt={renderedPost.metadata.title}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
       />

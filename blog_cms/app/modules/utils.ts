@@ -294,3 +294,110 @@ export const localState = {
   isCacheValid,
   getCacheAge,
 };
+
+// ******************************************************
+//  BLOG UTILS
+// ******************************************************
+
+// Predefined categories for dropdown
+export const BLOG_CATEGORIES = [
+  "Technology",
+  "Programming",
+  "IoT",
+  "Electronics",
+  "Embedded Systems",
+  "Hardware",
+  "Software",
+  "Tutorial",
+  "Project",
+  "Review",
+  "News",
+  "Education",
+  "Other",
+] as const;
+
+export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
+
+// Interface for form data
+export interface BlogFormData {
+  title: string;
+  content: string;
+  image: string;
+  category: string;
+  author: string;
+}
+
+// Generate frontmatter with form values
+export function generateFrontmatter(
+  data: BlogFormData,
+  created_at?: string
+): string {
+  const now = new Date().toISOString();
+  return `---
+title: ${data.title || "New Post"}
+created_at: ${created_at || now}
+updated_at: ${now}
+image: ${data.image || ""}
+category: ${data.category || ""}
+author: ${data.author || ""}
+---
+
+`;
+}
+
+// Create a blog post object from form data
+export function createBlogPostFromForm(
+  data: BlogFormData,
+  slug: string,
+  created_at?: string
+): BlogPost {
+  const now = new Date().toISOString();
+
+  // Ensure content has proper frontmatter
+  const contentWithFrontmatter = data.content.trim().startsWith("---")
+    ? data.content
+    : generateFrontmatter(data, created_at) + data.content;
+
+  return {
+    slug,
+    title: data.title,
+    content: contentWithFrontmatter,
+    created_at: created_at || now,
+    updated_at: now,
+    image: data.image,
+    category: data.category,
+    author: data.author,
+  };
+}
+
+// Validate form data
+export function validateBlogForm(data: BlogFormData): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  if (!data.title.trim()) {
+    errors.push("Please enter a title for your post");
+  }
+
+  if (!data.content.trim()) {
+    errors.push("Please enter some content for your post");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+// Default form data
+export function getDefaultFormData(): BlogFormData {
+  return {
+    title: "",
+    content: "",
+    image: "",
+    category: "",
+    author: "",
+  };
+}

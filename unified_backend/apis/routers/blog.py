@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import datetime
 from typing import List, Optional
@@ -19,6 +20,8 @@ from utils.supabase_service import supabase_service
 
 blog_router = APIRouter()
 security = HTTPBearer()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 async def require_auth(request: Request) -> AuthUser:

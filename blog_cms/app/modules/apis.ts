@@ -171,7 +171,7 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
 
 export async function verifyAuthToken(token: string): Promise<any> {
   try {
-    const response = await apiRequest("/api/blog/verify-token", {
+    const response = await apiRequest("/api/blog/auth/verify", {
       method: "POST",
       body: JSON.stringify({ token }),
     });
@@ -179,6 +179,44 @@ export async function verifyAuthToken(token: string): Promise<any> {
     return response;
   } catch (error) {
     console.error("Error verifying auth token:", error);
+    throw error;
+  }
+}
+
+export async function deletePost(slug: string): Promise<any> {
+  try {
+    const response = await apiRequest(`/api/blog/posts/${slug}`, {
+      method: "DELETE",
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error deleting post ${slug}:`, error);
+    throw error;
+  }
+}
+
+export async function updatePost(slug: string, post: BlogPost): Promise<any> {
+  try {
+    const response = await apiRequest(`/api/blog/posts/${slug}`, {
+      method: "PUT",
+      body: JSON.stringify(post),
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error updating post ${slug}:`, error);
+    throw error;
+  }
+}
+
+export async function createPost(post: BlogPost): Promise<any> {
+  try {
+    const response = await apiRequest("/api/blog/posts", {
+      method: "POST",
+      body: JSON.stringify(post),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error creating post:", error);
     throw error;
   }
 }
