@@ -78,3 +78,89 @@ nav {
 
 /* Import markdown styles */
 @import "./components/markdown/markdown.css";
+
+/* Custom styles for MDXEditor dark mode */
+.dark [data-testid="mdxeditor-root"] {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-toolbar {
+  background-color: #374151 !important;
+  border-bottom: 1px solid #4b5563 !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-toolbar button {
+  color: #f9fafb !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-toolbar button:hover {
+  background-color: #4b5563 !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h1,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h2,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h3,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h4,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h5,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable h6 {
+  color: #f9fafb !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable p {
+  color: #d1d5db !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable code {
+  background-color: #374151 !important;
+  color: #10b981 !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable pre {
+  background-color: #111827 !important;
+  color: #d1d5db !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable blockquote {
+  border-left-color: #4b5563 !important;
+  color: #d1d5db !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable table {
+  border-color: #4b5563 !important;
+}
+
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable th,
+.dark [data-testid="mdxeditor-root"] .mdxeditor-content-editable td {
+  border-color: #4b5563 !important;
+  color: #d1d5db !important;
+}
+
+/* Light mode styles */
+[data-testid="mdxeditor-root"] {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+[data-testid="mdxeditor-root"] .mdxeditor-toolbar {
+  background-color: #f9fafb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+[data-testid="mdxeditor-root"] .mdxeditor-toolbar button {
+  color: #374151 !important;
+}
+
+[data-testid="mdxeditor-root"] .mdxeditor-toolbar button:hover {
+  background-color: #e5e7eb !important;
+}
+
+[data-testid="mdxeditor-root"] .mdxeditor-content-editable {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}

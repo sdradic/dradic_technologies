@@ -7,4 +7,5 @@ export default [
     route("/:id", "routes/post.tsx"),
   ]),
   route("/login", "routes/login.tsx"),
+  route("/new-post", "routes/new-post.tsx"),
 ] satisfies RouteConfig;

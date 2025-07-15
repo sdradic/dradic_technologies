@@ -98,7 +98,7 @@ async def get_blog_posts(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch blog posts: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.get("/posts/{slug}", response_model=BlogPost)
@@ -127,7 +127,7 @@ async def get_blog_post(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch blog post: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.post("/posts", response_model=BlogPost)
@@ -188,7 +188,7 @@ author: {post_data.author or ""}
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to create blog post: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.put("/posts/{slug}", response_model=BlogPost)
@@ -257,7 +257,7 @@ author: {post_data.author or ""}
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to update blog post: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.delete("/posts/{slug}")
@@ -287,7 +287,7 @@ async def delete_blog_post(slug: str, user: AuthUser = Depends(require_auth)):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to delete blog post: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.post("/auth/verify")
@@ -305,7 +305,7 @@ async def verify_auth_token(token_data: AuthToken):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Token verification failed: {str(e)}"
-        )
+        ) from e
 
 
 @blog_router.get("/posts-metadata", response_model=List[BlogPostMetadata])
@@ -341,4 +341,4 @@ async def get_blog_posts_metadata(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch blog posts metadata: {str(e)}"
-        )
+        ) from e

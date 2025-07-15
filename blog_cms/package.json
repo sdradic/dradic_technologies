@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@mdxeditor/editor": "^3.39.1",
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
     "@supabase/supabase-js": "^2.50.3",

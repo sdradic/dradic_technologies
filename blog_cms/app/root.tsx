@@ -9,9 +9,15 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 
 export function HydrateFallback() {
   return (
-    <div className="flex flex-col items-center justify-center">
-      <Loader />
-    </div>
+    <RootLayout>
+      <AuthProvider>
+        <ThemeProvider>
+          <div className="flex flex-col items-center justify-center">
+            <Loader />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
+    </RootLayout>
   );
 }
 

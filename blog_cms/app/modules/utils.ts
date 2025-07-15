@@ -17,19 +17,52 @@ export function parseMarkdown(content: string): {
   metadata: MarkdownMetadata;
   body: string;
 } {
+  // Check if content has frontmatter
+  if (!content.trim().startsWith("---")) {
+    // No frontmatter, return default metadata with full content as body
+    const now = new Date().toISOString();
+    return {
+      metadata: {
+        title: "Untitled",
+        created_at: now,
+        updated_at: now,
+        image: "",
+        category: "",
+        author: "",
+      },
+      body: content.trim(),
+    };
+  }
+
   const parts = content.split("---");
 
   if (parts.length < 3) {
-    throw new Error("Invalid markdown format: Missing frontmatter");
+    // Invalid frontmatter format, return default metadata with full content as body
+    const now = new Date().toISOString();
+    return {
+      metadata: {
+        title: "Untitled",
+        created_at: now,
+        updated_at: now,
+        image: "",
+        category: "",
+        author: "",
+      },
+      body: content.trim(),
+    };
   }
 
   const frontmatter = parts[1].trim();
   const body = parts.slice(2).join("---").trim();
 
   // Use regex-based parsing to handle values that may contain colons (like URLs)
-  const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "";
-  const created_at = frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() || "";
-  const updated_at = frontmatter.match(/updated_at:\s*(.*)/)?.[1]?.trim() || "";
+  const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "Untitled";
+  const created_at =
+    frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() ||
+    new Date().toISOString();
+  const updated_at =
+    frontmatter.match(/updated_at:\s*(.*)/)?.[1]?.trim() ||
+    new Date().toISOString();
   const image = frontmatter.match(/image:\s*(.*)/)?.[1]?.trim() || "";
   const category = frontmatter.match(/category:\s*(.*)/)?.[1]?.trim() || "";
   const author = frontmatter.match(/author:\s*(.*)/)?.[1]?.trim() || "";
@@ -101,8 +134,8 @@ const DEFAULT_STATE: LocalStateData = {
   timestamp: Date.now(),
 };
 
-// Cache duration for blog data (5 minutes)
-const CACHE_DURATION = 5 * 60 * 1000;
+// Cache duration for blog data (1 hour for testing)
+const CACHE_DURATION = 60 * 60 * 1000;
 
 // Storage key
 const STORAGE_KEY = "dradic-tech-local-state";

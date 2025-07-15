@@ -9,6 +9,7 @@ import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
 import { localState } from "~/modules/utils";
 import { TrashIcon, SaveIcon } from "~/components/Icons";
+import MDXEditorComponent from "~/components/MDXEditor";
 
 interface LoaderData {
   html: string;
@@ -28,6 +29,28 @@ export default function Post({ params }: Route.ComponentProps) {
   const [renderedPost, setRenderedPost] = useState<null | LoaderData>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [postContent, setPostContent] = useState("");
+  const [postTitle, setPostTitle] = useState("");
+  const [postImage, setPostImage] = useState("");
+  const [postCategory, setPostCategory] = useState("");
+  const [postAuthor, setPostAuthor] = useState("");
+
+  // Predefined categories for dropdown
+  const categories = [
+    "Technology",
+    "Programming",
+    "IoT",
+    "Electronics",
+    "Embedded Systems",
+    "Hardware",
+    "Software",
+    "Tutorial",
+    "Project",
+    "Review",
+    "News",
+    "Education",
+    "Other",
+  ];
 
   useEffect(() => {
     const loadPost = async () => {
@@ -61,9 +84,18 @@ export default function Post({ params }: Route.ComponentProps) {
           throw new Error("No post content available");
         }
 
+        // Set the post content for editing
+        setPostContent(content);
+
         // Parse markdown content using utility functions
         const { metadata, body } = parseMarkdown(content);
         const html = await renderMarkdownToHtml(content);
+
+        // Set metadata for editing
+        setPostTitle(metadata.title || "");
+        setPostImage(metadata.image || "");
+        setPostCategory(metadata.category || "");
+        setPostAuthor(metadata.author || "");
 
         setRenderedPost({
           html,
@@ -78,6 +110,27 @@ export default function Post({ params }: Route.ComponentProps) {
 
     loadPost();
   }, [params.id, postFromState]);
+
+  // Update rendered post when content changes in edit mode
+  useEffect(() => {
+    if (isEditing && postContent && renderedPost) {
+      const updateRenderedPost = async () => {
+        try {
+          const html = await renderMarkdownToHtml(postContent);
+          setRenderedPost((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              html,
+            };
+          });
+        } catch (error) {
+          console.error("Failed to update rendered post:", error);
+        }
+      };
+      updateRenderedPost();
+    }
+  }, [postContent, isEditing]); // Removed renderedPost from dependencies
 
   if (isLoading) {
     return (
@@ -100,7 +153,80 @@ export default function Post({ params }: Route.ComponentProps) {
         </button>
         <button
           className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700"
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={() => {
+            // Simple toggle first to test if the issue is with the save logic
+            if (!isEditing) {
+              setIsEditing(true);
+              return;
+            }
+
+            // Save logic only when exiting edit mode
+            console.log("Saving and exiting edit mode...");
+            const now = new Date().toISOString();
+            const frontmatter = `---
+title: ${postTitle || "Untitled"}
+created_at: ${
+              postFromState?.created_at ||
+              renderedPost?.metadata?.created_at ||
+              now
+            }
+updated_at: ${now}
+image: ${postImage || ""}
+category: ${postCategory || ""}
+author: ${postAuthor || ""}
+---
+
+`;
+
+            const contentWithFrontmatter = postContent.trim().startsWith("---")
+              ? postContent
+              : frontmatter + postContent;
+
+            const postToSave = {
+              slug: params.id,
+              title: postTitle,
+              content: contentWithFrontmatter,
+              created_at:
+                postFromState?.created_at ||
+                renderedPost?.metadata?.created_at ||
+                now,
+              updated_at: now,
+              image: postImage,
+              category: postCategory,
+              author: postAuthor,
+            };
+
+            localState.setPost(postToSave);
+
+            // Reload the post content from localStorage to show updated data
+            const updatedPost = localState.getPost(params.id);
+            if (updatedPost) {
+              // Update the rendered post with new content
+              const updateRenderedPost = async () => {
+                try {
+                  const { metadata, body } = parseMarkdown(updatedPost.content);
+                  const html = await renderMarkdownToHtml(updatedPost.content);
+
+                  setRenderedPost({
+                    html,
+                    metadata,
+                  });
+
+                  // Update form fields with new metadata
+                  setPostTitle(metadata.title || "");
+                  setPostImage(metadata.image || "");
+                  setPostCategory(metadata.category || "");
+                  setPostAuthor(metadata.author || "");
+                  setPostContent(updatedPost.content);
+                } catch (error) {
+                  console.error("Failed to reload post after save:", error);
+                }
+              };
+              updateRenderedPost();
+            }
+
+            setIsEditing(false);
+          }}
         >
           <SaveIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
           {isEditing ? "Save" : "Edit"}
@@ -159,9 +285,130 @@ export default function Post({ params }: Route.ComponentProps) {
         alt={renderedPost.metadata.title}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
       />
-      <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
-        <MarkdownRenderer content={renderedPost.html} />
-      </div>
+      {isEditing ? (
+        <>
+          {/* Metadata Form */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Title Input */}
+            <div className="md:col-span-2">
+              <label
+                htmlFor="post-title"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Post Title *
+              </label>
+              <input
+                id="post-title"
+                type="text"
+                value={postTitle}
+                onChange={(e) => setPostTitle(e.target.value)}
+                placeholder="Enter your post title..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+                required
+              />
+            </div>
+
+            {/* Category Dropdown */}
+            <div>
+              <label
+                htmlFor="post-category"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Category
+              </label>
+              <select
+                id="post-category"
+                value={postCategory}
+                onChange={(e) => setPostCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+              >
+                <option value="">Select a category...</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Author Input */}
+            <div>
+              <label
+                htmlFor="post-author"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Author
+              </label>
+              <input
+                id="post-author"
+                type="text"
+                value={postAuthor}
+                onChange={(e) => setPostAuthor(e.target.value)}
+                placeholder="Enter author name..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+
+            {/* Image URL Input */}
+            <div className="md:col-span-2">
+              <label
+                htmlFor="post-image"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Featured Image URL
+              </label>
+              <input
+                id="post-image"
+                type="url"
+                value={postImage}
+                onChange={(e) => setPostImage(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+              />
+              {postImage && (
+                <div className="mt-2">
+                  <img
+                    src={postImage}
+                    alt="Preview"
+                    className="w-32 h-24 object-cover rounded-md border border-gray-300 dark:border-gray-600"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Editor */}
+          <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto border border-gray-300 dark:border-gray-600">
+            <MDXEditorComponent
+              selectedPost={
+                postFromState || {
+                  slug: params.id,
+                  title: postTitle,
+                  content: postContent,
+                  created_at:
+                    renderedPost?.metadata?.created_at ||
+                    new Date().toISOString(),
+                  updated_at:
+                    renderedPost?.metadata?.updated_at ||
+                    new Date().toISOString(),
+                  image: postImage,
+                  category: postCategory,
+                  author: postAuthor,
+                }
+              }
+              selectedPostContent={postContent}
+              setSelectedPostContent={setPostContent}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
+          <MarkdownRenderer content={renderedPost.html} />
+        </div>
+      )}
     </div>
   );
 }

@@ -3,8 +3,10 @@ import { PostsList } from "~/components/PostList";
 import { SearchBar } from "~/components/SearchBar";
 import { fetchBlogPosts } from "~/modules/apis";
 import type { BlogPost } from "~/modules/types";
+import { useNavigate } from "react-router";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
@@ -48,9 +50,17 @@ export default function Home() {
         <h1 className="text-4xl font-semibold text-center my-12">
           Blog <span className="text-primary-500">CMS</span>
         </h1>
-        <h1 className="font-semibold text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2">
-          All Posts
-        </h1>
+        <div className="flex flex-row items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+          <h1 className="font-semibold text-gray-600 dark:text-gray-400">
+            All Posts
+          </h1>
+          <button
+            onClick={() => navigate("/new-post")}
+            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors cursor-pointer"
+          >
+            New Post
+          </button>
+        </div>
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700">
           <PostsList posts={filteredPosts} isLoading={isLoading} />
