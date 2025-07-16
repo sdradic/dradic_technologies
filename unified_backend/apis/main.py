@@ -34,7 +34,6 @@ DRADIC_ENV = os.getenv("DRADIC__ENV", "DEV")
 allowed_origins = [
     "https://expense-tracker-kappa-livid.vercel.app",
     "https://dradic-technologies.vercel.app",
-    "https://blog-cms-livid.vercel.app",
     "https://dradic-technologies-blog.vercel.app",
 ]
 
@@ -50,7 +49,8 @@ app.add_middleware(
     allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "Accept"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Security scheme
@@ -69,6 +69,7 @@ EXCLUDED_PATHS = {
 OPTIONAL_AUTH_PATHS = {
     "/api/blog/posts",
     "/api/blog/posts-metadata",
+    "/api/blog/posts-separated",
 }
 
 
@@ -86,6 +87,10 @@ async def get_current_user_global(request: Request) -> Optional[dict]:
 
     # Skip auth for specific blog post paths (if they're individual posts)
     if path.startswith("/api/blog/posts/") and request.method == "GET":
+        return None
+
+    # Skip auth for posts-separated endpoints (public blog viewing)
+    if path.startswith("/api/blog/posts-separated") and request.method == "GET":
         return None
 
     # Get authorization header
