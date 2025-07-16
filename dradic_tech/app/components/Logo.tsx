@@ -1,4 +1,4 @@
-import { DradicTechLogo } from "../Icons";
+import { DradicTechLogo } from "./Icons";
 import { useNavigate } from "react-router";
 
 export const Logo = () => {

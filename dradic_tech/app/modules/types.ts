@@ -16,3 +16,11 @@ export interface BlogPostWithSeparatedContent {
   metadata: BlogPostMetadata;
   content: string; // Pure markdown content without frontmatter
 }
+
+export type NavItem = {
+  label: string;
+  path: string;
+  children?: NavItem[];
+};
+
+export type NavConfig = NavItem[];

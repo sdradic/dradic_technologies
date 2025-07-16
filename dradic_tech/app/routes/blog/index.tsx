@@ -1,4 +1,4 @@
-import type { Route } from "../+types/home";
+import type { Route } from "./+types/index";
 import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList } from "~/components/PostList";
 

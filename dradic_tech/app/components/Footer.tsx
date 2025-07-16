@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { DradicTechLogo } from "./Icons";
 import { SimpleInput } from "./SimpleInput";
 import { ThemeToggle } from "./ThemeToggle";
+import { useLocation } from "react-router";
 
 export default function Footer() {
   const [isBlog, setIsBlog] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     setIsBlog(location.pathname.startsWith("/blog"));
@@ -32,7 +34,7 @@ export default function Footer() {
               <div className="md:hidden flex separator mt-4"></div>
             </div>
           )}
-          <div className="md:hidden flex flex-row items-center justify-center gap-2 w-full max-w-6xl mx-auto my-2">
+          <div className="flex flex-row items-center justify-center gap-2 w-full max-w-6xl mx-auto my-2">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               &copy; {new Date().getFullYear()} Dradic Technologies.
             </p>
@@ -40,12 +42,6 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-      <div className="hidden md:flex flex-row items-center justify-center gap-2 w-full max-w-6xl mx-auto mt-2 mb-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          &copy; {new Date().getFullYear()} Dradic Technologies.
-        </p>
-        <ThemeToggle />
-      </div>
     </>
   );
 }
