@@ -365,9 +365,7 @@ async def get_blog_posts_metadata(
 
 
 @blog_router.get("/posts-separated", response_model=BlogPostSeparatedResponse)
-async def get_blog_posts_separated(
-    current_user: Optional[dict] = Depends(get_current_user_optional),
-):
+async def get_blog_posts_separated():
     """Get all blog posts with separated metadata and content (public endpoint)"""
     try:
         post_slugs = supabase_service.list_blog_posts()
@@ -412,9 +410,7 @@ async def get_blog_posts_separated(
 
 
 @blog_router.get("/posts-separated/{slug}", response_model=BlogPostWithSeparatedContent)
-async def get_blog_post_separated(
-    slug: str, current_user: Optional[dict] = Depends(get_current_user_optional)
-):
+async def get_blog_post_separated(slug: str):
     """Get a specific blog post by slug with separated metadata and content (public endpoint)"""
     try:
         content = supabase_service.get_blog_post_content(slug)
