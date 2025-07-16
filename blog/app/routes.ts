@@ -11,6 +11,12 @@ export default [
   route("/about", "routes/about.tsx"),
   ...prefix("blog", [
     index("routes/blog.tsx"),
-    route("/:id", "routes/post.tsx"),
+    route("/:slug", "routes/post.tsx"),
+  ]),
+  ...prefix("admin", [
+    route("/login", "routes/admin/login.tsx"),
+    index("routes/admin/home.tsx"),
+    route("/new-post", "routes/admin/new-post.tsx"),
+    route("/:slug", "routes/admin/post.tsx"),
   ]),
 ] satisfies RouteConfig;

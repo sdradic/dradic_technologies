@@ -18,6 +18,7 @@ export default function Navbar() {
   const navConfig: NavConfig = [
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
+    { label: "Admin", path: "/admin" },
   ];
 
   const handleNavClick = (item: { label: string; path: string }) => {

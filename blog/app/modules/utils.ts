@@ -1,6 +1,6 @@
 import { marked } from "marked";
 import { renderMarkdownToHtml as enhancedRender } from "../components/markdown";
-import type { BlogPost, MarkdownMetadata } from "./types";
+import type { BlogPost } from "./types";
 
 // ******************************************************
 //  MARKDOWN UTILS
@@ -12,76 +12,11 @@ marked.use({
   gfm: true,
 });
 
-// Simplified markdown parsing
-export function parseMarkdown(content: string): {
-  metadata: MarkdownMetadata;
-  body: string;
-} {
-  const parts = content.split("---");
-
-  if (parts.length < 3) {
-    throw new Error("Invalid markdown format: Missing frontmatter");
-  }
-
-  const frontmatter = parts[1].trim();
-  const body = parts.slice(2).join("---").trim();
-
-  const metadata: MarkdownMetadata = {
-    title: "",
-    created_at: "",
-    updated_at: "",
-    image: "",
-    category: "",
-    author: "",
-  };
-
-  // Use regex-based parsing to handle values that may contain colons (like URLs)
-  const title = frontmatter.match(/title:\s*(.*)/)?.[1]?.trim() || "";
-  const created_at = frontmatter.match(/created_at:\s*(.*)/)?.[1]?.trim() || "";
-  const updated_at = frontmatter.match(/updated_at:\s*(.*)/)?.[1]?.trim() || "";
-  const image = frontmatter.match(/image:\s*(.*)/)?.[1]?.trim() || "";
-  const category = frontmatter.match(/category:\s*(.*)/)?.[1]?.trim() || "";
-  const author = frontmatter.match(/author:\s*(.*)/)?.[1]?.trim() || "";
-
-  return {
-    metadata: { title, created_at, updated_at, image, category, author },
-    body,
-  };
-}
-
+// Render pure markdown content to HTML
 export async function renderMarkdownToHtml(content: string): Promise<string> {
   try {
-    let markdownBody = content;
-
-    // Extract body if content has frontmatter
-    if (content.trim().startsWith("---")) {
-      try {
-        const { body } = parseMarkdown(content);
-        markdownBody = body;
-      } catch {
-        // Fallback: extract content after second ---
-        const lines = content.split("\n");
-        let frontmatterEnded = false;
-        const bodyLines: string[] = [];
-
-        for (const line of lines) {
-          if (line.trim() === "---") {
-            if (frontmatterEnded) {
-              bodyLines.push(line);
-            } else {
-              frontmatterEnded = true;
-            }
-          } else if (frontmatterEnded) {
-            bodyLines.push(line);
-          }
-        }
-
-        markdownBody = bodyLines.join("\n");
-      }
-    }
-
-    // Use the enhanced markdown renderer
-    return await enhancedRender(markdownBody);
+    // The content should be pure markdown without frontmatter
+    return await enhancedRender(content);
   } catch (error) {
     console.error("Failed to render markdown to HTML:", error);
     return await marked.parse(content);
@@ -270,3 +205,87 @@ export const localState = {
   isCacheValid,
   getCacheAge,
 };
+
+// ******************************************************
+//  BLOG CMS UTILS
+// ******************************************************
+
+// Predefined categories for dropdown
+export const BLOG_CATEGORIES = [
+  "Technology",
+  "Programming",
+  "IoT",
+  "Electronics",
+  "Embedded Systems",
+  "Hardware",
+  "Software",
+  "Tutorial",
+  "Project",
+  "Review",
+  "News",
+  "Education",
+  "Other",
+] as const;
+
+export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
+
+// Interface for form data
+export interface BlogFormData {
+  title: string;
+  content: string;
+  image: string;
+  category: string;
+  author: string;
+}
+
+// Create a blog post object from form data
+export function createBlogPostFromForm(
+  data: BlogFormData,
+  slug: string,
+  created_at?: string
+): BlogPost {
+  const now = new Date().toISOString();
+
+  return {
+    slug,
+    title: data.title,
+    content: data.content, // Pure markdown content
+    created_at: created_at || now,
+    updated_at: now,
+    image: data.image,
+    category: data.category,
+    author: data.author,
+  };
+}
+
+// Validate form data
+export function validateBlogForm(data: BlogFormData): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  if (!data.title.trim()) {
+    errors.push("Please enter a title for your post");
+  }
+
+  if (!data.content.trim()) {
+    errors.push("Please enter some content for your post");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+// Default form data
+export function getDefaultFormData(): BlogFormData {
+  return {
+    title: "",
+    content: "",
+    image: "",
+    category: "",
+    author: "",
+  };
+}

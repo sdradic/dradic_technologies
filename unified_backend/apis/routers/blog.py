@@ -13,7 +13,9 @@ from models import (
     BlogPostCreate,
     BlogPostMetadata,
     BlogPostResponse,
+    BlogPostSeparatedResponse,
     BlogPostUpdate,
+    BlogPostWithSeparatedContent,
 )
 from utils.auth import get_current_user, get_current_user_optional
 from utils.supabase_service import supabase_service
@@ -159,7 +161,7 @@ async def create_blog_post(
                 status_code=409, detail="Blog post with this slug already exists"
             )
 
-        # Create frontmatter
+        # Create frontmatter from metadata and assemble full content
         now = datetime.now().isoformat()
         frontmatter = f"""---
 title: {post_data.title}
@@ -183,7 +185,7 @@ author: {post_data.author or ""}
             created_at=now,
             updated_at=now,
             image=post_data.image or "",
-            content=frontmatter,
+            content=post_data.content,  # Return pure content
         )
 
     except HTTPException:
@@ -214,7 +216,7 @@ async def update_blog_post(
         # Parse existing metadata
         existing_metadata = supabase_service.parse_blog_post_metadata(existing_content)
 
-        # Update frontmatter
+        # Update metadata with new values
         now = datetime.now().isoformat()
         updated_title = (
             post_data.title
@@ -226,20 +228,35 @@ async def update_blog_post(
             if post_data.image is not None
             else existing_metadata.get("image", "")
         )
-        updated_content = (
-            post_data.content if post_data.content is not None else existing_content
+        updated_category = (
+            post_data.category
+            if post_data.category is not None
+            else existing_metadata.get("category", "")
+        )
+        updated_author = (
+            post_data.author
+            if post_data.author is not None
+            else existing_metadata.get("author", "")
         )
 
+        # Use new content or extract existing content without frontmatter
+        updated_content = post_data.content if post_data.content is not None else ""
+        if not updated_content and existing_content.startswith("---"):
+            end_index = existing_content.find("---", 3)
+            if end_index != -1:
+                updated_content = existing_content[end_index + 3 :].strip()
+
+        # Assemble new frontmatter
         frontmatter = f"""---
 title: {updated_title}
 created_at: {existing_metadata.get("created_at", now)}
 updated_at: {now}
 image: {updated_image}
-category: {post_data.category or ""}
-author: {post_data.author or ""}
+category: {updated_category}
+author: {updated_author}
 ---
 
-{updated_content.split("---", 2)[-1].strip() if "---" in updated_content else updated_content}"""
+{updated_content}"""
 
         # Upload to Supabase
         success = supabase_service.upload_blog_post(slug, frontmatter)
@@ -252,7 +269,7 @@ author: {post_data.author or ""}
             created_at=existing_metadata.get("created_at", now),
             updated_at=now,
             image=updated_image,
-            content=frontmatter,
+            content=updated_content,  # Return pure content
         )
 
     except HTTPException:
@@ -344,4 +361,93 @@ async def get_blog_posts_metadata(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch blog posts metadata: {str(e)}"
+        ) from e
+
+
+@blog_router.get("/posts-separated", response_model=BlogPostSeparatedResponse)
+async def get_blog_posts_separated(
+    current_user: Optional[dict] = Depends(get_current_user_optional),
+):
+    """Get all blog posts with separated metadata and content (public endpoint)"""
+    try:
+        post_slugs = supabase_service.list_blog_posts()
+        posts: List[BlogPostWithSeparatedContent] = []
+
+        for slug in post_slugs:
+            content = supabase_service.get_blog_post_content(slug)
+            if content:
+                metadata = supabase_service.parse_blog_post_metadata(content)
+                # Extract pure content without frontmatter
+                pure_content = content
+                if content.startswith("---"):
+                    end_index = content.find("---", 3)
+                    if end_index != -1:
+                        pure_content = content[end_index + 3 :].strip()
+
+                post_metadata = BlogPostMetadata(
+                    slug=slug,
+                    title=metadata.get("title", "Untitled"),
+                    created_at=metadata.get("created_at", datetime.now().isoformat()),
+                    updated_at=metadata.get("updated_at", datetime.now().isoformat()),
+                    image=metadata.get("image", ""),
+                    category=metadata.get("category", ""),
+                    author=metadata.get("author", ""),
+                )
+
+                post = BlogPostWithSeparatedContent(
+                    metadata=post_metadata,
+                    content=pure_content,
+                )
+                posts.append(post)
+
+        # Sort by updated_at (newest first)
+        posts.sort(key=lambda x: x.metadata.updated_at, reverse=True)
+
+        return BlogPostSeparatedResponse(posts=posts, total_count=len(posts))
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch blog posts: {str(e)}"
+        ) from e
+
+
+@blog_router.get("/posts-separated/{slug}", response_model=BlogPostWithSeparatedContent)
+async def get_blog_post_separated(
+    slug: str, current_user: Optional[dict] = Depends(get_current_user_optional)
+):
+    """Get a specific blog post by slug with separated metadata and content (public endpoint)"""
+    try:
+        content = supabase_service.get_blog_post_content(slug)
+        if not content:
+            raise HTTPException(status_code=404, detail="Blog post not found")
+
+        metadata = supabase_service.parse_blog_post_metadata(content)
+
+        # Extract pure content without frontmatter
+        pure_content = content
+        if content.startswith("---"):
+            end_index = content.find("---", 3)
+            if end_index != -1:
+                pure_content = content[end_index + 3 :].strip()
+
+        post_metadata = BlogPostMetadata(
+            slug=slug,
+            title=metadata.get("title", "Untitled"),
+            created_at=metadata.get("created_at", datetime.now().isoformat()),
+            updated_at=metadata.get("updated_at", datetime.now().isoformat()),
+            image=metadata.get("image", ""),
+            category=metadata.get("category", ""),
+            author=metadata.get("author", ""),
+        )
+
+        return BlogPostWithSeparatedContent(
+            metadata=post_metadata,
+            content=pure_content,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch blog post: {str(e)}"
         ) from e

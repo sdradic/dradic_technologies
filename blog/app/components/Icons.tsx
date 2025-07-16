@@ -60,123 +60,6 @@ export const MenuIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChipSVG = ({ className, ...props }: any) => {
-  return (
-    <svg
-      viewBox="0 0 220 220"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      {...props}
-    >
-      <rect
-        x="40"
-        y="40"
-        width="140"
-        height="140"
-        rx="20"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="8"
-      />
-      <rect x="80" y="80" width="60" height="60" rx="12" fill="#16B6C6" />
-      <circle cx="110" cy="110" r="10" fill="#2ED9E7" />
-      {/* Pins */}
-      <line x1="110" y1="10" x2="110" y2="40" stroke="#fff" strokeWidth="8" />
-      <circle
-        cx="110"
-        cy="10"
-        r="8"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="4"
-      />
-      <line x1="110" y1="180" x2="110" y2="210" stroke="#fff" strokeWidth="8" />
-      <circle
-        cx="110"
-        cy="210"
-        r="8"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="4"
-      />
-      <line x1="40" y1="110" x2="10" y2="110" stroke="#fff" strokeWidth="8" />
-      <circle
-        cx="10"
-        cy="110"
-        r="8"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="4"
-      />
-      <line x1="180" y1="110" x2="210" y2="110" stroke="#fff" strokeWidth="8" />
-      <circle
-        cx="210"
-        cy="110"
-        r="8"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="4"
-      />
-      {/* More pins for corners */}
-      <line x1="60" y1="60" x2="35" y2="35" stroke="#fff" strokeWidth="6" />
-      <circle
-        cx="35"
-        cy="35"
-        r="6"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="3"
-      />
-      <line x1="160" y1="60" x2="185" y2="35" stroke="#fff" strokeWidth="6" />
-      <circle
-        cx="185"
-        cy="35"
-        r="6"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="3"
-      />
-      <line x1="60" y1="160" x2="35" y2="185" stroke="#fff" strokeWidth="6" />
-      <circle
-        cx="35"
-        cy="185"
-        r="6"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="3"
-      />
-      <line x1="160" y1="160" x2="185" y2="185" stroke="#fff" strokeWidth="6" />
-      <circle
-        cx="185"
-        cy="185"
-        r="6"
-        fill="#fff"
-        stroke="#16B6C6"
-        strokeWidth="3"
-      />
-    </svg>
-  );
-};
-
-export const RefreshIcon = ({ className, ...props }: any) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-};
-
 export const ChevronLeftIcon = ({ className, ...props }: any) => {
   return (
     <svg
@@ -189,6 +72,31 @@ export const ChevronLeftIcon = ({ className, ...props }: any) => {
       <path
         d="M15 19.92L8.48 13.4C7.71 12.63 7.71 11.37 8.48 10.6L15 4.07996"
         strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const SaveIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <path
+        d="M8.00001 22H16C20.02 22 20.74 20.39 20.95 18.43L21.7 10.43C21.97 7.99 21.27 6 17 6H7.00001C2.73001 6 2.03001 7.99 2.30001 10.43L3.05001 18.43C3.26001 20.39 3.98001 22 8.00001 22Z"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 6V5.2C8 3.43 8 2 11.2 2H12.8C16 2 16 3.43 16 5.2V6"
         strokeMiterlimit="10"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -258,14 +166,94 @@ export const SearchIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const SunIcon = ({ className, ...props }: any) => {
+export const ChipSVG = ({ className, ...props }: any) => {
   return (
-    <svg fill="none" viewBox="0 0 24 24" className={className} {...props}>
+    <svg
+      viewBox="0 0 220 220"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <rect
+        x="40"
+        y="40"
+        width="140"
+        height="140"
+        rx="20"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="8"
+      />
+      <rect x="80" y="80" width="60" height="60" rx="12" fill="#16B6C6" />
+      <circle cx="110" cy="110" r="10" fill="#2ED9E7" />
+      {/* Pins */}
+      <line x1="110" y1="10" x2="110" y2="40" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="110"
+        cy="10"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="110" y1="180" x2="110" y2="210" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="110"
+        cy="210"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="210" y1="110" x2="180" y2="110" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="210"
+        cy="110"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="10" y1="110" x2="40" y2="110" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="10"
+        cy="110"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+    </svg>
+  );
+};
+
+export const RefreshIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
       <path
+        d="M1 4V10H7"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        {...props}
-        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+      />
+      <path
+        d="M23 20V14H17"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -273,12 +261,82 @@ export const SunIcon = ({ className, ...props }: any) => {
 
 export const MoonIcon = ({ className, ...props }: any) => {
   return (
-    <svg fill="none" viewBox="0 0 24 24" className={className} {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      {...props}
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        {...props}
+        strokeWidth={2}
         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+      />
+    </svg>
+  );
+};
+
+export const SunIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+      />
+    </svg>
+  );
+};
+
+export const TrashIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <path
+        d="M21 5.97998C17.67 5.64998 14.32 5.47998 10.98 5.47998C9 5.47998 7.02 5.57998 5.04 5.77998L3 5.97998"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.33 16.5H13.66"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.5 12.5H14.5"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -287,17 +345,23 @@ export const MoonIcon = ({ className, ...props }: any) => {
 export const XIcon = ({ className, ...props }: any) => {
   return (
     <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
       viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
       {...props}
     >
       <path
+        d="M18 6L6 18"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={2}
-        d="M6 18L18 6M6 6l12 12"
+      />
+      <path
+        d="M6 6L18 18"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

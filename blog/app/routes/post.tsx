@@ -1,13 +1,14 @@
 import { useLocation } from "react-router";
 import { fetchPostContent } from "~/modules/api";
 import type { Route } from "./+types/post";
-import { renderMarkdownToHtml, parseMarkdown } from "~/modules/utils";
+import { renderMarkdownToHtml } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
 import NotFound from "./404";
 import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
 import { localState } from "~/modules/utils";
+import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
 interface LoaderData {
   html: string;
@@ -31,41 +32,59 @@ export default function Post({ params }: Route.ComponentProps) {
     const loadPost = async () => {
       try {
         setIsLoading(true);
-        let content = "";
+        let post: BlogPostWithSeparatedContent | null = null;
 
-        // Check local cache first
-        const cachedPost = localState.getPost(params.id);
-        if (cachedPost?.content) {
-          content = cachedPost.content;
-        } else if (
+        // Skip cache for now to ensure fresh data (temporary fix for migration)
+        if (
           postFromState?.content &&
           postFromState.content !== "Error loading content"
         ) {
           // Use content from navigation state if available and valid
-          content = postFromState.content;
+          // Convert to new format if needed
+          if (postFromState.metadata) {
+            post = postFromState;
+          } else {
+            post = {
+              metadata: {
+                slug: postFromState.slug,
+                title: postFromState.title,
+                created_at: postFromState.created_at,
+                updated_at: postFromState.updated_at,
+                image: postFromState.image,
+                category: postFromState.category,
+                author: postFromState.author,
+              },
+              content: postFromState.content,
+            };
+          }
         } else {
           // Fetch content from API
-          content = await fetchPostContent(params.id);
+          post = await fetchPostContent(params.slug);
           // Cache the post for future use
-          if (content && postFromState) {
+          if (post) {
             localState.setPost({
-              ...postFromState,
-              content,
+              slug: post.metadata.slug,
+              title: post.metadata.title,
+              created_at: post.metadata.created_at,
+              updated_at: post.metadata.updated_at,
+              image: post.metadata.image,
+              category: post.metadata.category,
+              author: post.metadata.author,
+              content: post.content,
             });
           }
         }
 
-        if (!content) {
+        if (!post || !post.content) {
           throw new Error("No post content available");
         }
 
-        // Parse markdown content using utility functions
-        const { metadata, body } = parseMarkdown(content);
-        const html = await renderMarkdownToHtml(content);
+        // Render markdown content (now pure markdown without frontmatter)
+        const html = await renderMarkdownToHtml(post.content);
 
         setRenderedPost({
           html,
-          metadata,
+          metadata: post.metadata,
         });
       } catch (err) {
         console.error("Failed to load blog post", err);
@@ -75,7 +94,7 @@ export default function Post({ params }: Route.ComponentProps) {
     };
 
     loadPost();
-  }, [params.id, postFromState]);
+  }, [params.slug, postFromState]);
 
   if (isLoading) {
     return (
@@ -141,7 +160,7 @@ export default function Post({ params }: Route.ComponentProps) {
             ? renderedPost.metadata.image
             : placeholderImage
         }
-        alt={renderedPost.metadata.title}
+        alt={renderedPost.metadata.image}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
       />
       <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { MoonIcon, SunIcon } from "./Icons";
-import { useTheme } from "~/context/ThemeContext";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();

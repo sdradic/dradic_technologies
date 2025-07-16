@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -13,17 +14,32 @@ import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
 import { Suspense, useEffect } from "react";
-import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 export function HydrateFallback() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <ThemeProvider>
-      <div>
-        <Navbar />
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <Loader />
+      {isAdminRoute ? (
+        <AuthProvider>
+          <div>
+            <Navbar />
+            <div className="flex flex-col items-center justify-center min-h-screen">
+              <Loader />
+            </div>
+          </div>
+        </AuthProvider>
+      ) : (
+        <div>
+          <Navbar />
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <Loader />
+          </div>
         </div>
-      </div>
+      )}
     </ThemeProvider>
   );
 }
@@ -59,16 +75,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppContent() {
+  return (
+    <div>
+      <Navbar />
+      <Suspense fallback={<Loader />}>
+        <Outlet />
+      </Suspense>
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <ThemeProvider>
-      <div>
-        <Navbar />
-        <Suspense fallback={<Loader />}>
-          <Outlet />
-        </Suspense>
-        <Footer />
-      </div>
+      <AuthProvider isAdminRoute={isAdminRoute}>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

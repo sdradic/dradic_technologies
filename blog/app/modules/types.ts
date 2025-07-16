@@ -9,14 +9,10 @@ export interface BlogPostMetadata {
 }
 
 export interface BlogPost extends BlogPostMetadata {
-  content: string;
+  content: string; // Pure markdown content without frontmatter
 }
 
-export interface MarkdownMetadata {
-  title: string;
-  created_at: string;
-  updated_at: string;
-  image?: string;
-  author?: string;
-  category?: string;
+export interface BlogPostWithSeparatedContent {
+  metadata: BlogPostMetadata;
+  content: string; // Pure markdown content without frontmatter
 }

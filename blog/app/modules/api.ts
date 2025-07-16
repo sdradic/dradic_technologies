@@ -1,5 +1,9 @@
 import { supabase } from "./supabase";
-import type { BlogPost, BlogPostMetadata } from "./types";
+import type {
+  BlogPost,
+  BlogPostMetadata,
+  BlogPostWithSeparatedContent,
+} from "./types";
 import { localState } from "./utils";
 
 const API_BASE_URL =
@@ -72,42 +76,55 @@ async function apiRequest<T>(
   }
 }
 
-export async function fetchPostContent(slug: string): Promise<string> {
+export async function fetchPostContent(
+  slug: string
+): Promise<BlogPostWithSeparatedContent> {
   try {
-    const post: BlogPost = await apiRequest(`/api/blog/posts/${slug}`);
-    return post.content;
+    // Clear cache for this post to force fresh data (temporary fix for migration)
+    localState.removePost(slug);
+
+    const post: BlogPostWithSeparatedContent = await apiRequest(
+      `/api/blog/posts-separated/${slug}`
+    );
+    return post;
   } catch (error) {
     console.error(`Error fetching post content for ${slug}:`, error);
     throw error;
   }
 }
 
-export async function fetchBlogPosts(): Promise<BlogPost[]> {
+export async function fetchBlogPosts(): Promise<
+  BlogPostWithSeparatedContent[]
+> {
   try {
-    // Check cache first
-    if (localState.isCacheValid()) {
-      const cachedPosts = localState.getBlogPosts();
-      if (cachedPosts.length > 0) {
-        return cachedPosts;
-      }
-    }
+    // Clear cache to force fresh data (temporary fix for migration)
+    localState.clearBlogData();
 
     // Fetch from API
-    const response: { posts: BlogPost[]; total_count: number } =
-      await apiRequest("/api/blog/posts");
+    const response: {
+      posts: BlogPostWithSeparatedContent[];
+      total_count: number;
+    } = await apiRequest("/api/blog/posts-separated");
 
     const posts = response.posts;
 
-    // Update cache
-    localState.setBlogPosts(posts);
+    // Update cache with converted format
+    const convertedPosts = posts.map((post) => ({
+      slug: post.metadata.slug,
+      title: post.metadata.title,
+      created_at: post.metadata.created_at,
+      updated_at: post.metadata.updated_at,
+      image: post.metadata.image,
+      category: post.metadata.category,
+      author: post.metadata.author,
+      content: post.content,
+    }));
+    localState.setBlogPosts(convertedPosts);
 
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-
-    // Return cached data if available
-    const cachedPosts = localState.getBlogPosts();
-    return cachedPosts;
+    return [];
   }
 }
 
@@ -171,7 +188,7 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
 
 export async function verifyAuthToken(token: string): Promise<any> {
   try {
-    const response = await apiRequest("/api/blog/verify-token", {
+    const response = await apiRequest("/api/blog/auth/verify", {
       method: "POST",
       body: JSON.stringify({ token }),
     });
@@ -179,6 +196,67 @@ export async function verifyAuthToken(token: string): Promise<any> {
     return response;
   } catch (error) {
     console.error("Error verifying auth token:", error);
+    throw error;
+  }
+}
+
+// CMS-specific API functions
+export async function deletePost(slug: string): Promise<any> {
+  try {
+    const response = await apiRequest(`/api/blog/posts/${slug}`, {
+      method: "DELETE",
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error deleting post ${slug}:`, error);
+    throw error;
+  }
+}
+
+export async function updatePost(
+  slug: string,
+  post: BlogPost
+): Promise<BlogPost> {
+  try {
+    // Extract only the fields that the backend expects for updates
+    const updateData = {
+      title: post.title,
+      content: post.content, // Pure markdown content
+      image: post.image,
+      category: post.category,
+      author: post.author,
+    };
+
+    const response: BlogPost = await apiRequest(`/api/blog/posts/${slug}`, {
+      method: "PUT",
+      body: JSON.stringify(updateData),
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error updating post ${slug}:`, error);
+    throw error;
+  }
+}
+
+export async function createPost(post: BlogPost): Promise<BlogPost> {
+  try {
+    // Extract only the fields that the backend expects for creation
+    const createData = {
+      slug: post.slug,
+      title: post.title,
+      content: post.content, // Pure markdown content
+      image: post.image,
+      category: post.category,
+      author: post.author,
+    };
+
+    const response: BlogPost = await apiRequest("/api/blog/posts", {
+      method: "POST",
+      body: JSON.stringify(createData),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error creating post:", error);
     throw error;
   }
 }

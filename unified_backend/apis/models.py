@@ -231,7 +231,7 @@ class BlogPost(BlogPostMetadata):
 class BlogPostCreate(BaseModel):
     slug: str
     title: str
-    content: str
+    content: str  # Pure markdown content without frontmatter
     image: Optional[str] = None
     category: Optional[str] = None
     author: Optional[str] = None
@@ -242,7 +242,7 @@ class BlogPostCreate(BaseModel):
 
 class BlogPostUpdate(BaseModel):
     title: Optional[str] = None
-    content: Optional[str] = None
+    content: Optional[str] = None  # Pure markdown content without frontmatter
     image: Optional[str] = None
     category: Optional[str] = None
     author: Optional[str] = None
@@ -253,6 +253,20 @@ class BlogPostUpdate(BaseModel):
 
 class BlogPostResponse(BaseModel):
     posts: List[BlogPost]
+    total_count: int
+
+
+# New models for separated metadata and content
+class BlogPostWithSeparatedContent(BaseModel):
+    metadata: BlogPostMetadata
+    content: str  # Pure markdown content without frontmatter
+
+    class Config:
+        from_attributes = True
+
+
+class BlogPostSeparatedResponse(BaseModel):
+    posts: List[BlogPostWithSeparatedContent]
     total_count: int
 
 

@@ -10,6 +10,9 @@ importers:
 
   blog:
     dependencies:
+      '@mdxeditor/editor':
+        specifier: ^3.39.1
+        version: 3.39.1(@codemirror/language@6.11.2)(@lezer/highlight@1.2.1)(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(yjs@13.6.27)
       '@react-router/node':
         specifier: ^7.5.3
         version: 7.6.3(react-router@7.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
@@ -17,11 +20,14 @@ importers:
         specifier: ^7.5.3
         version: 7.6.3(react-router@7.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
       '@supabase/supabase-js':
-        specifier: ^2.30.4
+        specifier: ^2.50.3
         version: 2.50.5
       dompurify:
         specifier: ^3.2.6
         version: 3.2.6
+      frontmatter:
+        specifier: ^0.0.3
+        version: 0.0.3
       isbot:
         specifier: ^5.1.27
         version: 5.1.28
@@ -37,6 +43,9 @@ importers:
       react-router:
         specifier: ^7.5.3
         version: 7.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
     devDependencies:
       '@react-router/dev':
         specifier: ^7.5.3

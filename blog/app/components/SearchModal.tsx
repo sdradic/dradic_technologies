@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "./Icons";
-import type { BlogPost } from "~/modules/types";
+import type { BlogPostWithSeparatedContent } from "~/modules/types";
 import { fetchBlogPosts } from "~/modules/api";
 import { SearchBar } from "./SearchBar";
 import { placeholderImage } from "~/modules/store";
@@ -11,8 +11,10 @@ interface SearchModalProps {
 }
 
 export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPostWithSeparatedContent[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<
+    BlogPostWithSeparatedContent[]
+  >([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,7 +42,9 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     } else {
       const filtered = posts.filter(
         (post) =>
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.metadata.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
           post.content?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredPosts(filtered);
@@ -82,9 +86,9 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+              className="p-2 rounded-lg transition-colors cursor-pointer"
             >
-              <XIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <XIcon className="size-6 stroke-gray-500 dark:stroke-gray-400 hover:stroke-primary-500 dark:hover:stroke-primary-500" />
             </button>
           </div>
 
@@ -115,30 +119,29 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                 {filteredPosts.length > 0 ? (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredPosts.map((post) => (
-                      <li key={post.slug} className="py-2">
+                      <li key={post.metadata.slug} className="py-2">
                         <a
-                          href={`/blog/${post.slug}`}
+                          href={`/blog/${post.metadata.slug}`}
                           className="flex gap-4 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           onClick={onClose}
                         >
                           <img
-                            src={post?.image || placeholderImage}
-                            alt={post.title}
+                            src={post.metadata?.image || placeholderImage}
+                            alt={post.metadata.title}
                             className="object-cover w-32 h-24 rounded-md"
                           />
                           <div className="flex flex-col gap-2 items-start justify-center">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200">
-                              {post.title}
+                              {post.metadata.title}
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(post.created_at).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                }
-                              )}
+                              {new Date(
+                                post.metadata.created_at
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
                             </p>
                           </div>
                         </a>
