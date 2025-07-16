@@ -1,4 +1,5 @@
 import { BLOG_CATEGORIES, type BlogFormData } from "~/modules/utils";
+import { Dropdown } from "./Dropdown";
 
 interface BlogPostFormProps {
   formData: BlogFormData;
@@ -48,20 +49,13 @@ export function BlogPostForm({
         >
           Category
         </label>
-        <select
+        <Dropdown
           id="post-category"
-          value={formData.category}
-          onChange={(e) => handleChange("category", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+          defaultValue={formData.category}
+          onChange={(value) => handleChange("category", value)}
           disabled={disabled}
-        >
-          <option value="">Select a category...</option>
-          {BLOG_CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
+          data={[...BLOG_CATEGORIES]}
+        />
       </div>
 
       {/* Author Input */}

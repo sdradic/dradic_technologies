@@ -2,13 +2,17 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
 import { localState } from "~/modules/utils";
-import { SaveIcon, ChevronLeftIcon, TrashIcon } from "~/components/Icons";
+import {
+  SaveIcon,
+  ChevronLeftIcon,
+  TrashIcon,
+  ThreeDotsMenuIcon,
+} from "~/components/Icons";
 import type { BlogPost, BlogPostWithSeparatedContent } from "~/modules/types";
 import { v7 as uuidv7 } from "uuid";
 import { useAuth } from "~/contexts/AuthContext";
 import { createPost, updatePost, deletePost } from "~/modules/api";
 import {
-  BLOG_CATEGORIES,
   type BlogFormData,
   createBlogPostFromForm,
   validateBlogForm,
@@ -35,6 +39,8 @@ export default function PostEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(!isNewPost);
   const hasNavigated = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -105,14 +111,14 @@ export default function PostEditor({
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      alert("You must be logged in to save posts");
+      setError("You must be logged in to save posts");
       return;
     }
 
     // Validate form data
     const validation = validateBlogForm({ ...formData, content: postContent });
     if (!validation.isValid) {
-      alert(validation.errors.join("\n"));
+      setError(validation.errors.join("\n"));
       return;
     }
 
@@ -148,7 +154,7 @@ export default function PostEditor({
       }
     } catch (error) {
       console.error("Failed to save post:", error);
-      alert(
+      setError(
         `Failed to save post: ${
           error instanceof Error ? error.message : "Unknown error"
         }`
@@ -160,12 +166,12 @@ export default function PostEditor({
 
   const handleDelete = async () => {
     if (!isAuthenticated) {
-      alert("You must be logged in to delete posts");
+      setError("You must be logged in to delete posts");
       return;
     }
 
     if (!slug) {
-      alert("Cannot delete a post that hasn't been saved yet");
+      setError("Cannot delete a post that hasn't been saved yet");
       return;
     }
 
@@ -176,7 +182,7 @@ export default function PostEditor({
         navigate("/admin");
       } catch (error) {
         console.error("Failed to delete post:", error);
-        alert("Failed to delete post. Please try again.");
+        setError("Failed to delete post. Please try again.");
       }
     }
   };
@@ -197,37 +203,86 @@ export default function PostEditor({
 
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto px-4 pt-4">
-      {/* Header */}
-      <div className="flex flex-row w-full mb-4 pt-4 items-center justify-between gap-2">
-        <button
-          onClick={() => navigate("/admin")}
-          className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700"
-        >
-          <ChevronLeftIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
-          Back
-        </button>
-        <h1 className="text-2xl font-bold text-center">
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg">
+          {error}
+        </div>
+      )}
+      {/* Header controls*/}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row w-full pt-4 items-center justify-between">
+          <button
+            onClick={() => navigate("/admin")}
+            className="group flex flex-row items-center gap-2 px-4 py-2 min-w-24 justify-center cursor-pointer hover:text-primary-500 dark:hover:text-primary-400"
+          >
+            <ChevronLeftIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+            Back
+          </button>
+          {/* Desktop Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="group flex-row md:flex hidden items-center gap-2 border border-primary-500 text-white bg-primary-400 dark:bg-primary-600 dark:border-gray-700 rounded-full px-4 py-2 min-w-28 justify-center cursor-pointer hover:bg-primary-500 dark:hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <SaveIcon className="size-4 stroke-2 md:flex hidden stroke-white dark:stroke-gray-100 group-hover:stroke-gray-50 dark:group-hover:stroke-gray-50" />
+              {isSaving ? "Saving..." : "Save"}
+            </button>
+            {!isNewPost && (
+              <button
+                onClick={handleDelete}
+                className="group flex-row md:flex hidden items-center gap-2 px-4 py-2 min-w-28 justify-center cursor-pointer border border-red-200 dark:border-red-700 rounded-full hover:bg-red-600 dark:hover:bg-red-400 bg-red-500 dark:bg-red-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <TrashIcon className="size-4 stroke-2 stroke-white dark:stroke-red-100 group-hover:stroke-red-100 dark:group-hover:stroke-red-100" />
+                Delete
+              </button>
+            )}
+          </div>
+          {/* Mobile Buttons */}
+          <div className="flex gap-2 md:hidden">
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <ThreeDotsMenuIcon className="size-5 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400 cursor-pointer" />
+            </button>
+            {isMobileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-transparent"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                />
+                <div className="absolute right-4 top-36 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSave();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    disabled={isSaving}
+                    className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-gray-100 hover:text-primary-500 dark:hover:bg-gray-400 dark:hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <SaveIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+                    {isSaving ? "Saving..." : "Save"}
+                  </button>
+                  {!isNewPost && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-red-100 dark:hover:bg-red-400 text-red-600 dark:text-red-200"
+                    >
+                      <TrashIcon className="size-4 stroke-2 stroke-red-500 dark:stroke-red-200 group-hover:stroke-red-500 dark:group-hover:stroke-red-200" />
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-center mb-4">
           {isNewPost ? "Create New Post" : "Edit Post"}
         </h1>
-        <div className="flex gap-2">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="flex flex-row items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-100 dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <SaveIcon className="w-4 h-4 stroke-2 stroke-gray-500 dark:stroke-gray-100" />
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-          {!isNewPost && (
-            <button
-              onClick={handleDelete}
-              className="flex flex-row items-center gap-2 border border-red-200 dark:border-red-700 rounded-full px-4 py-2 min-w-24 justify-center cursor-pointer hover:bg-red-100 dark:hover:bg-red-600 bg-red-50 dark:bg-red-700 text-red-600 dark:text-red-100"
-            >
-              <TrashIcon className="w-4 h-4 stroke-2 stroke-red-500 dark:stroke-red-100" />
-              Delete
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Metadata Form */}

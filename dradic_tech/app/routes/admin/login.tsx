@@ -4,11 +4,46 @@ import { useAuth } from "~/contexts/AuthContext";
 import { DradicTechLogo } from "~/components/Icons";
 
 export default function AdminLogin() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const navigate = useNavigate();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const hasNavigated = useRef(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isAuthLoading && !hasNavigated.current) {
+      setIsCheckingAuth(false);
+      if (isAuthenticated) {
+        hasNavigated.current = true;
+        navigate("/admin");
+      }
+    }
+  }, [isAuthLoading, isAuthenticated, navigate]);
+
+  if (isCheckingAuth || isAuthLoading) {
+    return null;
+  }
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      await login(email, password);
+      navigate("/admin");
+    } catch (err) {
+      console.error(
+        "Failed to sign in. Please check your credentials and try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
       <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
         <FormHeader />
-        <FormComponent />
+        <FormComponent handleLogin={handleLogin} isLoading={isLoading} />
       </div>
     </div>
   );
@@ -50,42 +85,13 @@ function FormHeader() {
   );
 }
 
-function FormComponent() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const navigate = useNavigate();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const hasNavigated = useRef(false);
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!isAuthLoading && !hasNavigated.current) {
-      setIsCheckingAuth(false);
-      if (isAuthenticated) {
-        hasNavigated.current = true;
-        navigate("/admin");
-      }
-    }
-  }, [isAuthLoading, isAuthenticated, navigate]);
-
-  if (isCheckingAuth || isAuthLoading) {
-    return null;
-  }
-
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      await login(email, password);
-      navigate("/admin");
-    } catch (err) {
-      console.error(
-        "Failed to sign in. Please check your credentials and try again."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+function FormComponent({
+  handleLogin,
+  isLoading,
+}: {
+  handleLogin: (email: string, password: string) => Promise<void>;
+  isLoading: boolean;
+}) {
   return (
     <form
       className="space-y-6"
