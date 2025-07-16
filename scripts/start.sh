@@ -52,36 +52,24 @@ fi
 # Frontend project selection
 echo ""
 echo "🌐 Select a frontend project to run on port 3000:"
-echo "1) Blog CMS"
-echo "2) Dradic Tech"
-echo "3) Expense Tracker"
-echo "4) Blog"
-echo "5) Exit"
+echo "1) Dradic Tech"
+echo "2) Expense Tracker"
+echo "3) Exit"
 echo ""
-read -p "Enter your choice (1-5): " choice
+read -p "Enter your choice (1-3): " choice
 
 case $choice in
     1)
-        echo "🚀 Starting Blog CMS..."
-        cd blog_cms
-        pnpm dev
-        ;;
-    2)
         echo "🚀 Starting Dradic Tech..."
         cd dradic_tech
         pnpm dev
         ;;
-    3)
+    2)
         echo "🚀 Starting Expense Tracker..."
         cd expense_tracker
         pnpm dev
         ;;
-    4)
-        echo "🚀 Starting Blog..."
-        cd blog
-        pnpm dev
-        ;;
-    5)
+    3)
         echo "👋 Goodbye!"
         kill $BACKEND_PID 2>/dev/null || true
         exit 0

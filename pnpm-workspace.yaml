@@ -1,5 +1,3 @@
 packages:
-  - "blog_cms"
   - "dradic_tech"
   - "expense_tracker"
-  - "blog"

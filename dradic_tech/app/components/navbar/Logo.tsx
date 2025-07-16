@@ -1,26 +1,22 @@
+import { DradicTechLogo } from "../Icons";
 import { useNavigate } from "react-router";
 
-interface LogoProps {
-  className?: string;
-}
-
-export const Logo = ({ className = "" }: LogoProps) => {
+export const Logo = () => {
   const navigate = useNavigate();
+
   return (
     <div
-      className="h-24 flex items-center cursor-pointer"
+      className="flex items-center cursor-pointer"
       onClick={() => navigate("/")}
     >
-      <img
-        src="/dradic_tech_logo_w_title.png"
-        alt="Dradic Technologies"
-        className={`hidden sm:block h-16 w-auto object-contain ${className}`}
-      />
-      <img
-        src="/dradic_tech_logo.png"
-        alt="Dradic Technologies"
-        className={`sm:hidden h-16 w-auto object-contain ${className}`}
-      />
+      <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-500" />
+      <div className="hidden md:flex items-center">
+        <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
+        <div className="flex flex-col">
+          <span className="text-2xl font-semibold">Dradic</span>
+          <span className="text-sm text-gray-500">Technologies</span>
+        </div>
+      </div>
     </div>
   );
 };

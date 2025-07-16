@@ -1,83 +1,74 @@
-import type { FormEvent } from "react";
+import { useState } from "react";
 
-interface UserContact {
-  name: string;
-  email: string;
-  phone: number;
-}
 export default function ContactForm() {
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    console.log(e);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
   };
   return (
-    <div className="flex items-center justify-center sm:px-2 px-8 max-h-screen">
-      <div className="max-w-md w-full p-8 bg-white dark:bg-gray-800 rounded-lg">
-        <div>
-          <div className="flex flex-col items-center justify-center gap-1 mt-2">
-            <h3 className="text-gray-500 dark:text-gray-400 mb-8">
-              Give us the following details and we'll contact you shortly
-            </h3>
-          </div>
+    <div className="flex flex-col gap-4 w-full min-w-80 p-6 bg-gray-50 dark:bg-dark-400 rounded-xl">
+      <h1 className="text-2xl font-bold text-center text-gray-700 dark:text-gray-300">
+        Contact Me
+      </h1>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="name"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your name"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-full bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+          />
         </div>
-        <form
-          className="space-y-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(e);
-          }}
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="email"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-full bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="message"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            placeholder="Enter your message"
+            rows={4}
+            className="resize-none w-full border border-gray-300 dark:border-gray-700 rounded-2xl bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-primary-500 dark:bg-primary-600 text-white font-medium rounded-full hover:bg-primary-600 dark:hover:bg-primary-700 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-primary-500 dark:border-primary-600"
+          disabled={isLoading}
         >
-          <div className="flex flex-col gap-6">
-            <div>
-              <label htmlFor="Full Name" className="">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="name"
-                required
-                className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                placeholder="Full Name"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label htmlFor="Phone" className="">
-                Phone
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="phone"
-                required
-                className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                placeholder="Phone"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative cursor-pointer w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
+          Send Message
+        </button>
+      </form>
     </div>
   );
 }

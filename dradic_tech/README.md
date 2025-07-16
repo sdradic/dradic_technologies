@@ -1,242 +1,87 @@
-# Dradic Technologies - Main Website
+# Welcome to React Router!
 
-The official website and portfolio for Dradic Technologies, showcasing our projects, services, and company information.
+A modern, production-ready template for building full-stack React applications using React Router.
 
-## 🚀 Features
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
-- **Modern Design**: Clean, professional design with smooth animations
-- **Project Showcase**: Highlighting our best work and achievements
-- **Contact Forms**: Easy communication channels for potential clients
-- **Blog Integration**: Seamless integration with our blog CMS
-- **Responsive Layout**: Optimized for all devices and screen sizes
-- **Performance Optimized**: Fast loading times and smooth interactions
+## Features
 
-## 🛠️ Tech Stack
+- 🚀 Server-side rendering
+- ⚡️ Hot Module Replacement (HMR)
+- 📦 Asset bundling and optimization
+- 🔄 Data loading and mutations
+- 🔒 TypeScript by default
+- 🎉 TailwindCSS for styling
+- 📖 [React Router docs](https://reactrouter.com/)
 
-- **Frontend**: React Router v7, TypeScript, Tailwind CSS
-- **Backend**: FastAPI (unified backend)
-- **Database**: Supabase (PostgreSQL)
-- **Build Tool**: Vite
-- **Package Manager**: pnpm
-- **Deployment**: Static hosting ready
+## Getting Started
 
-## 📦 Installation
+### Installation
 
-This project is part of the Dradic Technologies monorepo. To get started:
-
-1. **From the root directory:**
-
-   ```bash
-   pnpm install
-   ```
-
-2. **Start the development environment:**
-   ```bash
-   pnpm start
-   ```
-   Then select "Dradic Tech" from the menu.
-
-## 🎯 Quick Start
-
-### Manual Setup
-
-1. **Navigate to the project:**
-
-   ```bash
-   cd dradic_tech
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Start development server:**
-
-   ```bash
-   pnpm dev
-   ```
-
-4. **Open your browser:**
-   Navigate to `http://localhost:3000`
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the project root with the following variables:
-
-```env
-# API Configuration
-VITE_API_BASE_URL=http://localhost:8000
-
-# Contact Information
-VITE_CONTACT_EMAIL=contact@dradictech.com
-VITE_COMPANY_NAME=Dradic Technologies
-```
-
-## 📁 Project Structure
-
-```
-dradic_tech/
-├── app/
-│   ├── components/          # Reusable UI components
-│   │   ├── navbar/         # Navigation components
-│   │   │   ├── DesktopNav.tsx
-│   │   │   ├── MobileNav.tsx
-│   │   │   └── Logo.tsx
-│   │   ├── ContactForm.tsx
-│   │   ├── MemberCard.tsx
-│   │   ├── SectionHeader.tsx
-│   │   └── ...
-│   ├── module/             # Utility modules
-│   │   ├── apis.ts        # API client functions
-│   │   ├── projectsConfig.ts
-│   │   ├── types.ts       # TypeScript type definitions
-│   │   └── utils.ts       # Utility functions
-│   ├── routes/            # Page components
-│   │   ├── HomePage.tsx
-│   │   ├── AboutPage.tsx
-│   │   ├── ProjectsPage.tsx
-│   │   ├── ContactPage.tsx
-│   │   ├── BlogPage.tsx
-│   │   └── ...
-│   └── root.tsx           # Root component
-├── public/                # Static assets
-│   ├── dradic_tech_logo.png
-│   ├── dusan.jpeg
-│   └── ...
-└── package.json
-```
-
-## 🎨 Key Components
-
-### Navigation System
-
-Modern navigation with:
-
-- Desktop and mobile responsive design
-- Smooth transitions and animations
-- Logo and branding integration
-- Contact information display
-
-### Project Showcase
-
-Comprehensive project display featuring:
-
-- Project cards with images and descriptions
-- Technology stack indicators
-- Live demo links
-- GitHub repository links
-
-### Contact Forms
-
-Professional contact system with:
-
-- Contact form with validation
-- Email integration
-- Response confirmation
-- Spam protection
-
-### Blog Integration
-
-Seamless blog integration:
-
-- Blog post listing
-- Individual post pages
-- Category filtering
-- Search functionality
-
-## 🚀 Available Scripts
+Install the dependencies:
 
 ```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm typecheck    # Run TypeScript type checking
-pnpm clean        # Clean build artifacts
+npm install
 ```
 
-## 🔗 API Integration
+### Development
 
-This project integrates with the unified backend API for:
-
-- Contact form submissions
-- Blog post data
-- Project information
-- Analytics tracking
-
-## 🎯 Content Management
-
-### Projects Configuration
-
-Projects are configured in `app/module/projectsConfig.ts`:
-
-- Project metadata
-- Technology stacks
-- Links and descriptions
-- Image assets
-
-### Blog Integration
-
-Blog posts are fetched from the unified backend:
-
-- Real-time content updates
-- SEO optimization
-- Social media sharing
-
-## 🚀 Deployment
-
-### Build for Production
+Start the development server with HMR:
 
 ```bash
-pnpm build
+npm run dev
 ```
 
-The build output will be in the `build/` directory, ready for deployment.
+Your application will be available at `http://localhost:5173`.
 
-### Recommended Hosting
+## Building for Production
 
-- Vercel (recommended for React Router v7)
-- Netlify
-- AWS S3 + CloudFront
+Create a production build:
 
-### Environment Setup
+```bash
+npm run build
+```
 
-For production deployment, ensure:
+## Deployment
 
-- Environment variables are properly configured
-- API endpoints point to production backend
-- Analytics tracking is enabled
-- SSL certificates are configured
+### Docker Deployment
 
-## 📊 Performance Optimization
+To build and run using Docker:
 
-- **Code Splitting**: Automatic route-based code splitting
-- **Image Optimization**: Optimized images and lazy loading
-- **Caching**: Efficient caching strategies
-- **Bundle Analysis**: Regular bundle size monitoring
+```bash
+docker build -t my-app .
 
-## 🔍 SEO Features
+# Run the container
+docker run -p 3000:3000 my-app
+```
 
-- **Meta Tags**: Dynamic meta tag generation
-- **Structured Data**: JSON-LD schema markup
-- **Sitemap**: Automatic sitemap generation
-- **Open Graph**: Social media optimization
+The containerized application can be deployed to any platform that supports Docker, including:
 
-## 🤝 Contributing
+- AWS ECS
+- Google Cloud Run
+- Azure Container Apps
+- Digital Ocean App Platform
+- Fly.io
+- Railway
 
-1. Follow the monorepo development workflow
-2. Ensure all tests pass
-3. Follow the established code style
-4. Update documentation as needed
-5. Test responsive design across devices
+### DIY Deployment
 
-## 📄 License
+If you're familiar with deploying Node applications, the built-in app server is production-ready.
 
-This project is proprietary to Dradic Technologies.
+Make sure to deploy the output of `npm run build`
+
+```
+├── package.json
+├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
+├── build/
+│   ├── client/    # Static assets
+│   └── server/    # Server-side code
+```
+
+## Styling
+
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
 ---
 
-**Built with ❤️ by Dradic Technologies**
+Built with ❤️ using React Router.

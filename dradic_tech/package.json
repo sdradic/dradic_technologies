@@ -1,25 +1,26 @@
 {
-  "name": "dradic-technologies",
+  "name": "blog",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc",
-    "clean": "rm -rf build dist .react-router",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix"
+    "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@mdxeditor/editor": "^3.39.1",
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
-    "gray-matter": "^4.0.3",
+    "@supabase/supabase-js": "^2.50.3",
+    "dompurify": "^3.2.6",
+    "frontmatter": "^0.0.3",
     "isbot": "^5.1.27",
     "marked": "^15.0.12",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.5.3"
+    "react-router": "^7.5.3",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@react-router/dev": "^7.5.3",

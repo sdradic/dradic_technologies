@@ -6,8 +6,7 @@ A unified repository containing all Dradic Technologies projects and application
 
 ```
 dradic_technologies/
-├── blog_cms/              # Blog Content Management System
-├── dradic_tech/           # Main company website & portfolio
+├── dradic_tech/           # Main company website, portfolio & blog CMS
 ├── expense_tracker/       # Personal expense tracking application
 ├── unified_backend/       # Shared backend APIs (FastAPI)
 │   └── apis/             # FastAPI application
@@ -70,10 +69,7 @@ pnpm backend:dev
 #### Start individual frontend projects
 
 ```bash
-# Blog CMS
-cd blog_cms && pnpm dev
-
-# Dradic Tech website
+# Dradic Tech website & blog
 cd dradic_tech && pnpm dev
 
 # Expense Tracker
@@ -135,17 +131,16 @@ This monorepo uses pnpm workspaces for dependency management:
 
 ## 📁 Project Details
 
-### Blog CMS (`blog_cms/`)
-
-A content management system for creating and managing blog posts.
-
-- **Features**: Markdown editor, post management, authentication
-
 ### Dradic Tech (`dradic_tech/`)
 
-Main company website and portfolio showcasing projects and services.
+Main company website, portfolio, and integrated blog content management system.
 
-- **Features**: Project showcase, contact forms, blog integration
+- **Features**:
+  - Company website and project showcase
+  - Contact forms and business information
+  - **Blog CMS**: Markdown editor, post management, admin panel
+  - **Blog Frontend**: Public blog with search and navigation
+  - Authentication and user management
 
 ### Expense Tracker (`expense_tracker/`)
 
