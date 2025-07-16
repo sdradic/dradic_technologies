@@ -25,7 +25,7 @@ export default function Navbar() {
       label: "Portfolio",
       path: "/portfolio",
       children: [
-        { label: "Apps", path: "/portfolio/apps" },
+        { label: "Apps", path: "/portfolio/" },
         { label: "Projects", path: "/portfolio/projects" },
       ],
     },
