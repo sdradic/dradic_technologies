@@ -18,9 +18,11 @@ export default function Home() {
           software engineer and DevOps specialist.
         </h1>
         <p className="text-xl text-gray-500 dark:text-gray-400 text-center md:text-center mt-4">
-          I run a software consulting practice called{" "}
-          <span className="text-primary-500">Dradic Technologies</span> where I
-          help companies build and deploy modern software solutions.
+          I strive to create innovative applications and implement robust DevOps
+          solutions through my company{" "}
+          <span className="text-primary-500">Dradic Technologies</span>,
+          combining software engineering excellence with modern deployment
+          practices.
         </p>
         <div className="flex flex-col md:flex-row md:justify-between items-center mx-auto px-4 md:px-8 mt-16 gap-4">
           {/* Right Side: Chip SVG Illustration */}
