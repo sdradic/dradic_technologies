@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { DesktopNav } from "./navbar/DesktopNav";
 import { MobileNav } from "./navbar/MobileNav";
@@ -15,6 +15,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedPath = location.pathname;
+  const [isBlog, setIsBlog] = useState(false);
   const navConfig: NavConfig = [
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
@@ -25,6 +26,10 @@ export default function Navbar() {
     navigate(item.path);
     setIsSidebarOpen(false);
   };
+
+  useEffect(() => {
+    setIsBlog(location.pathname.startsWith("/blog"));
+  }, [location.pathname]);
 
   return (
     <>
@@ -38,19 +43,23 @@ export default function Navbar() {
           />
 
           <ThemeToggle />
-          <div
-            className="cursor-pointer rounded-xl p-2"
-            onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
-          >
-            <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
-          </div>
+          {isBlog && (
+            <div
+              className="cursor-pointer rounded-xl p-2"
+              onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+            >
+              <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
+            </div>
+          )}
           <MobileNav
             isSidebarOpen={isSidebarOpen}
             onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           />
-          <button className="sm:flex hidden bg-primary-500 dark:bg-primary-600 text-white cursor-pointer gap-2 px-4 py-2 text-sm rounded-full hover:bg-primary-600 dark:hover:bg-primary-500">
-            Subscribe
-          </button>
+          {isBlog && (
+            <button className="sm:flex hidden bg-primary-500 dark:bg-primary-600 text-white cursor-pointer gap-2 px-4 py-2 text-sm rounded-full hover:bg-primary-600 dark:hover:bg-primary-500">
+              Subscribe
+            </button>
+          )}
         </div>
       </nav>
 

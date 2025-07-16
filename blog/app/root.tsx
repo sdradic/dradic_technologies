@@ -13,8 +13,8 @@ import "./app.css";
 import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
-import { Suspense, useEffect } from "react";
-import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { Suspense } from "react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
 export function HydrateFallback() {

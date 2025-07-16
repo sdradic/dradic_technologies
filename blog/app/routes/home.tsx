@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList } from "~/components/PostList";
+import { ChipSVG } from "~/components/Icons";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,25 +16,20 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex flex-col mt-4 justify-center items-center text-center mx-4 pt-4 pb-8">
         <h1 className="text-4xl md:text-6xl font-semibold">
-          Weekly <span className="text-primary-500">embedded</span> +{" "}
-          <span className="text-primary-500">programing</span> tech insights and
-          tutorials
+          Hi! I'm <span className="text-primary-500">Dusan Radic</span>, a
+          software engineer and embedded systems developer.
         </h1>
-        <p className="text-lg text-gray-500 dark:text-gray-400 mt-4">
-          Join us as we explore the latest trends in technology and share our
-          insights with you.
-        </p>
-        {/* Subscribe Bar */}
-        <SimpleInput />
-      </div>
-      {/* Recent Posts */}
-      <div className="flex flex-col mt-6 justify-center text-left mx-4">
-        <h2 className="font-semibold text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Latest content
-        </h2>
-        <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700">
-          <PostsList />
-        </ul>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mx-auto px-4 md:px-8 mt-16 gap-4">
+          <p className="text-xl text-gray-50 text-wrap text-center md:text-left">
+            I run a software consulting practice called{" "}
+            <span className="text-primary-500">Dradic Technologies</span> where
+            I help companies build the next generation of embedded systems.
+          </p>
+          {/* Right Side: Chip SVG Illustration */}
+          <div className="flexflex-1 items-center justify-center mt-6">
+            <ChipSVG className="md:size-96 size-64" />
+          </div>
+        </div>
       </div>
     </div>
   );

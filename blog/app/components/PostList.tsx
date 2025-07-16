@@ -4,28 +4,58 @@ import { fetchBlogPosts } from "~/modules/api";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 import { placeholderImage } from "~/modules/store";
 
-export function PostsList() {
+interface PostListProps {
+  isAdmin?: boolean;
+  searchQuery?: string;
+}
+
+export function PostsList({
+  isAdmin = false,
+  searchQuery = "",
+}: PostListProps) {
   const [posts, setPosts] = useState<BlogPostWithSeparatedContent[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<
+    BlogPostWithSeparatedContent[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadPosts = async () => {
       const posts = await fetchBlogPosts();
       setPosts(posts);
+      setFilteredPosts(posts);
       setIsLoading(false);
     };
     loadPosts();
   }, []);
 
+  // Handle search filtering
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim().toLowerCase();
+    if (trimmedQuery === "") {
+      setFilteredPosts(posts);
+    } else {
+      const filtered = posts.filter((post) =>
+        post.metadata.title.toLowerCase().includes(trimmedQuery)
+      );
+      setFilteredPosts(filtered);
+    }
+  }, [searchQuery, posts]);
+
   if (isLoading) {
     return <PostsSkeleton />;
   }
 
+  const baseUrl = isAdmin ? "/admin" : "/blog";
+
   return (
     <>
-      {posts && posts.length > 0 ? (
-        posts.map((post: BlogPostWithSeparatedContent) => (
-          <NavLink key={post.metadata.slug} to={`/blog/${post.metadata.slug}`}>
+      {filteredPosts && filteredPosts.length > 0 ? (
+        filteredPosts.map((post: BlogPostWithSeparatedContent) => (
+          <NavLink
+            key={post.metadata.slug}
+            to={`${baseUrl}/${post.metadata.slug}`}
+          >
             <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-500 rounded-lg">
               <img
                 src={post.metadata?.image || placeholderImage}

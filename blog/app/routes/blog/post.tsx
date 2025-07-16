@@ -4,7 +4,7 @@ import type { Route } from "./+types/post";
 import { renderMarkdownToHtml } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
-import NotFound from "./404";
+import NotFound from "../404";
 import Loader from "~/components/Loader";
 import { placeholderImage } from "~/modules/store";
 import { localState } from "~/modules/utils";

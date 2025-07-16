@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "~/contexts/AuthContext";
-import Loader from "~/components/Loader";
-import { ThemeToggle } from "~/components/ThemeToggle";
 import { DradicTechLogo } from "~/components/Icons";
 
 export default function AdminLogin() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
       <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
         <FormHeader />
         <FormComponent />
@@ -57,12 +55,14 @@ function FormComponent() {
   const { login, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const hasNavigated = useRef(false);
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (!isAuthLoading) {
+    if (!isAuthLoading && !hasNavigated.current) {
       setIsCheckingAuth(false);
       if (isAuthenticated) {
+        hasNavigated.current = true;
         navigate("/admin");
       }
     }
