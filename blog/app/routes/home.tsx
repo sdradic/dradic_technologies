@@ -20,14 +20,14 @@ export default function Home() {
           software engineer and embedded systems developer.
         </h1>
         <div className="flex flex-col md:flex-row md:justify-between items-center mx-auto px-4 md:px-8 mt-16 gap-4">
-          <p className="text-xl text-gray-50 text-wrap text-center md:text-left">
+          <p className="text-xl text-gray-500 dark:text-white text-wrap text-center md:text-left">
             I run a software consulting practice called{" "}
             <span className="text-primary-500">Dradic Technologies</span> where
             I help companies build the next generation of embedded systems.
           </p>
           {/* Right Side: Chip SVG Illustration */}
           <div className="flexflex-1 items-center justify-center mt-6">
-            <ChipSVG className="md:size-96 size-64" />
+            <ChipSVG className="md:size-96 size-64 stroke-8 stroke-primary-500 dark:stroke-white" />
           </div>
         </div>
       </div>

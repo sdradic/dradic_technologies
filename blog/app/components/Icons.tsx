@@ -206,7 +206,16 @@ export const ChipSVG = ({ className, ...props }: any) => {
         stroke="#16B6C6"
         strokeWidth="4"
       />
-      <line x1="210" y1="110" x2="180" y2="110" stroke="#fff" strokeWidth="8" />
+      <line x1="40" y1="110" x2="10" y2="110" stroke="#fff" strokeWidth="8" />
+      <circle
+        cx="10"
+        cy="110"
+        r="8"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="4"
+      />
+      <line x1="180" y1="110" x2="210" y2="110" stroke="#fff" strokeWidth="8" />
       <circle
         cx="210"
         cy="110"
@@ -215,14 +224,42 @@ export const ChipSVG = ({ className, ...props }: any) => {
         stroke="#16B6C6"
         strokeWidth="4"
       />
-      <line x1="10" y1="110" x2="40" y2="110" stroke="#fff" strokeWidth="8" />
+      {/* More pins for corners */}
+      <line x1="60" y1="60" x2="35" y2="35" stroke="#fff" strokeWidth="6" />
       <circle
-        cx="10"
-        cy="110"
-        r="8"
+        cx="35"
+        cy="35"
+        r="6"
         fill="#fff"
         stroke="#16B6C6"
-        strokeWidth="4"
+        strokeWidth="3"
+      />
+      <line x1="160" y1="60" x2="185" y2="35" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="185"
+        cy="35"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+      <line x1="60" y1="160" x2="35" y2="185" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="35"
+        cy="185"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
+      />
+      <line x1="160" y1="160" x2="185" y2="185" stroke="#fff" strokeWidth="6" />
+      <circle
+        cx="185"
+        cy="185"
+        r="6"
+        fill="#fff"
+        stroke="#16B6C6"
+        strokeWidth="3"
       />
     </svg>
   );
