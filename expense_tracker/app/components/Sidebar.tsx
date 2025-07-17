@@ -13,6 +13,7 @@ import {
   IncomesIcon,
   DashboardIconOutline,
 } from "./Icons";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavItem {
   path: string;
@@ -199,15 +200,18 @@ export function Sidebar() {
         </ul>
         <div className="separator mt-8" />
         <div className="flex flex-col justify-between h-full pt-4">
-          <div>
-            <h2
-              className={`text-gray-500 dark:text-gray-500 px-4 mb-2 text-left ${
-                isCollapsed ? "hidden" : ""
-              }`}
-            >
-              SUPPORT
-            </h2>
+          <h2
+            className={`text-gray-500 dark:text-gray-500 px-4 mb-2 text-left ${
+              isCollapsed ? "hidden" : ""
+            }`}
+          >
+            SUPPORT
+          </h2>
+          <div className="flex flex-col justify-between h-full">
             <ul className="space-y-2">{navOptions.map(renderNavItem)}</ul>
+            <div className="md:flex hidden justify-center">
+              <ThemeToggle />
+            </div>
           </div>
           <div>
             <div className="separator my-4" />

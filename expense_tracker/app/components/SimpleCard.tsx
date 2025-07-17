@@ -6,7 +6,6 @@ export interface SimpleCardProps {
   description?: string | null;
   value: number;
   currency?: (typeof acceptedCurrencies)[number];
-  symbol?: string | null;
   previousValue?: number | null;
   canEdit?: boolean;
   onValueChange?: (newValue: number) => void;
@@ -18,7 +17,6 @@ export default function SimpleCard({
   description = null,
   value,
   currency = "CLP",
-  symbol = null,
   previousValue = null,
   inCarrousel = false,
 }: SimpleCardProps) {
@@ -47,7 +45,6 @@ export default function SimpleCard({
               value >= 0 ? "" : "text-red-500"
             }`}
           >
-            {symbol}
             {formatCurrency(value, currency)}
           </p>
           {percentageChange && (

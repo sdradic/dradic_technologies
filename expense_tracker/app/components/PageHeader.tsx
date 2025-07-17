@@ -1,13 +1,27 @@
+import { ThemeToggle } from "./ThemeToggle";
+
 interface PageHeaderProps {
   title: string;
   subtitle: string;
+  children?: React.ReactNode;
 }
 
-export default function PageHeader({ title, subtitle }: PageHeaderProps) {
+export default function PageHeader({
+  title,
+  subtitle,
+  children,
+}: PageHeaderProps) {
   return (
-    <div className="px-6 py-4 border-gray-200 dark:border-gray-800">
-      <h1 className="text-start text-3xl dark:text-white">{title}</h1>
-      <p className="text-gray-400 dark:text-gray-600 text-left">{subtitle}</p>
+    <div className="flex flex-col md:flex-row items-center justify-between gap-2 w-full px-6 py-4">
+      <div className="flex flex-col">
+        <h1 className="text-center md:text-start text-3xl dark:text-white">
+          {title}
+        </h1>
+        <p className="text-gray-400 dark:text-gray-600 text-left">{subtitle}</p>
+      </div>
+      <div className="flex items-center gap-2 ">
+        {children && <div className="flex items-center gap-2">{children}</div>}
+      </div>
     </div>
   );
 }

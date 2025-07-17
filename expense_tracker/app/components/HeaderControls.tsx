@@ -1,6 +1,5 @@
 import { useLocation } from "react-router";
 import PageHeader from "./PageHeader";
-import { ThemeToggle } from "./ThemeToggle";
 import { useEffect, useState } from "react";
 
 interface PageHeader {
@@ -8,7 +7,7 @@ interface PageHeader {
   subtitle: string;
 }
 
-export function HeaderControls() {
+export function HeaderControls({ children }: { children?: React.ReactNode }) {
   const location = useLocation();
   const PageHeaderMapping = {
     about: {
@@ -52,19 +51,9 @@ export function HeaderControls() {
       <PageHeader
         title={pageHeader?.title ?? ""}
         subtitle={pageHeader?.subtitle ?? ""}
-      />
-      <div className="flex items-center gap-2 px-4">
-        <div className="hidden md:block">
-          <ThemeToggle />
-        </div>
-        <button
-          className={`btn-secondary w-32 ${
-            pageHeader?.title === "Monthly Expenses" ? "block" : "hidden"
-          }`}
-        >
-          Export data
-        </button>
-      </div>
+      >
+        {children}
+      </PageHeader>
     </div>
   );
 }

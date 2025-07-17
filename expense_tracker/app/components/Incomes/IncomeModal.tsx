@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { SimpleModal } from "./SimpleModal";
-import { DatePicker } from "./DatePicker";
-import { Dropdown } from "./Dropdown";
-import { TrashIcon, PlusIconOutline } from "./Icons";
+import { SimpleModal } from "../SimpleModal";
+import { DatePicker } from "../DatePicker";
+import { Dropdown } from "../Dropdown";
+import { TrashIcon, PlusIconOutline } from "../Icons";
 import type {
   IncomeCreate,
   IncomeWithDetails,

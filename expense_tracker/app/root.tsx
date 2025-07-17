@@ -5,12 +5,18 @@ import {
   Scripts,
   ScrollRestoration,
   Outlet,
+  useLocation,
+  Navigate,
 } from "react-router";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { Sidebar } from "./components/Sidebar";
+import { Navbar } from "./components/Navbar";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Suspense } from "react";
+import Loader from "./components/Loader";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,6 +30,29 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export function HydrateFallback() {
+  const location = useLocation();
+  const isAuthRoute = !["/", "/login", "/logout", "/404"].includes(
+    location.pathname
+  );
+
+  return (
+    <ThemeProvider>
+      {isAuthRoute ? (
+        <AuthProvider>
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <Loader />
+          </div>
+        </AuthProvider>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <Loader />
+        </div>
+      )}
+    </ThemeProvider>
+  );
+}
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -43,12 +72,62 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Public routes that don't require authentication
+  const publicRoutes = ["/login", "/logout", "/404"];
+  const isPublicRoute = publicRoutes.includes(location.pathname);
+
+  // Redirect to login if not authenticated and trying to access protected route
+  if (!isAuthenticated && !isPublicRoute) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // For public routes, render without layout
+  if (isPublicRoute) {
+    return (
+      <div>
+        <Outlet />
+      </div>
+    );
+  }
+
+  // For authenticated routes, render with layout
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Desktop Sidebar - only show on md and above */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+
+      {/* Main content area */}
+      <main className="flex-1 overflow-auto">
+        {/* Mobile/Tablet Navbar - only show on screens smaller than md */}
+        <div className="md:hidden">
+          <Navbar />
+        </div>
+        <Suspense
+          fallback={
+            <div className="p-4 flex items-center justify-center">
+              <Loader />
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <RootLayout>
       <ThemeProvider>
         <AuthProvider>
-          <Outlet />
+          <AppContent />
         </AuthProvider>
       </ThemeProvider>
     </RootLayout>

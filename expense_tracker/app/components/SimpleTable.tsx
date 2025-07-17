@@ -134,39 +134,49 @@ export default function SimpleTable({
 
       {/* Mobile Cards */}
       <div className="sm:hidden">
-        {data.map((row) => (
-          <div
-            key={row.id}
-            className={`border-y border-gray-200 dark:border-gray-500 p-4 ${
-              onRowClick
-                ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
-                : ""
-            }`}
-            onClick={() => handleRowClick(row)}
-          >
-            {columns.map((column) => (
-              <div
-                key={column}
-                className="flex justify-between items-center py-2"
-              >
-                <span className=" text-gray-500 dark:text-gray-400">
-                  {column}:
-                </span>
-                <span className="text-gray-800 dark:text-white">
-                  {column.toLowerCase() === "amount" &&
-                  typeof row[column.replace(/\s+/g, "_").toLowerCase()] ===
-                    "number" &&
-                  row.currency
-                    ? formatCurrency(
-                        Number(row[column.replace(/\s+/g, "_").toLowerCase()]),
-                        row.currency as (typeof acceptedCurrencies)[number]
-                      )
-                    : row[column.replace(/\s+/g, "_").toLowerCase()]}
-                </span>
-              </div>
-            ))}
+        {data.length > 0 ? (
+          data.map((row) => (
+            <div
+              key={row.id}
+              className={`border-y border-gray-200 dark:border-gray-500 p-4 ${
+                onRowClick
+                  ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  : ""
+              }`}
+              onClick={() => handleRowClick(row)}
+            >
+              {columns.map((column) => (
+                <div
+                  key={column}
+                  className="flex justify-between items-center py-2"
+                >
+                  <span className=" text-gray-500 dark:text-gray-400">
+                    {column}:
+                  </span>
+                  <span className="text-gray-800 dark:text-white">
+                    {column.toLowerCase() === "amount" &&
+                    typeof row[column.replace(/\s+/g, "_").toLowerCase()] ===
+                      "number" &&
+                    row.currency
+                      ? formatCurrency(
+                          Number(
+                            row[column.replace(/\s+/g, "_").toLowerCase()]
+                          ),
+                          row.currency as (typeof acceptedCurrencies)[number]
+                        )
+                      : row[column.replace(/\s+/g, "_").toLowerCase()]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))
+        ) : (
+          <div className="p-8">
+            <p className="text-gray-500 dark:text-gray-400 text-center">
+              No records found
+            </p>
           </div>
-        ))}
+        )}
       </div>
       <div className="flex flex-row justify-end mt-2"></div>
     </div>

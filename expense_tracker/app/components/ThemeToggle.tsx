@@ -1,25 +1,36 @@
-import { useTheme } from "../contexts/ThemeContext";
+import { useEffect } from "react";
 import { MoonIcon, SunIcon } from "./Icons";
-import { darkModeState } from "~/modules/store";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
-  const { setIsDarkMode } = darkModeState();
+
+  useEffect(() => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+  }, [theme]);
 
   return (
-    <button
-      onClick={() => {
-        toggleTheme();
-        setIsDarkMode(theme === "light");
-      }}
-      className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+    <div
+      onClick={toggleTheme}
+      className="flex items-center justify-between w-14 h-6 p-1 rounded-full cursor-pointer border border-gray-400 dark:border-gray-400"
     >
-      {theme === "light" ? (
-        <MoonIcon className="w-5 h-5 stroke-gray-600 dark:stroke-white" />
-      ) : (
-        <SunIcon className="w-5 h-5 stroke-gray-600 dark:stroke-white" />
-      )}
-    </button>
+      <div
+        className={`
+        flex justify-center items-center w-1/2 h-full rounded-full
+        ${theme === "light" ? "bg-yellow-50" : ""}
+      `}
+      >
+        <SunIcon className="w-3 h-3 fill-yellow-400 stroke-yellow-500" />
+      </div>
+      <div
+        className={`
+        flex justify-center items-center w-1/2 h-full rounded-full
+        ${theme === "dark" ? "bg-dark-900" : ""}
+      `}
+      >
+        <MoonIcon className="w-3 h-3 fill-gray-400 stroke-gray-500" />
+      </div>
+    </div>
   );
 }

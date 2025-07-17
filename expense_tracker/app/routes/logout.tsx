@@ -34,7 +34,7 @@ export default function Logout() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 sm:px-2 px-8 max-h-screen">
       <div className="flex flex-col items-center justify-center max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow">
         <TallyUpLogo className="w-18 h-18 stroke-primary-400 fill-primary-400 dark:stroke-primary-600 dark:fill-primary-600" />
-        <Loader message="Logging out..." size={[12, 12]} />
+        <Loader message="Logging out..." loaderSize={[12, 12]} />
       </div>
     </div>
   );

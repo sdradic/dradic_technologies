@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { SimpleModal } from "./SimpleModal";
-import { DatePicker } from "./DatePicker";
-import { Dropdown } from "./Dropdown";
+import { SimpleModal } from "~/components/SimpleModal";
+import { DatePicker } from "~/components/DatePicker";
+import { Dropdown } from "~/components/Dropdown";
 import type {
   IncomeCreate,
   IncomeWithDetails,
   IncomeSource,
 } from "~/modules/types";
 import { incomeSourcesApi, incomesApi } from "~/modules/apis";
-import { TrashIcon } from "./Icons";
+import { TrashIcon } from "~/components/Icons";
 
 const currencies = [
   { value: "USD", label: "USD" },

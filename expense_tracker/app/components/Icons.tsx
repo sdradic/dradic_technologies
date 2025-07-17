@@ -4,8 +4,6 @@ export const SunIcon = ({ className, ...props }: any) => {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={2}
-        {...props}
         d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
       />
     </svg>
@@ -18,8 +16,6 @@ export const MoonIcon = ({ className, ...props }: any) => {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={2}
-        {...props}
         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
       />
     </svg>
@@ -677,6 +673,62 @@ export const CalendarIcon = ({ className, ...props }: any) => {
         strokeWidth={2}
         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
       />
+    </svg>
+  );
+};
+
+export const ReloadIcon = ({ className, ...props }: any) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <path d="M1 4V10H7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M23 20V14H17" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const DradicTechLogo = ({ className, ...props }: any) => {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 153 154"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path d="M130.802 76.3752L103.106 123.999L48.57 124.136L21.7185 76.6691L49.414 29.0448L103.949 28.9078L130.802 76.3752Z" />
+      <line x1="40.5735" y1="108.629" x2="67.379" y2="83.456" />
+      <line x1="67" y1="84" x2="88" y2="84" />
+      <circle cx="96" cy="85" r="8" />
+      <line x1="64.6606" y1="47.9" x2="48.4439" y2="61" />
+      <line x1="64" y1="29" x2="64" y2="49" />
+      <circle
+        cx="45.598"
+        cy="67.598"
+        r="8"
+        transform="rotate(176.462 45.598 67.598)"
+      />
+      <line x1="97.4635" y1="39.3656" x2="81.4612" y2="52.488" />
+      <line x1="95.9999" y1="40" x2="110" y2="40" />
+      <circle
+        cx="78.598"
+        cy="59.598"
+        r="8"
+        transform="rotate(176.462 78.598 59.598)"
+      />
+      <line x1="81.0001" y1="103" x2="115" y2="103" />
+      <line x1="73" y1="124" x2="73.0001" y2="112" />
+      <path d="M73.0917 112.583C68.6818 112.855 64.8859 109.502 64.6133 105.092C64.3406 100.682 67.6945 96.8859 72.1044 96.6133C76.5142 96.3406 80.3101 99.6945 80.5828 104.104C80.8554 108.514 77.5015 112.31 73.0917 112.583Z" />
     </svg>
   );
 };

@@ -3,7 +3,8 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
+
 from models import (
     CategorySummary,
     Expense,
@@ -13,13 +14,16 @@ from models import (
     ExpenseWithDetails,
     MonthlySummary,
 )
-from utils.db import DatabaseModel
 from utils.auth import get_current_user
+from utils.db import DatabaseModel
 
 expenses_router = APIRouter()
 
+
 @expenses_router.post("/", response_model=Expense)
-async def create_expense(expense: ExpenseCreate, current_user: dict = Depends(get_current_user)):
+async def create_expense(
+    expense: ExpenseCreate, current_user: dict = Depends(get_current_user)
+):
     """Create a new expense"""
     try:
         # Validate expense item exists and belongs to current user
@@ -32,9 +36,11 @@ async def create_expense(expense: ExpenseCreate, current_user: dict = Depends(ge
 
         if not item_result:
             raise HTTPException(status_code=400, detail="Expense item not found")
-        
+
         if item_result[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot create expense for another user's item")
+            raise HTTPException(
+                status_code=403, detail="Cannot create expense for another user's item"
+            )
 
         expense_data = expense.dict()
         new_expense = DatabaseModel.insert_record("expenses", expense_data)
@@ -47,6 +53,7 @@ async def create_expense(expense: ExpenseCreate, current_user: dict = Depends(ge
             status_code=500, detail=f"Failed to create expense: {str(e)}"
         ) from e
 
+
 @expenses_router.get("/", response_model=ExpenseResponse)
 async def get_expenses(
     user_id: Optional[str] = None,
@@ -57,14 +64,16 @@ async def get_expenses(
     end_date: Optional[date] = None,
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
     """Get expenses with optional filters"""
     try:
         # If user_id is specified, ensure it matches the current user
         if user_id and user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's expenses")
-        
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's expenses"
+            )
+
         # If no user_id is specified, default to current user's expenses
         if not user_id:
             user_id = current_user.get("uid")
@@ -156,7 +165,7 @@ async def get_expenses(
                 count=int(summary_data[0]["count"] or 0),
             )
         else:
-            summary = ExpenseSummary(total_amount=0.0, currency="USD", count=0)
+            summary = ExpenseSummary(total_amount=0.0, currency="CLP", count=0)
 
         return ExpenseResponse(
             expenses=[ExpenseWithDetails(**expense) for expense in expenses],
@@ -170,6 +179,7 @@ async def get_expenses(
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch expenses: {str(e)}"
         ) from e
+
 
 @expenses_router.get("/{expense_id}", response_model=ExpenseWithDetails)
 async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current_user)):
@@ -193,18 +203,24 @@ async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current
             raise HTTPException(status_code=404, detail="Expense not found")
 
         expense = expenses[0]
-        
+
         # Ensure user can only access their own expenses
-        if expense["user_name"] != current_user.get("name") and expense["user_email"] != current_user.get("email"):
+        if expense["user_name"] != current_user.get("name") and expense[
+            "user_email"
+        ] != current_user.get("email"):
             # Double check with user_id from expense_items
             user_check_query = """
                 SELECT ei.user_id FROM dradic_tech.expense_items ei 
                 JOIN dradic_tech.expenses e ON e.item_id = ei.id
                 WHERE e.id = :expense_id
             """
-            user_result = DatabaseModel.execute_query(user_check_query, {"expense_id": expense_id})
+            user_result = DatabaseModel.execute_query(
+                user_check_query, {"expense_id": expense_id}
+            )
             if user_result and user_result[0]["user_id"] != current_user.get("uid"):
-                raise HTTPException(status_code=403, detail="Cannot access another user's expense")
+                raise HTTPException(
+                    status_code=403, detail="Cannot access another user's expense"
+                )
 
         return ExpenseWithDetails(**expense)
     except HTTPException:
@@ -215,8 +231,13 @@ async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current
             status_code=500, detail=f"Failed to fetch expense: {str(e)}"
         ) from e
 
+
 @expenses_router.put("/{expense_id}", response_model=Expense)
-async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user: dict = Depends(get_current_user)):
+async def update_expense(
+    expense_id: UUID,
+    expense: ExpenseCreate,
+    current_user: dict = Depends(get_current_user),
+):
     """Update an expense"""
     try:
         # First check if the expense exists and belongs to the current user
@@ -225,13 +246,17 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user:
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             WHERE e.id = :expense_id
         """
-        existing_result = DatabaseModel.execute_query(existing_expense_query, {"expense_id": expense_id})
-        
+        existing_result = DatabaseModel.execute_query(
+            existing_expense_query, {"expense_id": expense_id}
+        )
+
         if not existing_result:
             raise HTTPException(status_code=404, detail="Expense not found")
-        
+
         if existing_result[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot update another user's expense")
+            raise HTTPException(
+                status_code=403, detail="Cannot update another user's expense"
+            )
 
         # Validate expense item exists and belongs to current user if item_id is being changed
         if expense.item_id:
@@ -244,9 +269,12 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user:
 
             if not item_result:
                 raise HTTPException(status_code=400, detail="Expense item not found")
-            
+
             if item_result[0]["user_id"] != current_user.get("uid"):
-                raise HTTPException(status_code=403, detail="Cannot assign expense to another user's item")
+                raise HTTPException(
+                    status_code=403,
+                    detail="Cannot assign expense to another user's item",
+                )
 
         expense_data = expense.dict(exclude_unset=True)
         updated_expense = DatabaseModel.update_record(
@@ -265,8 +293,11 @@ async def update_expense(expense_id: UUID, expense: ExpenseCreate, current_user:
             status_code=500, detail=f"Failed to update expense: {str(e)}"
         ) from e
 
+
 @expenses_router.delete("/{expense_id}")
-async def delete_expense(expense_id: UUID, current_user: dict = Depends(get_current_user)):
+async def delete_expense(
+    expense_id: UUID, current_user: dict = Depends(get_current_user)
+):
     """Delete an expense"""
     try:
         # First check if the expense exists and belongs to the current user
@@ -275,13 +306,17 @@ async def delete_expense(expense_id: UUID, current_user: dict = Depends(get_curr
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             WHERE e.id = :expense_id
         """
-        existing_result = DatabaseModel.execute_query(existing_expense_query, {"expense_id": expense_id})
-        
+        existing_result = DatabaseModel.execute_query(
+            existing_expense_query, {"expense_id": expense_id}
+        )
+
         if not existing_result:
             raise HTTPException(status_code=404, detail="Expense not found")
-        
+
         if existing_result[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot delete another user's expense")
+            raise HTTPException(
+                status_code=403, detail="Cannot delete another user's expense"
+            )
 
         deleted = DatabaseModel.delete_record("expenses", expense_id)
 
@@ -297,12 +332,13 @@ async def delete_expense(expense_id: UUID, current_user: dict = Depends(get_curr
             status_code=500, detail=f"Failed to delete expense: {str(e)}"
         ) from e
 
+
 @expenses_router.get("/summary/monthly/{year}/{month}", response_model=MonthlySummary)
 async def get_monthly_summary(
-    year: int, 
-    month: int, 
-    currency: str = "USD",
-    current_user: dict = Depends(get_current_user)
+    year: int,
+    month: int,
+    currency: str = "CLP",
+    current_user: dict = Depends(get_current_user),
 ):
     """Get monthly expense summary"""
     try:
@@ -329,7 +365,12 @@ async def get_monthly_summary(
             AND u.id = :user_id
             GROUP BY ei.category ORDER BY total_amount DESC
         """
-        params = {"year": year, "month": month, "currency": currency, "user_id": user_id}
+        params = {
+            "year": year,
+            "month": month,
+            "currency": currency,
+            "user_id": user_id,
+        }
 
         category_data = DatabaseModel.execute_query(query, params)
 
@@ -372,12 +413,13 @@ async def get_monthly_summary(
             status_code=500, detail=f"Failed to fetch monthly summary: {str(e)}"
         ) from e
 
+
 @expenses_router.get("/currencies/")
 async def get_currencies(current_user: dict = Depends(get_current_user)):
     """Get all unique currencies used in expenses"""
     try:
         user_id = current_user.get("uid")
-        
+
         query = """
             SELECT DISTINCT e.currency
             FROM dradic_tech.expenses e
