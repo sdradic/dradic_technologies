@@ -1,5 +1,8 @@
 import React, { Suspense } from "react";
 import { CardsSkeleton, ChartsTableSkeleton } from "../SkeletonLoader";
+import type { SimpleCardProps } from "../SimpleCard";
+import type { SimpleDonutGraphProps } from "../SimpleDonutGraph";
+import type { SimpleTableProps } from "../SimpleTable";
 
 // Lazy load the MonthlyCards component
 const LazyMonthlyCards = React.lazy(() =>
@@ -16,13 +19,13 @@ const LazyMonthlyCharts = React.lazy(() =>
 );
 
 interface LazyMonthlyCardsProps {
-  cards: any[];
+  cards: SimpleCardProps[];
   isLoading?: boolean;
 }
 
 interface LazyMonthlyChartsProps {
-  donutGraphData: any;
-  tableData: any;
+  donutGraphData: SimpleDonutGraphProps;
+  tableData: SimpleTableProps;
   onAddExpense: () => void;
   onRowClick: (row: { [key: string]: string | number }) => void;
   isLoading?: boolean;

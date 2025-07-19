@@ -29,10 +29,11 @@ export default function Login() {
     try {
       await login(email, password);
       navigate("/", { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(
-        err.message ||
-          "Failed to sign in. Please check your credentials and try again.",
+        err instanceof Error
+          ? err.message
+          : "Failed to sign in. Please check your credentials and try again.",
       );
     }
   };
@@ -42,8 +43,10 @@ export default function Login() {
       setIsGuestLoading(true);
       handleGuestLogin(true);
       navigate("/", { replace: true });
-    } catch (err: any) {
-      setError(err.message || "Failed to log in as guest");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Failed to log in as guest",
+      );
     } finally {
       setIsGuestLoading(false);
     }

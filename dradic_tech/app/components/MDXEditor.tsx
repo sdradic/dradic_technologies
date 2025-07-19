@@ -23,6 +23,7 @@ import {
   AdmonitionDirectiveDescriptor,
   directivesPlugin,
   diffSourcePlugin,
+  type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import { useTheme } from "~/contexts/ThemeContext";
 import type { BlogPost } from "~/modules/types";
@@ -44,7 +45,7 @@ export default function MDXEditorComponent({
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<MDXEditorMethods | null>(null);
 
   // Handle client-side mounting
   useEffect(() => {

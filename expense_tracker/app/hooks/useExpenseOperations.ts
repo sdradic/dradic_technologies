@@ -15,7 +15,7 @@ export function useExpenseOperations() {
     async (
       expenseData: ExpenseCreate,
       demoOperations?: {
-        addDemoExpense: (expenseData: ExpenseCreate) => any;
+        addDemoExpense: (expenseData: ExpenseCreate) => ExpenseWithDetails;
         updateTableAndChartData: (expenses: ExpenseWithDetails[]) => void;
         guestExpenses: ExpenseWithDetails[];
       },

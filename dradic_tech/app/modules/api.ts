@@ -13,7 +13,7 @@ class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public response?: any,
+    public response?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -190,12 +190,17 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   }
 }
 
-export async function verifyAuthToken(token: string): Promise<any> {
+export async function verifyAuthToken(
+  token: string,
+): Promise<{ valid: boolean; user?: unknown }> {
   try {
-    const response = await apiRequest("/api/blog/auth/verify", {
-      method: "POST",
-      body: JSON.stringify({ token }),
-    });
+    const response = await apiRequest<{ valid: boolean; user?: unknown }>(
+      "/api/blog/auth/verify",
+      {
+        method: "POST",
+        body: JSON.stringify({ token }),
+      },
+    );
 
     return response;
   } catch (error) {
@@ -205,11 +210,14 @@ export async function verifyAuthToken(token: string): Promise<any> {
 }
 
 // CMS-specific API functions
-export async function deletePost(slug: string): Promise<any> {
+export async function deletePost(slug: string): Promise<{ success: boolean }> {
   try {
-    const response = await apiRequest(`/api/blog/posts/${slug}`, {
-      method: "DELETE",
-    });
+    const response = await apiRequest<{ success: boolean }>(
+      `/api/blog/posts/${slug}`,
+      {
+        method: "DELETE",
+      },
+    );
     return response;
   } catch (error) {
     console.error(`Error deleting post ${slug}:`, error);

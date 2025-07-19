@@ -1,4 +1,12 @@
+import type { SimpleCardProps } from "../components/SimpleCard";
+import type { SimpleDonutGraphProps } from "../components/SimpleDonutGraph";
+import type { SimpleTableProps } from "../components/SimpleTable";
 import { type acceptedCurrencies } from "./store";
+import type {
+  ExpenseWithDetails,
+  IncomeSource,
+  IncomeWithDetails,
+} from "./types";
 
 export function formatCurrency(
   value: number,
@@ -21,16 +29,16 @@ const STORAGE_KEY = "expense-tracker-local-state";
 interface LocalStorageData {
   theme?: "light" | "dark";
   monthlyData?: {
-    cards: any[];
-    tableData: any;
-    donutGraphData: any;
-    allExpenses: any[];
+    cards: SimpleCardProps[];
+    tableData: SimpleTableProps;
+    donutGraphData: SimpleDonutGraphProps;
+    allExpenses: ExpenseWithDetails[];
     lastFetchTime: number;
   };
   incomeData?: {
-    tableData: any;
-    allIncomes: any[];
-    sources: any[];
+    tableData: SimpleTableProps;
+    allIncomes: IncomeWithDetails[];
+    sources: IncomeSource[];
     lastFetchTime: number;
   };
 }

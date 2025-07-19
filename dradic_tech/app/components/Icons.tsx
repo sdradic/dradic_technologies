@@ -1,4 +1,10 @@
-export const TallyUpLogo = ({ className, ...props }: any) => {
+interface IconProps {
+  className?: string;
+  isSidebarOpen?: boolean;
+  [key: string]: unknown;
+}
+
+export const TallyUpLogo = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 130 139"
@@ -16,7 +22,7 @@ export const TallyUpLogo = ({ className, ...props }: any) => {
   );
 };
 
-export const ArrowUpIcon = ({ className, ...props }: any) => {
+export const ArrowUpIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -35,7 +41,7 @@ export const ArrowUpIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const MenuIcon = ({ className, ...props }: any) => {
+export const MenuIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
@@ -60,7 +66,7 @@ export const MenuIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronLeftIcon = ({ className, ...props }: any) => {
+export const ChevronLeftIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -79,7 +85,7 @@ export const ChevronLeftIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronDownIcon = ({ className, ...props }: any) => {
+export const ChevronDownIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -93,7 +99,7 @@ export const ChevronDownIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const DynamicChevronIcon = ({ className, ...props }: any) => {
+export const DynamicChevronIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -107,7 +113,7 @@ export const DynamicChevronIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const SaveIcon = ({ className, ...props }: any) => {
+export const SaveIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -132,7 +138,7 @@ export const SaveIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const DradicTechLogo = ({ className, ...props }: any) => {
+export const DradicTechLogo = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
@@ -168,7 +174,7 @@ export const DradicTechLogo = ({ className, ...props }: any) => {
   );
 };
 
-export const SearchIcon = ({ className, ...props }: any) => {
+export const SearchIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -193,7 +199,7 @@ export const SearchIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChipSVG = ({ className, ...props }: any) => {
+export const ChipSVG = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 220 220"
@@ -291,7 +297,7 @@ export const ChipSVG = ({ className, ...props }: any) => {
   );
 };
 
-export const RefreshIcon = ({ className, ...props }: any) => {
+export const RefreshIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -322,7 +328,7 @@ export const RefreshIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const MoonIcon = ({ className, ...props }: any) => {
+export const MoonIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -342,7 +348,7 @@ export const MoonIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const SunIcon = ({ className, ...props }: any) => {
+export const SunIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -362,7 +368,7 @@ export const SunIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const TrashIcon = ({ className, ...props }: any) => {
+export const TrashIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -405,7 +411,7 @@ export const TrashIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const XIcon = ({ className, ...props }: any) => {
+export const XIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -430,7 +436,7 @@ export const XIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ThreeDotsMenuIcon = ({ className, ...props }: any) => {
+export const ThreeDotsMenuIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"

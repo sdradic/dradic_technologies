@@ -70,20 +70,27 @@ export function useIncomeData() {
 
   const fetchIncomeData = useCallback(
     async (forceRefresh = false) => {
-      if (!user?.id) return;
+      if (!user && !isGuest) return;
+
+      // Check cache expiry for authenticated users
+      if (!forceRefresh && lastFetchTime) {
+        const timeSinceLastFetch = Date.now() - lastFetchTime;
+        if (timeSinceLastFetch < CACHE_EXPIRY) {
+          return; // Use cached data
+        }
+      }
+
+      setIsLoading(true);
+      setIsTableLoading(true);
+      setIsSourcesLoading(true);
+      setError(null);
 
       try {
-        setIsLoading(true);
-        setIsTableLoading(true);
-        setIsSourcesLoading(true);
-        setError(null);
-
-        // Check if data is fresh (unless forcing refresh)
-        if (
-          !forceRefresh &&
-          lastFetchTime &&
-          Date.now() - lastFetchTime < CACHE_EXPIRY
-        ) {
+        if (isGuest) {
+          // Use demo data for guests
+          initializeDemoIncomeData();
+          setSources(guestIncomeSources);
+          updateTableData(guestIncomes);
           setIsLoading(false);
           setIsTableLoading(false);
           setIsSourcesLoading(false);
@@ -105,12 +112,12 @@ export function useIncomeData() {
 
         // Fetch incomes and sources separately for granular loading
         const incomesPromise = incomesApi.getAll({
-          user_id: user.id,
+          user_id: user!.id,
           start_date: formatDate(startDate),
           end_date: formatDate(endDate),
         });
 
-        const sourcesPromise = incomeSourcesApi.getAll(user.id);
+        const sourcesPromise = incomeSourcesApi.getAll({ user_id: user!.id });
 
         // Start both requests
         const [incomesResponse, sourcesResponse] = await Promise.all([
@@ -186,7 +193,17 @@ export function useIncomeData() {
         setIsLoading(false);
       }
     },
-    [user, lastFetchTime, CACHE_EXPIRY, updateTableData],
+    [
+      user,
+      lastFetchTime,
+      CACHE_EXPIRY,
+      updateTableData,
+      getEmptyIncomeData,
+      isGuest,
+      guestIncomes,
+      guestIncomeSources,
+      initializeDemoIncomeData,
+    ],
   );
 
   // Initialize data with cache checking
@@ -264,6 +281,7 @@ export function useIncomeData() {
     initializeDemoIncomeData,
     guestIncomes,
     guestIncomeSources,
+    getEmptyIncomeData,
   ]);
 
   return {

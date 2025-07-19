@@ -7,30 +7,31 @@ interface PageHeaderData {
   subtitle: string;
 }
 
+const PageHeaderMapping = {
+  about: {
+    title: "About",
+    subtitle: "About TallyUp",
+  },
+  dashboard: {
+    title: "Dashboard",
+    subtitle: "Goals and savings",
+  },
+  expenses: {
+    title: "Monthly Expenses",
+    subtitle: "Manage your monthly expenses",
+  },
+  incomes: {
+    title: "Incomes",
+    subtitle: "Manage your incomes",
+  },
+  settings: {
+    title: "Settings",
+    subtitle: "Manage your settings",
+  },
+};
+
 export function HeaderControls({ children }: { children?: React.ReactNode }) {
   const location = useLocation();
-  const PageHeaderMapping = {
-    about: {
-      title: "About",
-      subtitle: "About TallyUp",
-    },
-    dashboard: {
-      title: "Dashboard",
-      subtitle: "Goals and savings",
-    },
-    expenses: {
-      title: "Monthly Expenses",
-      subtitle: "Manage your monthly expenses",
-    },
-    incomes: {
-      title: "Incomes",
-      subtitle: "Manage your incomes",
-    },
-    settings: {
-      title: "Settings",
-      subtitle: "Manage your settings",
-    },
-  };
   const [pageHeader, setPageHeader] = useState<PageHeaderData | null>(null);
 
   useEffect(() => {

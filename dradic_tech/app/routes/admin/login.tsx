@@ -30,7 +30,7 @@ export default function AdminLogin() {
       setIsLoading(true);
       await login(email, password);
       navigate("/admin");
-    } catch (_err) {
+    } catch {
       console.error(
         "Failed to sign in. Please check your credentials and try again.",
       );

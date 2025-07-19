@@ -1,4 +1,9 @@
-export const SunIcon = ({ className, ...props }: any) => {
+interface IconProps {
+  className?: string;
+  [key: string]: unknown;
+}
+
+export const SunIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg fill="none" viewBox="0 0 24 24" className={className} {...props}>
       <path
@@ -10,7 +15,7 @@ export const SunIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const MoonIcon = ({ className, ...props }: any) => {
+export const MoonIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg fill="none" viewBox="0 0 24 24" className={className} {...props}>
       <path
@@ -22,7 +27,7 @@ export const MoonIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const TallyUpLogo = ({ className, ...props }: any) => {
+export const TallyUpLogo = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 130 139"
@@ -40,7 +45,7 @@ export const TallyUpLogo = ({ className, ...props }: any) => {
   );
 };
 
-export const DashboardIconOutline = ({ className, ...props }: any) => {
+export const DashboardIconOutline = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 25 24"
@@ -80,7 +85,7 @@ export const DashboardIconOutline = ({ className, ...props }: any) => {
   );
 };
 
-export const ExpensesIcon = ({ className, ...props }: any) => {
+export const ExpensesIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -122,7 +127,7 @@ export const ExpensesIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const IncomesIcon = ({ className, ...props }: any) => {
+export const IncomesIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 25 24"
@@ -147,7 +152,7 @@ export const IncomesIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const SettingsIcon = ({ className, ...props }: any) => {
+export const SettingsIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -172,7 +177,7 @@ export const SettingsIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const DailyIcon = ({ className, ...props }: any) => {
+export const DailyIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -245,7 +250,7 @@ export const DailyIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const MonthlyIcon = ({ className, ...props }: any) => {
+export const MonthlyIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -294,7 +299,7 @@ export const MonthlyIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const CategoriesIcon = ({ className, ...props }: any) => {
+export const CategoriesIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -331,7 +336,7 @@ export const CategoriesIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const AboutIcon = ({ className, ...props }: any) => {
+export const AboutIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -362,7 +367,7 @@ export const AboutIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronRightIcon = ({ className, ...props }: any) => {
+export const ChevronRightIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -382,7 +387,7 @@ export const ChevronRightIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronLeftIcon = ({ className, ...props }: any) => {
+export const ChevronLeftIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -402,7 +407,7 @@ export const ChevronLeftIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronDownIcon = ({ className, ...props }: any) => {
+export const ChevronDownIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -422,7 +427,7 @@ export const ChevronDownIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronUpIcon = ({ className, ...props }: any) => {
+export const ChevronUpIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -442,7 +447,7 @@ export const ChevronUpIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const PlusIconOutline = ({ className, ...props }: any) => {
+export const PlusIconOutline = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -461,7 +466,7 @@ export const PlusIconOutline = ({ className, ...props }: any) => {
   );
 };
 
-export const MenuIcon = ({ className, ...props }: any) => {
+export const MenuIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -492,7 +497,7 @@ export const MenuIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const XIcon = ({ className, ...props }: any) => {
+export const XIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -517,7 +522,7 @@ export const XIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const LogoutIcon = ({ className, ...props }: any) => {
+export const LogoutIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -542,7 +547,7 @@ export const LogoutIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ErrorXIcon = ({ className, ...props }: any) => {
+export const ErrorXIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -560,7 +565,7 @@ export const ErrorXIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ChevronWithTransform = ({ className, ...props }: any) => {
+export const ChevronWithTransform = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
@@ -579,7 +584,7 @@ export const ChevronWithTransform = ({ className, ...props }: any) => {
   );
 };
 
-export const TrashIcon = ({ className, ...props }: any) => {
+export const TrashIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -622,13 +627,14 @@ export const TrashIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const RightArrowIcon = ({ className, ...props }: any) => {
+export const RightArrowIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
+      {...props}
     >
       <path
         strokeLinecap="round"
@@ -640,13 +646,14 @@ export const RightArrowIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const LeftArrowIcon = ({ className, ...props }: any) => {
+export const LeftArrowIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
+      {...props}
     >
       <path
         strokeLinecap="round"
@@ -658,7 +665,7 @@ export const LeftArrowIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const CalendarIcon = ({ className, ...props }: any) => {
+export const CalendarIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}
@@ -677,7 +684,7 @@ export const CalendarIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const ReloadIcon = ({ className, ...props }: any) => {
+export const ReloadIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -697,7 +704,7 @@ export const ReloadIcon = ({ className, ...props }: any) => {
   );
 };
 
-export const DradicTechLogo = ({ className, ...props }: any) => {
+export const DradicTechLogo = ({ className, ...props }: IconProps) => {
   return (
     <svg
       className={className}

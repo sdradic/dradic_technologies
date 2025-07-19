@@ -103,16 +103,20 @@ const ExpenseModal = ({
 
   // Fetch items only if not preloaded
   const fetchItems = useCallback(async () => {
-    if (preloadedItems && preloadedItems.length > 0) return;
+    if (preloadedItems && preloadedItems.length > 0) {
+      setLocalItems(preloadedItems);
+      return;
+    }
 
     try {
+      setError(null);
       const response = await expenseItemsApi.getAll({ user_id: userId });
       setLocalItems(response.items);
     } catch (error) {
       setError("Failed to fetch expense items");
       console.error("Error fetching expense items:", error);
     }
-  }, [userId, preloadedItems?.length]);
+  }, [userId, preloadedItems]);
 
   useEffect(() => {
     if (isOpen && userId) {

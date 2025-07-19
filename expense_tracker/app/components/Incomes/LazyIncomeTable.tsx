@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { TableSkeleton } from "../SkeletonLoader";
+import type { SimpleTableProps } from "../SimpleTable";
 
 // Lazy load the IncomeTable component
 const LazyIncomeTable = React.lazy(() =>
@@ -9,7 +10,7 @@ const LazyIncomeTable = React.lazy(() =>
 );
 
 interface LazyIncomeTableProps {
-  tableData: any;
+  tableData: SimpleTableProps;
   onAddIncome: () => void;
   onRowClick: (row: { [key: string]: string | number }) => void;
   isLoading?: boolean;

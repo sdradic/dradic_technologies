@@ -27,10 +27,11 @@ export default function SignUp() {
     try {
       await signup(email, password, name);
       navigate("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(
-        err.message ||
-          "Failed to sign up. Please check your credentials and try again.",
+        err instanceof Error
+          ? err.message
+          : "Failed to sign up. Please check your credentials and try again.",
       );
     }
   };

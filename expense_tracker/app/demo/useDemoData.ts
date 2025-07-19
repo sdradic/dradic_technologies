@@ -49,19 +49,20 @@ export function useDemoData() {
 
     // Create demo expenses from the table data
     const demoExpenses: ExpenseWithDetails[] = demoData.tableData.data.map(
-      (row: any) => ({
-        id: row.id,
+      (row: { [key: string]: string | number }) => ({
+        id: String(row.id),
         item_id:
-          demoItems.find((item) => item.name === row.name)?.id || "demo-item-1",
-        date: row.date,
+          demoItems.find((item) => item.name === String(row.name))?.id ||
+          "demo-item-1",
+        date: String(row.date),
         amount:
           typeof row.amount === "number"
             ? row.amount
-            : parseFloat(row.amount.toString()),
+            : parseFloat(String(row.amount)),
         currency: "CLP",
         created_at: new Date().toISOString(),
-        item_name: row.name,
-        item_category: row.category,
+        item_name: String(row.name),
+        item_category: String(row.category),
         item_is_fixed: false,
         user_name: "Guest User",
         user_email: "guest@example.com",
@@ -153,22 +154,22 @@ export function useDemoData() {
     const demoSources = getDemoIncomeSources();
     // Create demo incomes from the table data
     const demoIncomes: IncomeWithDetails[] = demoIncomeData.tableData.data.map(
-      (row: any) => ({
-        id: row.id,
+      (row: { [key: string]: string | number }) => ({
+        id: String(row.id),
         source_id:
-          demoSources.find((s) => s.name === row.source)?.id || "demo-source-1",
+          demoSources.find((source) => source.name === String(row.source))
+            ?.id || "demo-source-1",
         amount:
           typeof row.amount === "number"
             ? row.amount
-            : parseFloat(row.amount.toString()),
-        currency: row.currency,
-        date: row.date,
-        description: row.description,
+            : parseFloat(String(row.amount)),
+        currency: String(row.currency),
+        date: String(row.date),
+        description: String(row.description),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        source_name: row.source,
-        source_category:
-          demoSources.find((s) => s.name === row.source)?.category || "",
+        source_name: String(row.source),
+        source_category: "",
         user_name: "Guest User",
         user_email: "guest@example.com",
         group_name: "",

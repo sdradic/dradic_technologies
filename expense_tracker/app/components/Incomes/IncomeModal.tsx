@@ -106,16 +106,20 @@ const IncomeModal = ({
 
   // Fetch sources only if not preloaded
   const fetchSources = useCallback(async () => {
-    if (preloadedSources && preloadedSources.length > 0) return;
+    if (preloadedSources && preloadedSources.length > 0) {
+      setLocalSources(preloadedSources);
+      return;
+    }
 
     try {
-      const response = await incomeSourcesApi.getAll(userId);
+      setError(null);
+      const response = await incomeSourcesApi.getAll({ user_id: userId });
       setLocalSources(response.items);
     } catch (error) {
       setError("Failed to fetch income sources");
       console.error("Error fetching income sources:", error);
     }
-  }, [userId, preloadedSources?.length]);
+  }, [userId, preloadedSources]);
 
   useEffect(() => {
     if (isOpen && userId) {

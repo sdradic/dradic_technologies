@@ -1,11 +1,15 @@
 import { useDemoData } from "./useDemoData";
-import type { ExpenseCreate } from "../modules/types";
+import type {
+  ExpenseCreate,
+  ExpenseWithDetails,
+  ExpenseItem,
+} from "../modules/types";
 
 interface DemoExpenseManagerProps {
   children: (props: {
-    guestExpenses: any[];
-    guestExpenseItems: any[];
-    addDemoExpense: (expenseData: ExpenseCreate) => any;
+    guestExpenses: ExpenseWithDetails[];
+    guestExpenseItems: ExpenseItem[];
+    addDemoExpense: (expenseData: ExpenseCreate) => ExpenseWithDetails;
     updateDemoExpense: (expenseId: string, expenseData: ExpenseCreate) => void;
     deleteDemoExpense: (expenseId: string) => void;
   }) => React.ReactNode;

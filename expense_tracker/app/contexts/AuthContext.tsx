@@ -156,9 +156,12 @@ export function useAuthStore() {
       }
 
       return null;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signup error:", error);
-      const errorMessage = error.message || "An error occurred during signup";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during signup";
       setAuthError(errorMessage);
       throw error;
     } finally {
@@ -181,9 +184,12 @@ export function useAuthStore() {
       }
 
       return mapSupabaseUser(data.user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      const errorMessage = error.message || "An error occurred during login";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during login";
       setAuthError(errorMessage);
       throw error;
     } finally {
@@ -203,8 +209,8 @@ export function useAuthStore() {
       setUser(isLoggingIn ? mockUser : null);
       setIsAuthenticated(isLoggingIn);
       setIsGuest(isLoggingIn);
-    } catch (error: any) {
-      setAuthError(error.message);
+    } catch (error: unknown) {
+      setAuthError(error instanceof Error ? error.message : "Unknown error");
       throw error;
     } finally {
       setIsLoading(false);

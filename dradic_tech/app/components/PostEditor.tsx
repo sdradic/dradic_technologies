@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
 import { localState } from "~/modules/utils";
@@ -80,36 +80,37 @@ export default function PostEditor({
     }
   }, [isNewPost, existingPost, slug]);
 
-  const defaultPost: BlogPost = {
-    slug: slug || "",
-    title: formData.title || "New Post",
-    content: postContent,
-    created_at: existingPost?.metadata.created_at || new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    image: formData.image,
-    category: formData.category,
-    author: formData.author,
-  };
-
   // Memoize the selectedPost object to prevent unnecessary re-renders
-  const selectedPost = useMemo(
-    () => ({
+  const selectedPost = useMemo(() => {
+    const defaultPost: BlogPost = {
+      slug: slug || "",
+      title: formData.title || "New Post",
+      content: postContent,
+      created_at: existingPost?.metadata.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      image: formData.image,
+      category: formData.category,
+      author: formData.author,
+    };
+
+    return {
       ...defaultPost,
       title: formData.title,
       image: formData.image,
       category: formData.category,
       author: formData.author,
-    }),
-    [
-      formData.title,
-      formData.image,
-      formData.category,
-      formData.author,
-      defaultPost,
-    ],
-  );
+    };
+  }, [
+    slug,
+    formData.title,
+    formData.image,
+    formData.category,
+    formData.author,
+    postContent,
+    existingPost?.metadata.created_at,
+  ]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!isAuthenticated) {
       setError("You must be logged in to save posts");
       return;
@@ -162,9 +163,17 @@ export default function PostEditor({
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [
+    isAuthenticated,
+    formData,
+    postContent,
+    isNewPost,
+    slug,
+    existingPost?.metadata.created_at,
+    navigate,
+  ]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!isAuthenticated) {
       setError("You must be logged in to delete posts");
       return;
@@ -185,7 +194,7 @@ export default function PostEditor({
         setError("Failed to delete post. Please try again.");
       }
     }
-  };
+  }, [isAuthenticated, slug, navigate]);
 
   // Show loading state while checking authentication or loading post
   if (isLoading || isLoadingPost) {

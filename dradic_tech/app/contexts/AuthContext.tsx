@@ -1,4 +1,11 @@
-import { createContext, useContext, useMemo, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import type { ReactNode } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "../modules/supabase";
@@ -57,10 +64,10 @@ export function useAuthStore(isAdminRoute: boolean = false) {
           }
         }
       } catch (error) {
-        console.error("Error in auth state change:", error);
         if (isMounted) {
           setAuthError("Failed to load user session");
         }
+        throw error;
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -75,7 +82,7 @@ export function useAuthStore(isAdminRoute: boolean = false) {
     };
   }, [isAdminRoute]);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
       if (email !== "sdradic95@gmail.com") throw new Error("Unauthorized");
       setIsLoading(true);
@@ -92,15 +99,15 @@ export function useAuthStore(isAdminRoute: boolean = false) {
 
       // The onAuthStateChange listener will handle the state update
       return mapSupabaseUser(data.user);
-    } catch (error: any) {
-      setAuthError(error.message);
+    } catch (error: unknown) {
+      setAuthError(error instanceof Error ? error.message : "Unknown error");
       throw error;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
@@ -112,7 +119,7 @@ export function useAuthStore(isAdminRoute: boolean = false) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Memoize the context value to prevent unnecessary re-renders
   const contextValue = useMemo(
