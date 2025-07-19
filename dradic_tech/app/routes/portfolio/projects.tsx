@@ -11,24 +11,6 @@ export default function Projects() {
       link: "https://github.com/sdradic/Bioinformatics",
       tags: ["Bioinformatics", "Compression", "Algorithms"],
     },
-    {
-      name: "Project 1",
-      description: "Description of Project 1",
-      link: "https://project1.com",
-      tags: ["Embedded Systems", "IoT", "Algorithms"],
-    },
-    {
-      name: "Project 2",
-      description: "Description of Project 2",
-      link: "https://project2.com",
-      tags: ["Bioinformatics", "Compression", "Algorithms"],
-    },
-    {
-      name: "Project 3",
-      description: "Description of Project 3",
-      link: "https://project3.com",
-      tags: ["IoT", "Embedded Systems", "Algorithms"],
-    },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
