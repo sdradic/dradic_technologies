@@ -2,10 +2,9 @@ import logging as logger
 from datetime import date, datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models import (
-    CategorySummary,
     DashboardCard,
     DashboardData,
     DashboardDonutData,
@@ -17,7 +16,6 @@ from models import (
     IncomeResponse,
     IncomeSummary,
     IncomeWithDetails,
-    MonthlySummary,
 )
 from utils.auth import get_current_user
 from utils.db import DatabaseModel
@@ -341,83 +339,6 @@ async def delete_income(income_id: str, current_user: dict = current_user_depend
         logger.error(f"Failed to delete income: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to delete income: {str(e)}"
-        ) from e
-
-
-@incomes_router.get("/summary/monthly/{year}/{month}", response_model=MonthlySummary)
-async def get_monthly_summary(
-    year: int = Path(..., ge=2000, le=2100),
-    month: int = Path(..., ge=1, le=12),
-    currency: str = "CLP",
-    current_user: dict = current_user_dependency,
-):
-    """Get monthly income summary"""
-    try:
-        # Build the query for monthly summary
-        query = """
-            SELECT
-                isc.category,
-                SUM(i.amount) as total_amount,
-                COUNT(*) as count
-            FROM dradic_tech.incomes i
-            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
-            JOIN dradic_tech.users u ON isc.user_id = u.id
-            WHERE u.id = :user_id
-                AND EXTRACT(YEAR FROM i.date) = :year
-                AND EXTRACT(MONTH FROM i.date) = :month
-                AND i.currency = :currency
-            GROUP BY isc.category
-            ORDER BY total_amount DESC
-        """
-
-        params = {
-            "user_id": current_user.get("uid"),
-            "year": year,
-            "month": month,
-            "currency": currency,
-        }
-
-        category_data = DatabaseModel.execute_query(query, params)
-
-        # Calculate total
-        total_query = """
-            SELECT SUM(i.amount) as total_amount, COUNT(*) as count
-            FROM dradic_tech.incomes i
-            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
-            JOIN dradic_tech.users u ON isc.user_id = u.id
-            WHERE u.id = :user_id
-                AND EXTRACT(YEAR FROM i.date) = :year
-                AND EXTRACT(MONTH FROM i.date) = :month
-                AND i.currency = :currency
-        """
-
-        total_data = DatabaseModel.execute_query(total_query, params)
-
-        total_amount = float(total_data[0]["total_amount"] or 0) if total_data else 0.0
-        total_count = int(total_data[0]["count"] or 0) if total_data else 0
-
-        categories = []
-        for cat in category_data:
-            categories.append(
-                CategorySummary(
-                    category=cat["category"],
-                    amount=float(cat["total_amount"] or 0),
-                    count=int(cat["count"] or 0),
-                )
-            )
-
-        return MonthlySummary(
-            year=year,
-            month=month,
-            currency=currency,
-            total_amount=total_amount,
-            total_count=total_count,
-            categories=categories,
-        )
-    except Exception as e:
-        logger.error(f"Failed to fetch monthly summary: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch monthly summary: {str(e)}"
         ) from e
 
 

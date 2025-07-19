@@ -6,7 +6,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models import (
-    CategorySummary,
     DashboardCard,
     DashboardData,
     DashboardDonutData,
@@ -18,7 +17,6 @@ from models import (
     ExpenseResponse,
     ExpenseSummary,
     ExpenseWithDetails,
-    MonthlySummary,
 )
 from utils.auth import get_current_user
 from utils.db import DatabaseModel
@@ -336,88 +334,6 @@ async def delete_expense(
         logger.error(f"Failed to delete expense: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to delete expense: {str(e)}"
-        ) from e
-
-
-@expenses_router.get("/summary/monthly/{year}/{month}", response_model=MonthlySummary)
-async def get_monthly_summary(
-    year: int,
-    month: int,
-    currency: str = "CLP",
-    current_user: dict = current_user_dependency,
-):
-    """Get monthly expense summary"""
-    try:
-        # Validate month
-        if month < 1 or month > 12:
-            raise HTTPException(
-                status_code=400, detail="Month must be between 1 and 12"
-            )
-
-        user_id = current_user.get("uid")
-
-        # Base query for monthly summary
-        query = """
-            SELECT
-                ei.category,
-                SUM(e.amount) as total_amount,
-                COUNT(*) as count
-            FROM dradic_tech.expenses e
-            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
-            JOIN dradic_tech.users u ON ei.user_id = u.id
-            WHERE EXTRACT(YEAR FROM e.date) = :year
-            AND EXTRACT(MONTH FROM e.date) = :month
-            AND e.currency = :currency
-            AND u.id = :user_id
-            GROUP BY ei.category ORDER BY total_amount DESC
-        """
-        params = {
-            "year": year,
-            "month": month,
-            "currency": currency,
-            "user_id": user_id,
-        }
-
-        category_data = DatabaseModel.execute_query(query, params)
-
-        # Calculate total
-        total_query = """
-            SELECT SUM(e.amount) as total_amount
-            FROM dradic_tech.expenses e
-            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
-            JOIN dradic_tech.users u ON ei.user_id = u.id
-            WHERE EXTRACT(YEAR FROM e.date) = :year
-            AND EXTRACT(MONTH FROM e.date) = :month
-            AND e.currency = :currency
-            AND u.id = :user_id
-        """
-
-        total_data = DatabaseModel.execute_query(total_query, params)
-        total_amount = float(total_data[0]["total_amount"] or 0) if total_data else 0.0
-
-        categories = [
-            CategorySummary(
-                category=cat["category"],
-                amount=float(cat["total_amount"]),
-                count=int(cat["count"]),
-            )
-            for cat in category_data
-        ]
-
-        return MonthlySummary(
-            year=year,
-            month=month,
-            total_amount=total_amount,
-            currency=currency,
-            total_count=sum(cat.count for cat in categories),
-            categories=categories,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to fetch monthly summary: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch monthly summary: {str(e)}"
         ) from e
 
 
