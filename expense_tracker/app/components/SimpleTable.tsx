@@ -109,9 +109,9 @@ export default function SimpleTable({
                       row.currency
                         ? formatCurrency(
                             Number(
-                              row[column.replace(/\s+/g, "_").toLowerCase()]
+                              row[column.replace(/\s+/g, "_").toLowerCase()],
                             ),
-                            row.currency as (typeof acceptedCurrencies)[number]
+                            row.currency as (typeof acceptedCurrencies)[number],
                           )
                         : row[column.replace(/\s+/g, "_").toLowerCase()]}
                     </td>
@@ -160,9 +160,9 @@ export default function SimpleTable({
                     row.currency
                       ? formatCurrency(
                           Number(
-                            row[column.replace(/\s+/g, "_").toLowerCase()]
+                            row[column.replace(/\s+/g, "_").toLowerCase()],
                           ),
-                          row.currency as (typeof acceptedCurrencies)[number]
+                          row.currency as (typeof acceptedCurrencies)[number],
                         )
                       : row[column.replace(/\s+/g, "_").toLowerCase()]}
                   </span>

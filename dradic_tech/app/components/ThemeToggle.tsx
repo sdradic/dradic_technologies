@@ -13,6 +13,15 @@ export function ThemeToggle() {
   return (
     <div
       onClick={toggleTheme}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleTheme();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       className="flex items-center justify-between w-14 h-6 p-1 rounded-full cursor-pointer border border-gray-500 dark:border-gray-400"
     >
       <div

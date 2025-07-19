@@ -65,7 +65,7 @@ export function useIncomeData() {
       setTableData(newTableData);
       setIsTableLoading(false);
     },
-    [isGuest]
+    [isGuest],
   );
 
   const fetchIncomeData = useCallback(
@@ -142,7 +142,7 @@ export function useIncomeData() {
               source: income.source_name,
               amount: formatCurrency(
                 income.amount,
-                income.currency as Currency
+                income.currency as Currency,
               ),
               currency: income.currency,
               date: income.date,
@@ -177,7 +177,7 @@ export function useIncomeData() {
                   "Description",
                 ],
                 data: [],
-              }
+              },
         );
         setSources([]);
         setIsTableLoading(false);
@@ -186,7 +186,7 @@ export function useIncomeData() {
         setIsLoading(false);
       }
     },
-    [user, lastFetchTime, CACHE_EXPIRY, updateTableData]
+    [user, lastFetchTime, CACHE_EXPIRY, updateTableData],
   );
 
   // Initialize data with cache checking
@@ -216,7 +216,7 @@ export function useIncomeData() {
               description: "Click on an income to edit it.",
               columns: ["Source", "Amount", "Currency", "Date", "Description"],
               data: [],
-            }
+            },
           );
           setAllIncomes(cachedIncomeData.allIncomes || []);
           setSources(cachedIncomeData.sources || []);
@@ -246,7 +246,7 @@ export function useIncomeData() {
               description: "Click on an income to edit it.",
               columns: ["Source", "Amount", "Currency", "Date", "Description"],
               data: [],
-            }
+            },
       );
       setSources([]);
       setIsLoading(false);

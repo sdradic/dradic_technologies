@@ -1,7 +1,7 @@
 import { HeaderControls } from "~/components/HeaderControls";
 import type { Route } from "../+types/root";
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_args: Route.MetaArgs) {
   return [
     { title: "TallyUp" },
     { name: "description", content: "TallyUp your expense tracking app" },

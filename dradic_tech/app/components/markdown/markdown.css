@@ -127,15 +127,15 @@
   .markdown-content h1 {
     @apply text-3xl;
   }
-  
+
   .markdown-content h2 {
     @apply text-2xl;
   }
-  
+
   .markdown-content h3 {
     @apply text-xl;
   }
-  
+
   .markdown-content pre {
     @apply text-xs;
   }
@@ -193,4 +193,4 @@
 
 .dark .markdown-content td {
   @apply text-gray-300 border-gray-600;
-} 
+}

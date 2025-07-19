@@ -30,7 +30,7 @@ export default function SignUp() {
     } catch (err: any) {
       setError(
         err.message ||
-          "Failed to sign up. Please check your credentials and try again."
+          "Failed to sign up. Please check your credentials and try again.",
       );
     }
   };

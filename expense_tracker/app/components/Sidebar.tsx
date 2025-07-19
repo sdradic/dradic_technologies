@@ -79,7 +79,7 @@ export function Sidebar() {
 
   const toggleExpand = (path: string) => {
     setExpandedItems((prev) =>
-      prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path]
+      prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path],
     );
   };
 
@@ -93,7 +93,9 @@ export function Sidebar() {
           <Link
             to={item.path}
             onClick={() => {
-              hasChildren && toggleExpand(item.path);
+              if (hasChildren) {
+                toggleExpand(item.path);
+              }
             }}
             className={`flex items-center justify-center ${
               isCollapsed ? "" : "justify-start px-4"
@@ -194,7 +196,11 @@ export function Sidebar() {
         </h2>
         <ul
           className="space-y-2"
-          onClick={() => isCollapsed && setIsCollapsed(!isCollapsed)}
+          onClick={() => {
+            if (isCollapsed) {
+              setIsCollapsed(!isCollapsed);
+            }
+          }}
         >
           {navItems.map(renderNavItem)}
         </ul>

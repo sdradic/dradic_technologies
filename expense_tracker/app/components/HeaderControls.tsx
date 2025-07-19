@@ -2,7 +2,7 @@ import { useLocation } from "react-router";
 import PageHeader from "./PageHeader";
 import { useEffect, useState } from "react";
 
-interface PageHeader {
+interface PageHeaderData {
   title: string;
   subtitle: string;
 }
@@ -31,7 +31,7 @@ export function HeaderControls({ children }: { children?: React.ReactNode }) {
       subtitle: "Manage your settings",
     },
   };
-  const [pageHeader, setPageHeader] = useState<PageHeader | null>(null);
+  const [pageHeader, setPageHeader] = useState<PageHeaderData | null>(null);
 
   useEffect(() => {
     const path = location.pathname.split("/")[1];

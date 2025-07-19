@@ -84,7 +84,7 @@ const MonthlyIncomesPage = () => {
               guestIncomes,
               sources,
             },
-            () => fetchIncomeData(true)
+            () => fetchIncomeData(true),
           )
         }
         userId={user?.id || "mock-user-id"}
@@ -107,7 +107,7 @@ const MonthlyIncomesPage = () => {
               guestIncomes,
               sources,
             },
-            () => fetchIncomeData(true)
+            () => fetchIncomeData(true),
           )
         }
         userId={user?.id || "mock-user-id"}
@@ -121,7 +121,7 @@ const MonthlyIncomesPage = () => {
               updateTableData,
               guestIncomes,
             },
-            () => fetchIncomeData(true)
+            () => fetchIncomeData(true),
           )
         }
       />

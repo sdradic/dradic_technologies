@@ -42,6 +42,19 @@ const AppCard = ({
           alert("Coming Soon");
         }
       }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (link) {
+            window.open(link, "_blank");
+          } else {
+            alert("Coming Soon");
+          }
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={link ? `Open ${title} app` : `${title} - Coming Soon`}
     >
       {image && (
         <img src={image} alt={title} className="size-16 rounded-lg mx-auto" />

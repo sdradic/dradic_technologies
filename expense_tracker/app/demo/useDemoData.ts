@@ -66,7 +66,7 @@ export function useDemoData() {
         user_name: "Guest User",
         user_email: "guest@example.com",
         group_name: "",
-      })
+      }),
     );
 
     setGuestExpenses(demoExpenses);
@@ -82,7 +82,7 @@ export function useDemoData() {
   const addDemoExpense = useCallback(
     (expenseData: ExpenseCreate) => {
       const selectedItem = guestExpenseItems.find(
-        (item) => item.id === expenseData.item_id
+        (item) => item.id === expenseData.item_id,
       );
 
       const newExpense: ExpenseWithDetails = {
@@ -103,13 +103,13 @@ export function useDemoData() {
       setGuestExpenses((prev) => [...prev, newExpense]);
       return newExpense;
     },
-    [guestExpenseItems]
+    [guestExpenseItems],
   );
 
   const updateDemoExpense = useCallback(
     (expenseId: string, expenseData: ExpenseCreate) => {
       const selectedItem = guestExpenseItems.find(
-        (item) => item.id === expenseData.item_id
+        (item) => item.id === expenseData.item_id,
       );
 
       setGuestExpenses((prev) =>
@@ -125,16 +125,16 @@ export function useDemoData() {
                 item_category: selectedItem?.category || "Uncategorized",
                 item_is_fixed: selectedItem?.is_fixed || false,
               }
-            : expense
-        )
+            : expense,
+        ),
       );
     },
-    [guestExpenseItems]
+    [guestExpenseItems],
   );
 
   const deleteDemoExpense = useCallback((expenseId: string) => {
     setGuestExpenses((prev) =>
-      prev.filter((expense) => expense.id !== expenseId)
+      prev.filter((expense) => expense.id !== expenseId),
     );
   }, []);
 
@@ -145,7 +145,7 @@ export function useDemoData() {
   // --- INCOME DEMO DATA ---
   const [guestIncomes, setGuestIncomes] = useState<IncomeWithDetails[]>([]);
   const [guestIncomeSources, setGuestIncomeSources] = useState<IncomeSource[]>(
-    []
+    [],
   );
 
   const initializeDemoIncomeData = useCallback(() => {
@@ -172,7 +172,7 @@ export function useDemoData() {
         user_name: "Guest User",
         user_email: "guest@example.com",
         group_name: "",
-      })
+      }),
     );
     setGuestIncomes(demoIncomes);
     setGuestIncomeSources(demoSources);
@@ -203,7 +203,7 @@ export function useDemoData() {
       setGuestIncomes((prev) => [...prev, newIncome]);
       return newIncome;
     },
-    []
+    [],
   );
 
   const updateDemoIncome = useCallback(
@@ -223,11 +223,11 @@ export function useDemoData() {
                 source_category: selectedSource?.category || "",
                 updated_at: new Date().toISOString(),
               }
-            : income
-        )
+            : income,
+        ),
       );
     },
-    []
+    [],
   );
 
   const deleteDemoIncome = useCallback((incomeId: string) => {
@@ -244,16 +244,16 @@ export function useDemoData() {
     (sourceId: string, data: Partial<IncomeSource>) => {
       setGuestIncomeSources((prev) =>
         prev.map((source) =>
-          source.id === sourceId ? { ...source, ...data } : source
-        )
+          source.id === sourceId ? { ...source, ...data } : source,
+        ),
       );
     },
-    []
+    [],
   );
 
   const deleteDemoIncomeSource = useCallback((sourceId: string) => {
     setGuestIncomeSources((prev) =>
-      prev.filter((source) => source.id !== sourceId)
+      prev.filter((source) => source.id !== sourceId),
     );
   }, []);
 

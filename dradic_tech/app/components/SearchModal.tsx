@@ -45,7 +45,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
           post.metadata.title
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
-          post.content?.toLowerCase().includes(searchQuery.toLowerCase())
+          post.content?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredPosts(filtered);
     }
@@ -74,7 +74,17 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 backdrop-blur-lg z-40" onClick={onClose} />
+      <div
+        className="fixed inset-0 backdrop-blur-lg z-40"
+        onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onClose();
+          }
+        }}
+        tabIndex={-1}
+        role="presentation"
+      />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
@@ -137,7 +147,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               {new Date(
-                                post.metadata.created_at
+                                post.metadata.created_at,
                               ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",

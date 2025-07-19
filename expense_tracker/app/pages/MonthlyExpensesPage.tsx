@@ -1,7 +1,7 @@
 import { ErrorXIcon } from "~/components/Icons";
 import { ExpenseModal } from "~/components/ExpenseModal";
 import { MonthlyCards, MonthlyCharts } from "~/components/Expenses/Monthly";
-import Loader from "~/components/Loader";
+
 import {
   CardsSkeleton,
   ChartsTableSkeleton,
@@ -86,7 +86,7 @@ export default function MonthlyExpensesPage() {
               updateTableAndChartData,
               guestExpenses,
             },
-            () => fetchMonthlyData(true)
+            () => fetchMonthlyData(true),
           )
         }
         userId={user?.id || "mock-user-id"}
@@ -108,7 +108,7 @@ export default function MonthlyExpensesPage() {
               updateTableAndChartData,
               guestExpenses,
             },
-            () => fetchMonthlyData(true)
+            () => fetchMonthlyData(true),
           )
         }
         userId={user?.id || "mock-user-id"}
@@ -122,7 +122,7 @@ export default function MonthlyExpensesPage() {
               updateTableAndChartData,
               guestExpenses,
             },
-            () => fetchMonthlyData(true)
+            () => fetchMonthlyData(true),
           )
         }
       />

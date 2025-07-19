@@ -5,14 +5,14 @@ import { CardsSkeleton, ChartsTableSkeleton } from "../SkeletonLoader";
 const LazyMonthlyCards = React.lazy(() =>
   import("./Monthly/MonthlyCards").then((module) => ({
     default: module.MonthlyCards,
-  }))
+  })),
 );
 
 // Lazy load the MonthlyCharts component
 const LazyMonthlyCharts = React.lazy(() =>
   import("./Monthly/MonthlyCharts").then((module) => ({
     default: module.MonthlyCharts,
-  }))
+  })),
 );
 
 interface LazyMonthlyCardsProps {

@@ -58,6 +58,15 @@ export default function Navbar() {
             <div
               className="cursor-pointer rounded-xl p-2"
               onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setIsSearchModalOpen(!isSearchModalOpen);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label="Open search modal"
             >
               <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
             </div>

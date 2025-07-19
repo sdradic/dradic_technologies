@@ -109,7 +109,7 @@ class ExpenseSummary(BaseModel):
 
 class CategorySummary(BaseModel):
     category: Optional[str]
-    total_amount: float
+    amount: float
     count: int
 
 
@@ -118,6 +118,7 @@ class MonthlySummary(BaseModel):
     month: int
     total_amount: float
     currency: str
+    total_count: int
     categories: List[CategorySummary]
 
 
@@ -189,7 +190,7 @@ class MonthlyIncomeSummary(MonthlySummary):
 
 # Response Models for API
 class IncomeSourceResponse(BaseModel):
-    items: List[IncomeSourceWithUser]
+    sources: List[IncomeSourceWithUser]
     total_count: int
 
 

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { SearchBar } from "~/components/SearchBar";
 
 export default function Projects() {
-  const columns = ["Name", "Category", "Description", "Link"];
   const data = [
     {
       name: "Compression algorithm analysis applied to DNA sequences",
@@ -15,7 +14,7 @@ export default function Projects() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const filteredData = data.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+    project.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -63,10 +62,19 @@ const ProjectCard = ({
 }) => {
   return (
     <div
-      className="flex flex-col gap-4 mt-4 border bg-gray-50 dark:bg-dark-400 border-gray-200 dark:border-gray-800 rounded-lg p-4 w-full max-w-2xl mx-auto"
+      className="flex flex-col gap-4 mt-4 border bg-gray-50 dark:bg-dark-400 border-gray-200 dark:border-gray-800 rounded-lg p-4 w-full max-w-2xl mx-auto cursor-pointer"
       onClick={() => {
         window.open(link, "_blank");
       }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          window.open(link, "_blank");
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open ${name} project`}
     >
       <h2 className="text-2xl font-semibold">{name}</h2>
       <p className="text-gray-500 dark:text-gray-400">{description}</p>

@@ -233,6 +233,13 @@ export const UnifiedNav = ({
         <div
           className="fixed inset-0 backdrop-blur-lg z-10 md:hidden"
           onClick={onToggleSidebar}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              onToggleSidebar();
+            }
+          }}
+          tabIndex={-1}
+          role="presentation"
         />
       )}
     </>

@@ -86,7 +86,7 @@ export function useMonthlyData() {
         const expenseAmount = Math.abs(expense.amount);
         categories.set(
           category,
-          (categories.get(category) || 0) + expenseAmount
+          (categories.get(category) || 0) + expenseAmount,
         );
       });
 
@@ -107,7 +107,7 @@ export function useMonthlyData() {
       setDonutGraphData(newDonutGraphData);
       setIsChartsLoading(false);
     },
-    [isGuest]
+    [isGuest],
   );
 
   const fetchMonthlyData = useCallback(
@@ -170,7 +170,7 @@ export function useMonthlyData() {
         const createCard = (
           title: string,
           description: string,
-          value: number
+          value: number,
         ): SimpleCardProps => {
           // Ensure we have a valid currency
           let validCurrency: Currency;
@@ -201,12 +201,12 @@ export function useMonthlyData() {
           createCard(
             "Total Expenses",
             "Total expenses for the month",
-            totalExpenses
+            totalExpenses,
           ),
           createCard(
             "Total Savings",
             "Total savings for the month",
-            totalIncome - totalExpenses
+            totalIncome - totalExpenses,
           ),
         ];
         setCards(updatedCards);
@@ -244,10 +244,10 @@ export function useMonthlyData() {
                 const expenseAmount = Math.abs(expense.amount);
                 categories.set(
                   category,
-                  (categories.get(category) || 0) + expenseAmount
+                  (categories.get(category) || 0) + expenseAmount,
                 );
                 return categories;
-              }, new Map<string, number>())
+              }, new Map<string, number>()),
             )
               .map(([label, value]) => ({ label, value }))
               .filter((item) => item.value > 0)
@@ -273,7 +273,7 @@ export function useMonthlyData() {
         setIsLoading(false);
       }
     },
-    [user, lastFetchTime, CACHE_EXPIRY, updateTableAndChartData, getEmptyData]
+    [user, lastFetchTime, CACHE_EXPIRY, updateTableAndChartData, getEmptyData],
   );
 
   // Initialize data with cache checking
@@ -305,14 +305,14 @@ export function useMonthlyData() {
               description: "Click on an expense to edit it.",
               columns: ["Name", "Category", "Amount", "Date", "Description"],
               data: [],
-            }
+            },
           );
           setDonutGraphData(
             cachedMonthlyData.donutGraphData || {
               title: "Expenses by category",
               description: "Expenses by category",
               data: [],
-            }
+            },
           );
           setAllExpenses(cachedMonthlyData.allExpenses || []);
           setLastFetchTime(cachedMonthlyData.lastFetchTime);

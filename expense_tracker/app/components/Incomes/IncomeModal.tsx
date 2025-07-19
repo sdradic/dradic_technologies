@@ -133,7 +133,7 @@ const IncomeModal = ({
       // Check if source already exists
       const existingSource = (sources || []).find(
         (source) =>
-          source.name.toLowerCase() === newSourceForm.name.toLowerCase()
+          source.name.toLowerCase() === newSourceForm.name.toLowerCase(),
       );
 
       if (existingSource) {
@@ -193,7 +193,7 @@ const IncomeModal = ({
       setError(`Failed to ${isEditMode ? "update" : "create"} income`);
       console.error(
         `Error ${isEditMode ? "updating" : "creating"} income:`,
-        error
+        error,
       );
     } finally {
       setIsLoading(false);

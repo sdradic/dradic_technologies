@@ -2,7 +2,7 @@ import type { Route } from "./+types/index";
 import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList } from "~/components/PostList";
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_args: Route.MetaArgs) {
   return [
     { title: "Dradic Technologies Blog" },
     { name: "description", content: "Welcome to Dradic Technologies Blog!" },

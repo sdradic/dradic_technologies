@@ -2,7 +2,7 @@ import { type acceptedCurrencies } from "./store";
 
 export function formatCurrency(
   value: number,
-  currency: (typeof acceptedCurrencies)[number]
+  currency: (typeof acceptedCurrencies)[number],
 ) {
   // Ensure we have a valid currency, fallback to CLP if not
   const validCurrency = currency && currency.length === 3 ? currency : "CLP";

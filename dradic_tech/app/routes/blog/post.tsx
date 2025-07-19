@@ -126,7 +126,7 @@ export default function Post({ params }: Route.ComponentProps) {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
-                }
+                },
           )}
         </p>
         <div className="w-1 h-1 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
@@ -151,7 +151,7 @@ export default function Post({ params }: Route.ComponentProps) {
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-          }
+          },
         )}
       </p>
       <img

@@ -80,7 +80,7 @@ export const AddIncomeModal = ({
 
         // Check if source with same name already exists
         const existingSource = sources.find(
-          (source) => source.name.toLowerCase() === itemData.name.toLowerCase()
+          (source) => source.name.toLowerCase() === itemData.name.toLowerCase(),
         );
 
         if (existingSource) {
@@ -108,11 +108,11 @@ export const AddIncomeModal = ({
         setIsLoading(false);
       }
     },
-    [userId]
+    [userId],
   );
 
   const handleTransactionSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
     setIsLoading(true);

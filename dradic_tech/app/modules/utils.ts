@@ -142,7 +142,7 @@ export function getPostContent(slug: string): string | null {
 export function setPost(post: BlogPost): void {
   if (state) {
     const existingIndex = state.blogPosts.findIndex(
-      (p) => p.slug === post.slug
+      (p) => p.slug === post.slug,
     );
     if (existingIndex !== -1) {
       state.blogPosts[existingIndex] = post;
@@ -242,7 +242,7 @@ export interface BlogFormData {
 export function createBlogPostFromForm(
   data: BlogFormData,
   slug: string,
-  created_at?: string
+  created_at?: string,
 ): BlogPost {
   const now = new Date().toISOString();
 

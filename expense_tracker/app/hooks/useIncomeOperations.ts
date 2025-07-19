@@ -9,14 +9,8 @@ import type {
 } from "../modules/types";
 
 export function useIncomeOperations() {
-  const { user, isGuest } = useAuth();
-  const {
-    guestIncomes,
-    guestIncomeSources,
-    addDemoIncome,
-    updateDemoIncome,
-    deleteDemoIncome,
-  } = useDemoData();
+  const { isGuest } = useAuth();
+  const { addDemoIncome, updateDemoIncome, deleteDemoIncome } = useDemoData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] =
@@ -31,7 +25,7 @@ export function useIncomeOperations() {
         guestIncomes: IncomeWithDetails[];
         guestIncomeSources: IncomeSource[];
       },
-      fetchIncomeData?: () => Promise<void>
+      fetchIncomeData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -40,7 +34,7 @@ export function useIncomeOperations() {
           // Handle locally for guest users
           const newIncome = addDemoIncome(
             incomeData,
-            demoOperations.guestIncomeSources
+            demoOperations.guestIncomeSources,
           );
           const updatedIncomes = [...demoOperations.guestIncomes, newIncome];
           demoOperations.updateTableData(updatedIncomes);
@@ -54,11 +48,11 @@ export function useIncomeOperations() {
       } catch (err) {
         console.error("Error adding income:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to add income"
+          err instanceof ApiError ? err.message : "Failed to add income",
         );
       }
     },
-    [isGuest, addDemoIncome]
+    [isGuest, addDemoIncome],
   );
 
   const handleEditIncome = useCallback(
@@ -69,7 +63,7 @@ export function useIncomeOperations() {
         guestIncomes: IncomeWithDetails[];
         guestIncomeSources: IncomeSource[];
       },
-      fetchIncomeData?: () => Promise<void>
+      fetchIncomeData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -79,7 +73,7 @@ export function useIncomeOperations() {
           updateDemoIncome(
             selectedIncome.id,
             incomeData,
-            demoOperations.guestIncomeSources
+            demoOperations.guestIncomeSources,
           );
           const updatedIncomes = demoOperations.guestIncomes.map((income) =>
             income.id === selectedIncome.id
@@ -92,15 +86,15 @@ export function useIncomeOperations() {
                   source_id: incomeData.source_id,
                   source_name:
                     demoOperations.guestIncomeSources.find(
-                      (s) => s.id === incomeData.source_id
+                      (s) => s.id === incomeData.source_id,
                     )?.name || "Unknown",
                   source_category:
                     demoOperations.guestIncomeSources.find(
-                      (s) => s.id === incomeData.source_id
+                      (s) => s.id === incomeData.source_id,
                     )?.category || "",
                   updated_at: new Date().toISOString(),
                 }
-              : income
+              : income,
           );
           demoOperations.updateTableData(updatedIncomes);
           setIsEditModalOpen(false);
@@ -114,11 +108,11 @@ export function useIncomeOperations() {
       } catch (err) {
         console.error("Error updating income:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to update income"
+          err instanceof ApiError ? err.message : "Failed to update income",
         );
       }
     },
-    [isGuest, selectedIncome, updateDemoIncome]
+    [isGuest, selectedIncome, updateDemoIncome],
   );
 
   const handleDeleteIncome = useCallback(
@@ -128,7 +122,7 @@ export function useIncomeOperations() {
         updateTableData: (incomes: IncomeWithDetails[]) => void;
         guestIncomes: IncomeWithDetails[];
       },
-      fetchIncomeData?: () => Promise<void>
+      fetchIncomeData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -137,7 +131,7 @@ export function useIncomeOperations() {
           // Handle locally for guest users
           deleteDemoIncome(incomeId);
           const updatedIncomes = demoOperations.guestIncomes.filter(
-            (income) => income.id !== incomeId
+            (income) => income.id !== incomeId,
           );
           demoOperations.updateTableData(updatedIncomes);
         } else if (fetchIncomeData) {
@@ -148,18 +142,18 @@ export function useIncomeOperations() {
       } catch (err) {
         console.error("Error deleting income:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to delete income"
+          err instanceof ApiError ? err.message : "Failed to delete income",
         );
       }
     },
-    [isGuest, deleteDemoIncome]
+    [isGuest, deleteDemoIncome],
   );
 
   const handleRowClick = useCallback(
     (
       row: { [key: string]: string | number },
       allIncomes: IncomeWithDetails[],
-      guestIncomes?: IncomeWithDetails[]
+      guestIncomes?: IncomeWithDetails[],
     ) => {
       const incomes = isGuest ? guestIncomes : allIncomes;
       const income = incomes?.find((inc) => inc.id === row.id);
@@ -169,7 +163,7 @@ export function useIncomeOperations() {
         setIsEditModalOpen(true);
       }
     },
-    [isGuest]
+    [isGuest],
   );
 
   return {

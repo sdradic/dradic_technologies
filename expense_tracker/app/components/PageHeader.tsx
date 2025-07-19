@@ -1,5 +1,3 @@
-import { ThemeToggle } from "./ThemeToggle";
-
 interface PageHeaderProps {
   title: string;
   subtitle: string;

@@ -1,25 +1,34 @@
 import logging as logger
-from typing import List, Optional
-from uuid import UUID
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, Depends, HTTPException
+
 from models import (
     IncomeSource,
     IncomeSourceCreate,
+    IncomeSourceResponse,
     IncomeSourceWithUser,
 )
-from utils.db import DatabaseModel
 from utils.auth import get_current_user
+from utils.db import DatabaseModel
 
 income_sources_router = APIRouter()
 
+# Module-level singleton for dependency injection
+current_user_dependency = Depends(get_current_user)
+
+
 @income_sources_router.post("/", response_model=IncomeSource)
-async def create_income_source(source: IncomeSourceCreate, current_user: dict = Depends(get_current_user)):
+async def create_income_source(
+    source: IncomeSourceCreate, current_user: dict = current_user_dependency
+):
     """Create a new income source"""
     try:
         # Ensure user can only create income sources for themselves
         if source.user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot create income source for another user")
+            raise HTTPException(
+                status_code=403, detail="Cannot create income source for another user"
+            )
 
         # Validate user exists
         user_check_query = """
@@ -30,7 +39,6 @@ async def create_income_source(source: IncomeSourceCreate, current_user: dict = 
         user_exists = DatabaseModel.execute_query(
             user_check_query, {"user_id": source.user_id}
         )
-
         if not user_exists or user_exists[0]["count"] == 0:
             raise HTTPException(status_code=400, detail="User not found")
 
@@ -45,19 +53,24 @@ async def create_income_source(source: IncomeSourceCreate, current_user: dict = 
             status_code=500, detail=f"Failed to create income source: {str(e)}"
         ) from e
 
-@income_sources_router.get("/", response_model=List[IncomeSourceWithUser])
+
+@income_sources_router.get("/", response_model=IncomeSourceResponse)
 async def get_income_sources(
     user_id: Optional[str] = None,
     category: Optional[str] = None,
-    current_user: dict = Depends(get_current_user)
+    limit: int = 100,
+    offset: int = 0,
+    current_user: dict = current_user_dependency,
 ):
     """Get income sources with optional filters"""
     try:
-                # If user_id is specified, ensure it matches the current user
+        # If user_id is specified, ensure it matches the current user
         if user_id and user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's income sources")
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's income sources"
+            )
 
-        # If no user_id is specified, default to current user's income sources
+        # If no user_id is specified, default to current user's sources
         if not user_id:
             user_id = current_user.get("uid")
 
@@ -76,10 +89,22 @@ async def get_income_sources(
             query += " AND isc.category = :category"
             params["category"] = category
 
-        query += " ORDER BY isc.name"
+        # Get total count
+        count_query = f"SELECT COUNT(*) as total FROM ({query}) as subquery"
+        total_count = DatabaseModel.execute_query(count_query, params)
+        total = total_count[0]["total"] if total_count else 0
+
+        # Add pagination
+        query += " ORDER BY isc.name LIMIT :limit OFFSET :offset"
+        params["limit"] = str(limit)
+        params["offset"] = str(offset)
 
         sources = DatabaseModel.execute_query(query, params)
-        return [IncomeSourceWithUser(**source) for source in sources]
+
+        return IncomeSourceResponse(
+            sources=[IncomeSourceWithUser(**source) for source in sources],
+            total_count=total,
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -88,8 +113,11 @@ async def get_income_sources(
             status_code=500, detail=f"Failed to fetch income sources: {str(e)}"
         ) from e
 
+
 @income_sources_router.get("/{source_id}", response_model=IncomeSourceWithUser)
-async def get_income_source(source_id: UUID, current_user: dict = Depends(get_current_user)):
+async def get_income_source(
+    source_id: str, current_user: dict = current_user_dependency
+):
     """Get a specific income source by ID"""
     try:
         query = """
@@ -106,10 +134,12 @@ async def get_income_source(source_id: UUID, current_user: dict = Depends(get_cu
             raise HTTPException(status_code=404, detail="Income source not found")
 
         source = sources[0]
-        
+
         # Ensure user can only access their own income sources
         if source["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's income source")
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's income source"
+            )
 
         return IncomeSourceWithUser(**source)
     except HTTPException:
@@ -120,25 +150,36 @@ async def get_income_source(source_id: UUID, current_user: dict = Depends(get_cu
             status_code=500, detail=f"Failed to fetch income source: {str(e)}"
         ) from e
 
+
 @income_sources_router.put("/{source_id}", response_model=IncomeSource)
-async def update_income_source(source_id: UUID, source: IncomeSourceCreate, current_user: dict = Depends(get_current_user)):
+async def update_income_source(
+    source_id: str,
+    source: IncomeSourceCreate,
+    current_user: dict = current_user_dependency,
+):
     """Update an income source"""
     try:
         # First check if the source exists and belongs to the current user
         existing_source_query = """
             SELECT user_id FROM dradic_tech.income_sources WHERE id = :source_id
         """
-        existing_sources = DatabaseModel.execute_query(existing_source_query, {"source_id": source_id})
-        
+        existing_sources = DatabaseModel.execute_query(
+            existing_source_query, {"source_id": source_id}
+        )
+
         if not existing_sources:
             raise HTTPException(status_code=404, detail="Income source not found")
-        
+
         if existing_sources[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot update another user's income source")
+            raise HTTPException(
+                status_code=403, detail="Cannot update another user's income source"
+            )
 
         # Ensure the user_id in the update matches the current user
         if source.user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot change income source ownership")
+            raise HTTPException(
+                status_code=403, detail="Cannot change income source ownership"
+            )
 
         # Validate user exists if user_id is being changed
         if source.user_id:
@@ -155,7 +196,9 @@ async def update_income_source(source_id: UUID, source: IncomeSourceCreate, curr
                 raise HTTPException(status_code=400, detail="User not found")
 
         source_data = source.dict(exclude_unset=True)
-        updated_source = DatabaseModel.update_record("income_sources", source_id, source_data)
+        updated_source = DatabaseModel.update_record(
+            "income_sources", source_id, source_data
+        )
 
         if not updated_source:
             raise HTTPException(status_code=404, detail="Income source not found")
@@ -169,21 +212,28 @@ async def update_income_source(source_id: UUID, source: IncomeSourceCreate, curr
             status_code=500, detail=f"Failed to update income source: {str(e)}"
         ) from e
 
+
 @income_sources_router.delete("/{source_id}")
-async def delete_income_source(source_id: UUID, current_user: dict = Depends(get_current_user)):
+async def delete_income_source(
+    source_id: str, current_user: dict = current_user_dependency
+):
     """Delete an income source"""
     try:
         # First check if the source exists and belongs to the current user
         existing_source_query = """
             SELECT user_id FROM dradic_tech.income_sources WHERE id = :source_id
         """
-        existing_sources = DatabaseModel.execute_query(existing_source_query, {"source_id": source_id})
-        
+        existing_sources = DatabaseModel.execute_query(
+            existing_source_query, {"source_id": source_id}
+        )
+
         if not existing_sources:
             raise HTTPException(status_code=404, detail="Income source not found")
-        
+
         if existing_sources[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot delete another user's income source")
+            raise HTTPException(
+                status_code=403, detail="Cannot delete another user's income source"
+            )
 
         # Check if source has incomes
         income_check_query = """
@@ -201,7 +251,7 @@ async def delete_income_source(source_id: UUID, current_user: dict = Depends(get
                 detail="Cannot delete income source that has incomes. Delete incomes first.",
             )
 
-        deleted = DatabaseModel.delete_record("income_sources", source_id)
+        deleted = DatabaseModel.delete_record("income_sources", str(source_id))
 
         if not deleted:
             raise HTTPException(status_code=404, detail="Income source not found")
@@ -215,26 +265,35 @@ async def delete_income_source(source_id: UUID, current_user: dict = Depends(get
             status_code=500, detail=f"Failed to delete income source: {str(e)}"
         ) from e
 
+
 @income_sources_router.get("/{source_id}/incomes")
-async def get_source_incomes(source_id: UUID, limit: int = 100, offset: int = 0, current_user: dict = Depends(get_current_user)):
+async def get_source_incomes(
+    source_id: str,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: dict = current_user_dependency,
+):
     """Get all incomes for a specific income source"""
     try:
         # First check if the source belongs to the current user
         source_check_query = """
             SELECT user_id FROM dradic_tech.income_sources WHERE id = :source_id
         """
-        sources = DatabaseModel.execute_query(source_check_query, {"source_id": source_id})
-        
+        sources = DatabaseModel.execute_query(
+            source_check_query, {"source_id": source_id}
+        )
+
         if not sources:
             raise HTTPException(status_code=404, detail="Income source not found")
-        
+
         if sources[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's income source")
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's income source"
+            )
 
         query = """
             SELECT
-                i.id, i.source_id, i.amount, i.currency, i.date, i.description,
-                i.created_at, i.updated_at,
+                i.id, i.source_id, i.date, i.amount, i.currency, i.created_at,
                 isc.name as source_name, isc.category as source_category,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
@@ -260,12 +319,11 @@ async def get_source_incomes(source_id: UUID, limit: int = 100, offset: int = 0,
             status_code=500, detail=f"Failed to fetch source incomes: {str(e)}"
         ) from e
 
+
 @income_sources_router.get("/categories/")
-async def get_categories(current_user: dict = Depends(get_current_user)):
+async def get_categories(current_user: dict = current_user_dependency):
     """Get all unique categories"""
     try:
-        user_id = current_user.get("uid")
-
         query = """
             SELECT DISTINCT category
             FROM dradic_tech.income_sources
@@ -273,10 +331,12 @@ async def get_categories(current_user: dict = Depends(get_current_user)):
             ORDER BY category
         """
 
-        categories = DatabaseModel.execute_query(query, {"user_id": user_id})
+        categories = DatabaseModel.execute_query(
+            query, {"user_id": current_user.get("uid")}
+        )
         return [cat["category"] for cat in categories if cat["category"]]
     except Exception as e:
         logger.error(f"Failed to fetch categories: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch categories: {str(e)}"
-        ) from e 
+        ) from e

@@ -4,7 +4,7 @@ import { ApiError, expensesApi } from "../modules/apis";
 import type { ExpenseCreate, ExpenseWithDetails } from "../modules/types";
 
 export function useExpenseOperations() {
-  const { user, isGuest } = useAuth();
+  const { isGuest } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] =
@@ -19,7 +19,7 @@ export function useExpenseOperations() {
         updateTableAndChartData: (expenses: ExpenseWithDetails[]) => void;
         guestExpenses: ExpenseWithDetails[];
       },
-      fetchMonthlyData?: () => Promise<void>
+      fetchMonthlyData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -39,11 +39,11 @@ export function useExpenseOperations() {
       } catch (err) {
         console.error("Error adding expense:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to add expense"
+          err instanceof ApiError ? err.message : "Failed to add expense",
         );
       }
     },
-    [isGuest]
+    [isGuest],
   );
 
   const handleEditExpense = useCallback(
@@ -52,12 +52,12 @@ export function useExpenseOperations() {
       demoOperations?: {
         updateDemoExpense: (
           expenseId: string,
-          expenseData: ExpenseCreate
+          expenseData: ExpenseCreate,
         ) => void;
         updateTableAndChartData: (expenses: ExpenseWithDetails[]) => void;
         guestExpenses: ExpenseWithDetails[];
       },
-      fetchMonthlyData?: () => Promise<void>
+      fetchMonthlyData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -68,7 +68,7 @@ export function useExpenseOperations() {
           const updatedExpenses = demoOperations.guestExpenses.map((expense) =>
             expense.id === selectedExpense.id
               ? { ...expense, ...expenseData }
-              : expense
+              : expense,
           );
           demoOperations.updateTableAndChartData(updatedExpenses);
           setIsEditModalOpen(false);
@@ -82,11 +82,11 @@ export function useExpenseOperations() {
       } catch (err) {
         console.error("Error updating expense:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to update expense"
+          err instanceof ApiError ? err.message : "Failed to update expense",
         );
       }
     },
-    [isGuest, selectedExpense]
+    [isGuest, selectedExpense],
   );
 
   const handleDeleteExpense = useCallback(
@@ -97,7 +97,7 @@ export function useExpenseOperations() {
         updateTableAndChartData: (expenses: ExpenseWithDetails[]) => void;
         guestExpenses: ExpenseWithDetails[];
       },
-      fetchMonthlyData?: () => Promise<void>
+      fetchMonthlyData?: () => Promise<void>,
     ) => {
       try {
         setError(null);
@@ -106,7 +106,7 @@ export function useExpenseOperations() {
           // Handle locally for guest users
           demoOperations.deleteDemoExpense(expenseId);
           const updatedExpenses = demoOperations.guestExpenses.filter(
-            (expense) => expense.id !== expenseId
+            (expense) => expense.id !== expenseId,
           );
           demoOperations.updateTableAndChartData(updatedExpenses);
         } else if (fetchMonthlyData) {
@@ -117,18 +117,18 @@ export function useExpenseOperations() {
       } catch (err) {
         console.error("Error deleting expense:", err);
         setError(
-          err instanceof ApiError ? err.message : "Failed to delete expense"
+          err instanceof ApiError ? err.message : "Failed to delete expense",
         );
       }
     },
-    [isGuest]
+    [isGuest],
   );
 
   const handleRowClick = useCallback(
     (
       row: { [key: string]: string | number },
       allExpenses: ExpenseWithDetails[],
-      guestExpenses?: ExpenseWithDetails[]
+      guestExpenses?: ExpenseWithDetails[],
     ) => {
       const expenses = isGuest ? guestExpenses : allExpenses;
       const expense = expenses?.find((exp) => exp.id === row.id);
@@ -138,7 +138,7 @@ export function useExpenseOperations() {
         setIsEditModalOpen(true);
       }
     },
-    [isGuest]
+    [isGuest],
   );
 
   return {

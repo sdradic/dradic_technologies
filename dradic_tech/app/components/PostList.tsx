@@ -36,7 +36,7 @@ export function PostsList({
       setFilteredPosts(posts);
     } else {
       const filtered = posts.filter((post) =>
-        post.metadata.title.toLowerCase().includes(trimmedQuery)
+        post.metadata.title.toLowerCase().includes(trimmedQuery),
       );
       setFilteredPosts(filtered);
     }
@@ -59,6 +59,7 @@ export function PostsList({
             <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-500 rounded-lg">
               <img
                 src={post.metadata?.image || placeholderImage}
+                alt={post.metadata.title}
                 className="object-cover w-32 h-24 rounded-md"
               />
               <div className="flex flex-col gap-2 items-start justify-center">
@@ -74,7 +75,7 @@ export function PostsList({
                       day: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
-                    }
+                    },
                   )}
                 </p>
               </div>

@@ -13,10 +13,11 @@ export const SimpleModal = ({
   onClose,
   className = "",
 }: SimpleModalProps) => {
-  if (!isOpen) return null;
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -25,7 +26,9 @@ export const SimpleModal = ({
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [onClose]);
+  }, [onClose, isOpen]);
+
+  if (!isOpen) return null;
 
   const handleBackdropClick = (event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {

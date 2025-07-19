@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MDXEditor,
   headingsPlugin,
@@ -46,18 +46,6 @@ export default function MDXEditorComponent({
   const [isClient, setIsClient] = useState(false);
   const editorRef = useRef<any>(null);
 
-  // Ensure selectedPost is not undefined
-  const safeSelectedPost = selectedPost || {
-    slug: "",
-    title: "Untitled",
-    content: "",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    image: "",
-    category: "",
-    author: "",
-  };
-
   // Handle client-side mounting
   useEffect(() => {
     // Use a small delay to ensure proper hydration
@@ -75,7 +63,7 @@ export default function MDXEditorComponent({
       // Use a timeout to ensure DOM is ready
       const timeoutId = setTimeout(() => {
         const editorElement = document.querySelector(
-          '[data-testid="mdxeditor-root"]'
+          '[data-testid="mdxeditor-root"]',
         );
         if (editorElement) {
           if (theme === "dark") {

@@ -34,7 +34,7 @@ export const links: Route.LinksFunction = () => [
 export function HydrateFallback() {
   const location = useLocation();
   const isAuthRoute = !["/", "/login", "/logout", "/404"].includes(
-    location.pathname
+    location.pathname,
   );
 
   return (
@@ -73,7 +73,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   // Public routes that don't require authentication

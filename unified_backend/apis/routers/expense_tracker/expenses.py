@@ -19,10 +19,13 @@ from utils.db import DatabaseModel
 
 expenses_router = APIRouter()
 
+# Module-level singleton for dependency injection
+current_user_dependency = Depends(get_current_user)
+
 
 @expenses_router.post("/", response_model=Expense)
 async def create_expense(
-    expense: ExpenseCreate, current_user: dict = Depends(get_current_user)
+    expense: ExpenseCreate, current_user: dict = current_user_dependency
 ):
     """Create a new expense"""
     try:
@@ -64,7 +67,7 @@ async def get_expenses(
     end_date: Optional[date] = None,
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = current_user_dependency,
 ):
     """Get expenses with optional filters"""
     try:
@@ -95,7 +98,7 @@ async def get_expenses(
 
         if item_id:
             query += " AND e.item_id = :item_id"
-            params["item_id"] = item_id
+            params["item_id"] = str(item_id)
 
         if category:
             query += " AND ei.category = :category"
@@ -107,11 +110,11 @@ async def get_expenses(
 
         if start_date:
             query += " AND e.date >= :start_date"
-            params["start_date"] = start_date
+            params["start_date"] = str(start_date)
 
         if end_date:
             query += " AND e.date <= :end_date"
-            params["end_date"] = end_date
+            params["end_date"] = str(end_date)
 
         # Get total count
         count_query = f"SELECT COUNT(*) as total FROM ({query}) as subquery"
@@ -120,8 +123,8 @@ async def get_expenses(
 
         # Add ordering and pagination
         query += " ORDER BY e.date DESC, e.created_at DESC LIMIT :limit OFFSET :offset"
-        params["limit"] = limit
-        params["offset"] = offset
+        params["limit"] = str(limit)
+        params["offset"] = str(offset)
 
         expenses = DatabaseModel.execute_query(query, params)
 
@@ -182,7 +185,7 @@ async def get_expenses(
 
 
 @expenses_router.get("/{expense_id}", response_model=ExpenseWithDetails)
-async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current_user)):
+async def get_expense(expense_id: UUID, current_user: dict = current_user_dependency):
     """Get a specific expense by ID"""
     try:
         query = """
@@ -204,23 +207,20 @@ async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current
 
         expense = expenses[0]
 
-        # Ensure user can only access their own expenses
-        if expense["user_name"] != current_user.get("name") and expense[
-            "user_email"
-        ] != current_user.get("email"):
-            # Double check with user_id from expense_items
-            user_check_query = """
-                SELECT ei.user_id FROM dradic_tech.expense_items ei 
-                JOIN dradic_tech.expenses e ON e.item_id = ei.id
-                WHERE e.id = :expense_id
-            """
-            user_result = DatabaseModel.execute_query(
-                user_check_query, {"expense_id": expense_id}
+        # Double check with user_id from expense_items
+        user_check_query = """
+            SELECT ei.user_id FROM dradic_tech.expense_items ei
+            JOIN dradic_tech.expenses e ON e.item_id = ei.id
+            WHERE e.id = :expense_id
+        """
+        user_check = DatabaseModel.execute_query(
+            user_check_query, {"expense_id": expense_id}
+        )
+
+        if not user_check or user_check[0]["user_id"] != current_user.get("uid"):
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's expense"
             )
-            if user_result and user_result[0]["user_id"] != current_user.get("uid"):
-                raise HTTPException(
-                    status_code=403, detail="Cannot access another user's expense"
-                )
 
         return ExpenseWithDetails(**expense)
     except HTTPException:
@@ -236,7 +236,7 @@ async def get_expense(expense_id: UUID, current_user: dict = Depends(get_current
 async def update_expense(
     expense_id: UUID,
     expense: ExpenseCreate,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = current_user_dependency,
 ):
     """Update an expense"""
     try:
@@ -278,7 +278,7 @@ async def update_expense(
 
         expense_data = expense.dict(exclude_unset=True)
         updated_expense = DatabaseModel.update_record(
-            "expenses", expense_id, expense_data
+            "expenses", str(expense_id), expense_data
         )
 
         if not updated_expense:
@@ -296,7 +296,7 @@ async def update_expense(
 
 @expenses_router.delete("/{expense_id}")
 async def delete_expense(
-    expense_id: UUID, current_user: dict = Depends(get_current_user)
+    expense_id: UUID, current_user: dict = current_user_dependency
 ):
     """Delete an expense"""
     try:
@@ -318,7 +318,7 @@ async def delete_expense(
                 status_code=403, detail="Cannot delete another user's expense"
             )
 
-        deleted = DatabaseModel.delete_record("expenses", expense_id)
+        deleted = DatabaseModel.delete_record("expenses", str(expense_id))
 
         if not deleted:
             raise HTTPException(status_code=404, detail="Expense not found")
@@ -338,7 +338,7 @@ async def get_monthly_summary(
     year: int,
     month: int,
     currency: str = "CLP",
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = current_user_dependency,
 ):
     """Get monthly expense summary"""
     try:
@@ -392,7 +392,7 @@ async def get_monthly_summary(
         categories = [
             CategorySummary(
                 category=cat["category"],
-                total_amount=float(cat["total_amount"]),
+                amount=float(cat["total_amount"]),
                 count=int(cat["count"]),
             )
             for cat in category_data
@@ -403,6 +403,7 @@ async def get_monthly_summary(
             month=month,
             total_amount=total_amount,
             currency=currency,
+            total_count=sum(cat.count for cat in categories),
             categories=categories,
         )
     except HTTPException:
@@ -415,7 +416,7 @@ async def get_monthly_summary(
 
 
 @expenses_router.get("/currencies/")
-async def get_currencies(current_user: dict = Depends(get_current_user)):
+async def get_currencies(current_user: dict = current_user_dependency):
     """Get all unique currencies used in expenses"""
     try:
         user_id = current_user.get("uid")

@@ -20,7 +20,7 @@ export const DatePicker = ({
 }: DatePickerProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date>(
-    value ? new Date(value) : new Date()
+    value ? new Date(value) : new Date(),
   );
   const [shouldFlip, setShouldFlip] = useState<boolean>(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +104,7 @@ export const DatePicker = ({
           disabled={isDisabled}
         >
           {day}
-        </button>
+        </button>,
       );
     }
 

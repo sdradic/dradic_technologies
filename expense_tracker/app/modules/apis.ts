@@ -30,7 +30,11 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 class ApiError extends Error {
-  constructor(message: string, public status: number, public response?: any) {
+  constructor(
+    message: string,
+    public status: number,
+    public response?: any,
+  ) {
     super(message);
     this.name = "ApiError";
   }
@@ -54,7 +58,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 // Generic API request handler
 async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -80,7 +84,7 @@ async function apiRequest<T>(
       throw new ApiError(
         errorData.detail || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
-        errorData
+        errorData,
       );
     }
 
@@ -91,7 +95,7 @@ async function apiRequest<T>(
     }
     throw new ApiError(
       error instanceof Error ? error.message : "Network error",
-      0
+      0,
     );
   }
 }
@@ -106,10 +110,7 @@ export const groupsApi = {
     }),
 
   // Get all groups
-  getAll: (userId?: string): Promise<Group[]> => {
-    const params = userId ? `?user_id=${userId}` : "";
-    return apiRequest(`/api/expense-tracker/groups/${params}`);
-  },
+  getAll: (): Promise<Group[]> => apiRequest(`/api/expense-tracker/groups/`),
 
   // Get a specific group
   getById: (id: string): Promise<Group> =>
@@ -187,7 +188,7 @@ export const expenseItemsApi = {
       is_fixed?: boolean;
       limit?: number;
       offset?: number;
-    } = {}
+    } = {},
   ): Promise<ExpenseItemResponse> => {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -199,7 +200,7 @@ export const expenseItemsApi = {
     return apiRequest(
       `/api/expense-tracker/expense-items/${
         queryString ? `?${queryString}` : ""
-      }`
+      }`,
     );
   },
 
@@ -224,17 +225,17 @@ export const expenseItemsApi = {
   getExpenses: (
     id: string,
     limit = 100,
-    offset = 0
+    offset = 0,
   ): Promise<ExpenseWithDetails[]> =>
     apiRequest(
-      `/api/expense-tracker/expense-items/${id}/expenses?limit=${limit}&offset=${offset}`
+      `/api/expense-tracker/expense-items/${id}/expenses?limit=${limit}&offset=${offset}`,
     ),
 
   // Get all categories
   getCategories: (userId?: string): Promise<string[]> => {
     const params = userId ? `?user_id=${userId}` : "";
     return apiRequest(
-      `/api/expense-tracker/expense-items/categories/${params}`
+      `/api/expense-tracker/expense-items/categories/${params}`,
     );
   },
 };
@@ -259,7 +260,7 @@ export const expensesApi = {
       end_date?: string;
       limit?: number;
       offset?: number;
-    } = {}
+    } = {},
   ): Promise<ExpenseResponse> => {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -269,7 +270,7 @@ export const expensesApi = {
     });
     const queryString = searchParams.toString();
     return apiRequest(
-      `/api/expense-tracker/expenses/${queryString ? `?${queryString}` : ""}`
+      `/api/expense-tracker/expenses/${queryString ? `?${queryString}` : ""}`,
     );
   },
 
@@ -295,12 +296,12 @@ export const expensesApi = {
     year: number,
     month: number,
     userId?: string,
-    currency = "USD"
+    currency = "CLP",
   ): Promise<MonthlySummary> => {
     const params = new URLSearchParams({ currency });
     if (userId) params.append("user_id", userId);
     return apiRequest(
-      `/api/expense-tracker/expenses/summary/monthly/${year}/${month}?${params}`
+      `/api/expense-tracker/expenses/summary/monthly/${year}/${month}?${params}`,
     );
   },
 
@@ -322,16 +323,28 @@ export const incomeSourcesApi = {
 
   // Get all income sources (optionally filter by user)
   getAll: (
-    userId?: string,
-    skip = 0,
-    limit = 100
+    params: {
+      user_id?: string;
+      category?: string;
+      limit?: number;
+      offset?: number;
+    } = {},
   ): Promise<IncomeSourceResponse> => {
-    const params = new URLSearchParams({
-      skip: skip.toString(),
+    const { limit = 100, offset = 0, ...rest } = params;
+    const searchParams = new URLSearchParams({
       limit: limit.toString(),
-      ...(userId && { user_id: userId }),
+      offset: offset.toString(),
+      ...Object.entries(rest).reduce(
+        (acc, [key, value]) => {
+          if (value !== undefined) {
+            acc[key] = value.toString();
+          }
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
     });
-    return apiRequest(`/api/expense-tracker/income-sources/?${params}`);
+    return apiRequest(`/api/expense-tracker/income-sources/?${searchParams}`);
   },
 
   // Get a specific income source
@@ -350,6 +363,20 @@ export const incomeSourcesApi = {
     apiRequest(`/api/expense-tracker/income-sources/${id}`, {
       method: "DELETE",
     }),
+
+  // Get all incomes for a specific income source
+  getSourceIncomes: (
+    sourceId: string,
+    limit = 100,
+    offset = 0,
+  ): Promise<IncomeWithDetails[]> =>
+    apiRequest(
+      `/api/expense-tracker/income-sources/${sourceId}/incomes?limit=${limit}&offset=${offset}`,
+    ),
+
+  // Get all unique categories
+  getCategories: (): Promise<string[]> =>
+    apiRequest(`/api/expense-tracker/income-sources/categories/`),
 };
 
 // Incomes API
@@ -366,22 +393,27 @@ export const incomesApi = {
     params: {
       user_id?: string;
       source_id?: string;
+      category?: string;
+      currency?: string;
       start_date?: string;
       end_date?: string;
       skip?: number;
       limit?: number;
-    } = {}
+    } = {},
   ): Promise<IncomeResponse> => {
     const { skip = 0, limit = 100, ...rest } = params;
     const searchParams = new URLSearchParams({
       skip: skip.toString(),
       limit: limit.toString(),
-      ...Object.entries(rest).reduce((acc, [key, value]) => {
-        if (value !== undefined) {
-          acc[key] = value.toString();
-        }
-        return acc;
-      }, {} as Record<string, string>),
+      ...Object.entries(rest).reduce(
+        (acc, [key, value]) => {
+          if (value !== undefined) {
+            acc[key] = value.toString();
+          }
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
     });
     return apiRequest(`/api/expense-tracker/incomes/?${searchParams}`);
   },
@@ -408,16 +440,12 @@ export const incomesApi = {
     year: number,
     month: number,
     userId?: string,
-    currency = "USD"
+    currency = "CLP",
   ): Promise<MonthlyIncomeSummary> => {
-    const params = new URLSearchParams({
-      year: year.toString(),
-      month: month.toString(),
-      currency,
-      ...(userId && { user_id: userId }),
-    });
+    const params = new URLSearchParams({ currency });
+    if (userId) params.append("user_id", userId);
     return apiRequest(
-      `/api/expense-tracker/incomes/monthly-summary/?${params}`
+      `/api/expense-tracker/incomes/summary/monthly/${year}/${month}?${params}`,
     );
   },
 };

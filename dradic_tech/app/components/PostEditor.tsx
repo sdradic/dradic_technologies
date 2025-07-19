@@ -106,7 +106,7 @@ export default function PostEditor({
       formData.category,
       formData.author,
       defaultPost,
-    ]
+    ],
   );
 
   const handleSave = async () => {
@@ -130,7 +130,7 @@ export default function PostEditor({
         const newSlug = uuidv7();
         const newPost = createBlogPostFromForm(
           { ...formData, content: postContent },
-          newSlug
+          newSlug,
         );
         await createPost(newPost);
         localState.setPost(newPost);
@@ -157,7 +157,7 @@ export default function PostEditor({
       setError(
         `Failed to save post: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setIsSaving(false);
@@ -248,6 +248,13 @@ export default function PostEditor({
                 <div
                   className="fixed inset-0 bg-transparent"
                   onClick={() => setIsMobileMenuOpen(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
+                  tabIndex={-1}
+                  role="presentation"
                 />
                 <div className="absolute right-4 top-36 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10">
                   <button

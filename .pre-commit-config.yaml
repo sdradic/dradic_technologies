@@ -1,0 +1,84 @@
+fail_fast: true
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: install-pre-commit-hooks
+        name: Install pre-commit hooks
+        entry: pre-commit install
+        language: system
+        always_run: true
+        pass_filenames: false
+
+        # Expense Tracker Backend: unified_backend/apis/routers/expense_tracker
+      - id: format-expense-tracker
+        name: Format unified_backend/apis/routers/expense_tracker
+        entry: sh -c 'cd unified_backend/apis/routers/expense_tracker &&  uv sync --all-extras && uv run ruff format .'
+        language: python
+        files: ^unified_backend/apis/routers/expense_tracker/
+        stages: [pre-commit]
+
+      - id: lint-expense-tracker
+        name: Lint unified_backend/apis/routers/expense_tracker
+        entry: sh -c 'cd unified_backend/apis/routers/expense_tracker && uv sync --all-extras && uv run ruff check --fix .'
+        language: python
+        files: ^unified_backend/apis/routers/expense_tracker/
+        stages: [pre-commit]
+
+      - id: mypy-expense-tracker
+        name: Mypy unified_backend/apis/routers/expense_tracker
+        entry: sh -c 'cd unified_backend/apis/routers/expense_tracker && uv sync --all-extras && uv run mypy .'
+        language: python
+        files: ^unified_backend/apis/routers/expense_tracker/
+        stages: [pre-commit]
+
+      # Expense Tracker Frontend: dradic_tech/app/routes/expense_tracker
+      - id: check-deps-expense-tracker-frontend
+        name: Check dependencies for expense tracker frontend
+        entry: sh -c 'cd expense_tracker && pnpm install --frozen-lockfile || (echo "You need to run pnpm install first" && exit 1)'
+        language: node
+        files: ^expense_tracker/
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: format-expense-tracker-frontend
+        name: Format dradic_tech/app/routes/expense_tracker
+        entry: sh -c 'cd expense_tracker && pnpm run format'
+        language: node
+        files: ^expense_tracker/app/.*\.(js|jsx|ts|tsx|css|scss|json|md)$
+        stages: [pre-commit]
+
+      - id: lint-expense-tracker-frontend
+        name: Lint expense tracker frontend
+        entry: sh -c 'cd expense_tracker && pnpm run lint'
+        language: node
+        files: ^expense_tracker/app/.*\.(js|jsx|ts|tsx)$
+        stages: [pre-commit]
+
+      # Dradic Tech Frontend: dradic_tech/app
+      - id: check-deps-dradic-tech-frontend
+        name: Check dependencies for dradic tech frontend
+        entry: sh -c 'cd dradic_tech && pnpm install --frozen-lockfile || (echo "You need to run pnpm install first" && exit 1)'
+        language: node
+        files: ^dradic_tech/app/
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: format-dradic-tech-frontend
+        name: Format dradic_tech/app
+        entry: sh -c 'cd dradic_tech && pnpm run format'
+        language: node
+        files: ^dradic_tech/app/.*\.(js|jsx|ts|tsx|css|scss|json|md)$
+        stages: [pre-commit]
+
+      - id: lint-dradic-tech-frontend
+        name: Lint dradic tech frontend
+        entry: sh -c 'cd dradic_tech && pnpm run lint'
+        language: node
+        files: ^dradic_tech/app/.*\.(js|jsx|ts|tsx)$
+        stages: [pre-commit]

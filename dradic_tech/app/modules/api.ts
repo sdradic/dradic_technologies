@@ -10,7 +10,11 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 class ApiError extends Error {
-  constructor(message: string, public status: number, public response?: any) {
+  constructor(
+    message: string,
+    public status: number,
+    public response?: any,
+  ) {
     super(message);
     this.name = "ApiError";
   }
@@ -34,7 +38,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 // Generic API request handler
 async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -60,7 +64,7 @@ async function apiRequest<T>(
       throw new ApiError(
         errorData.detail || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
-        errorData
+        errorData,
       );
     }
 
@@ -71,20 +75,20 @@ async function apiRequest<T>(
     }
     throw new ApiError(
       error instanceof Error ? error.message : "Network error",
-      0
+      0,
     );
   }
 }
 
 export async function fetchPostContent(
-  slug: string
+  slug: string,
 ): Promise<BlogPostWithSeparatedContent> {
   try {
     // Clear cache for this post to force fresh data (temporary fix for migration)
     localState.removePost(slug);
 
     const post: BlogPostWithSeparatedContent = await apiRequest(
-      `/api/blog/posts-separated/${slug}`
+      `/api/blog/posts-separated/${slug}`,
     );
     return post;
   } catch (error) {
@@ -152,14 +156,14 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
             image,
             category,
             author,
-          })
+          }),
         );
       }
     }
 
     // Fetch from API
     const metadata: BlogPostMetadata[] = await apiRequest(
-      "/api/blog/posts-metadata"
+      "/api/blog/posts-metadata",
     );
 
     return metadata;
@@ -178,7 +182,7 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
           image,
           category,
           author,
-        })
+        }),
       );
     }
 
@@ -215,7 +219,7 @@ export async function deletePost(slug: string): Promise<any> {
 
 export async function updatePost(
   slug: string,
-  post: BlogPost
+  post: BlogPost,
 ): Promise<BlogPost> {
   try {
     // Extract only the fields that the backend expects for updates

@@ -30,9 +30,9 @@ export default function AdminLogin() {
       setIsLoading(true);
       await login(email, password);
       navigate("/admin");
-    } catch (err) {
+    } catch (_err) {
       console.error(
-        "Failed to sign in. Please check your credentials and try again."
+        "Failed to sign in. Please check your credentials and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -99,7 +99,7 @@ function FormComponent({
         e.preventDefault();
         handleLogin(
           e.currentTarget.email.value,
-          e.currentTarget.password.value
+          e.currentTarget.password.value,
         );
       }}
     >

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Sidebar } from "./Sidebar";
-import { TallyUpLogo, MenuIcon, XIcon } from "./Icons";
+import { TallyUpLogo, MenuIcon } from "./Icons";
 import { useNavigate } from "react-router";
 
 export function Navbar() {

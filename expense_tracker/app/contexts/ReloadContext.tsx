@@ -12,7 +12,7 @@ const ReloadContext = createContext<ReloadContextType | undefined>(undefined);
 export function ReloadProvider({ children }: { children: ReactNode }) {
   const [isReloading, setIsReloading] = useState(false);
   const [reloadCallback, setReloadCallback] = useState<(() => void) | null>(
-    null
+    null,
   );
 
   const triggerReload = useCallback(async () => {

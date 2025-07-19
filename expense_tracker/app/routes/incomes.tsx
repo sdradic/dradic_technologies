@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { HeaderControls } from "~/components/HeaderControls";
 import { HeaderButton } from "~/components/HeaderButton";
 import { ReloadProvider, useReload } from "~/contexts/ReloadContext";
@@ -7,7 +7,7 @@ import { ReloadIcon } from "~/components/Icons";
 const MonthlyIncomesPage = lazy(() =>
   import("../pages/MonthlyIncomesPage").then((module) => ({
     default: module.MonthlyIncomesPage,
-  }))
+  })),
 );
 
 function IncomesContent() {

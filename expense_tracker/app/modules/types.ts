@@ -163,7 +163,7 @@ export interface IncomeSummary {
   count: number;
 }
 
-export interface MonthlyIncomeSummary extends MonthlySummary {}
+export type MonthlyIncomeSummary = MonthlySummary;
 
 export interface IncomeSourceResponse {
   items: IncomeSourceWithUser[];

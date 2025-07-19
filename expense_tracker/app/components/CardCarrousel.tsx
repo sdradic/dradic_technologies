@@ -12,7 +12,6 @@ export const CardCarrousel = ({
   cards,
   className = "",
 }: CardCarrouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -110,7 +109,6 @@ export const CardCarrousel = ({
               description={card.description}
               value={card.value}
               currency={card.currency}
-              symbol={card.symbol}
               previousValue={card.previousValue}
               canEdit={card.canEdit}
               inCarrousel={true}

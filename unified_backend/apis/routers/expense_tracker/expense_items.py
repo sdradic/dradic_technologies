@@ -2,25 +2,34 @@ import logging as logger
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
+
 from models import (
     ExpenseItem,
     ExpenseItemCreate,
     ExpenseItemResponse,
     ExpenseItemWithUser,
 )
-from utils.db import DatabaseModel
 from utils.auth import get_current_user
+from utils.db import DatabaseModel
 
 expense_items_router = APIRouter()
 
+# Module-level singleton for dependency injection
+current_user_dependency = Depends(get_current_user)
+
+
 @expense_items_router.post("/", response_model=ExpenseItem)
-async def create_expense_item(item: ExpenseItemCreate, current_user: dict = Depends(get_current_user)):
+async def create_expense_item(
+    item: ExpenseItemCreate, current_user: dict = current_user_dependency
+):
     """Create a new expense item"""
     try:
         # Ensure user can only create expense items for themselves
         if item.user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot create expense item for another user")
+            raise HTTPException(
+                status_code=403, detail="Cannot create expense item for another user"
+            )
 
         # Validate user exists
         user_check_query = """
@@ -46,6 +55,7 @@ async def create_expense_item(item: ExpenseItemCreate, current_user: dict = Depe
             status_code=500, detail=f"Failed to create expense item: {str(e)}"
         ) from e
 
+
 @expense_items_router.get("/", response_model=ExpenseItemResponse)
 async def get_expense_items(
     user_id: Optional[str] = None,
@@ -53,14 +63,16 @@ async def get_expense_items(
     is_fixed: Optional[bool] = None,
     limit: int = 100,
     offset: int = 0,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = current_user_dependency,
 ):
     """Get expense items with optional filters"""
     try:
         # If user_id is specified, ensure it matches the current user
         if user_id and user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's expense items")
-        
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's expense items"
+            )
+
         # If no user_id is specified, default to current user's items
         if not user_id:
             user_id = current_user.get("uid")
@@ -82,7 +94,7 @@ async def get_expense_items(
 
         if is_fixed is not None:
             query += " AND ei.is_fixed = :is_fixed"
-            params["is_fixed"] = is_fixed
+            params["is_fixed"] = str(is_fixed)
 
         # Get total count
         count_query = f"SELECT COUNT(*) as total FROM ({query}) as subquery"
@@ -91,8 +103,8 @@ async def get_expense_items(
 
         # Add pagination
         query += " ORDER BY ei.name LIMIT :limit OFFSET :offset"
-        params["limit"] = limit
-        params["offset"] = offset
+        params["limit"] = str(limit)
+        params["offset"] = str(offset)
 
         items = DatabaseModel.execute_query(query, params)
 
@@ -107,8 +119,9 @@ async def get_expense_items(
             status_code=500, detail=f"Failed to fetch expense items: {str(e)}"
         ) from e
 
+
 @expense_items_router.get("/{item_id}", response_model=ExpenseItemWithUser)
-async def get_expense_item(item_id: UUID, current_user: dict = Depends(get_current_user)):
+async def get_expense_item(item_id: UUID, current_user: dict = current_user_dependency):
     """Get a specific expense item by ID"""
     try:
         query = """
@@ -125,10 +138,12 @@ async def get_expense_item(item_id: UUID, current_user: dict = Depends(get_curre
             raise HTTPException(status_code=404, detail="Expense item not found")
 
         item = items[0]
-        
+
         # Ensure user can only access their own expense items
         if item["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's expense item")
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's expense item"
+            )
 
         return ExpenseItemWithUser(**item)
     except HTTPException:
@@ -139,25 +154,36 @@ async def get_expense_item(item_id: UUID, current_user: dict = Depends(get_curre
             status_code=500, detail=f"Failed to fetch expense item: {str(e)}"
         ) from e
 
+
 @expense_items_router.put("/{item_id}", response_model=ExpenseItem)
-async def update_expense_item(item_id: UUID, item: ExpenseItemCreate, current_user: dict = Depends(get_current_user)):
+async def update_expense_item(
+    item_id: UUID,
+    item: ExpenseItemCreate,
+    current_user: dict = current_user_dependency,
+):
     """Update an expense item"""
     try:
         # First check if the item exists and belongs to the current user
         existing_item_query = """
             SELECT user_id FROM dradic_tech.expense_items WHERE id = :item_id
         """
-        existing_items = DatabaseModel.execute_query(existing_item_query, {"item_id": item_id})
-        
+        existing_items = DatabaseModel.execute_query(
+            existing_item_query, {"item_id": item_id}
+        )
+
         if not existing_items:
             raise HTTPException(status_code=404, detail="Expense item not found")
-        
+
         if existing_items[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot update another user's expense item")
+            raise HTTPException(
+                status_code=403, detail="Cannot update another user's expense item"
+            )
 
         # Ensure the user_id in the update matches the current user
         if item.user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot change expense item ownership")
+            raise HTTPException(
+                status_code=403, detail="Cannot change expense item ownership"
+            )
 
         # Validate user exists if user_id is being changed
         if item.user_id:
@@ -174,7 +200,9 @@ async def update_expense_item(item_id: UUID, item: ExpenseItemCreate, current_us
                 raise HTTPException(status_code=400, detail="User not found")
 
         item_data = item.dict(exclude_unset=True)
-        updated_item = DatabaseModel.update_record("expense_items", item_id, item_data)
+        updated_item = DatabaseModel.update_record(
+            "expense_items", str(item_id), item_data
+        )
 
         if not updated_item:
             raise HTTPException(status_code=404, detail="Expense item not found")
@@ -188,21 +216,28 @@ async def update_expense_item(item_id: UUID, item: ExpenseItemCreate, current_us
             status_code=500, detail=f"Failed to update expense item: {str(e)}"
         ) from e
 
+
 @expense_items_router.delete("/{item_id}")
-async def delete_expense_item(item_id: UUID, current_user: dict = Depends(get_current_user)):
+async def delete_expense_item(
+    item_id: UUID, current_user: dict = current_user_dependency
+):
     """Delete an expense item"""
     try:
         # First check if the item exists and belongs to the current user
         existing_item_query = """
             SELECT user_id FROM dradic_tech.expense_items WHERE id = :item_id
         """
-        existing_items = DatabaseModel.execute_query(existing_item_query, {"item_id": item_id})
-        
+        existing_items = DatabaseModel.execute_query(
+            existing_item_query, {"item_id": item_id}
+        )
+
         if not existing_items:
             raise HTTPException(status_code=404, detail="Expense item not found")
-        
+
         if existing_items[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot delete another user's expense item")
+            raise HTTPException(
+                status_code=403, detail="Cannot delete another user's expense item"
+            )
 
         # Check if item has expenses
         expense_check_query = """
@@ -220,7 +255,7 @@ async def delete_expense_item(item_id: UUID, current_user: dict = Depends(get_cu
                 detail="Cannot delete expense item that has expenses. Delete expenses first.",
             )
 
-        deleted = DatabaseModel.delete_record("expense_items", item_id)
+        deleted = DatabaseModel.delete_record("expense_items", str(item_id))
 
         if not deleted:
             raise HTTPException(status_code=404, detail="Expense item not found")
@@ -234,8 +269,14 @@ async def delete_expense_item(item_id: UUID, current_user: dict = Depends(get_cu
             status_code=500, detail=f"Failed to delete expense item: {str(e)}"
         ) from e
 
+
 @expense_items_router.get("/{item_id}/expenses")
-async def get_item_expenses(item_id: UUID, limit: int = 100, offset: int = 0, current_user: dict = Depends(get_current_user)):
+async def get_item_expenses(
+    item_id: UUID,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: dict = current_user_dependency,
+):
     """Get all expenses for a specific expense item"""
     try:
         # First check if the item belongs to the current user
@@ -243,12 +284,14 @@ async def get_item_expenses(item_id: UUID, limit: int = 100, offset: int = 0, cu
             SELECT user_id FROM dradic_tech.expense_items WHERE id = :item_id
         """
         items = DatabaseModel.execute_query(item_check_query, {"item_id": item_id})
-        
+
         if not items:
             raise HTTPException(status_code=404, detail="Expense item not found")
-        
+
         if items[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's expense item")
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's expense item"
+            )
 
         query = """
             SELECT
@@ -278,14 +321,19 @@ async def get_item_expenses(item_id: UUID, limit: int = 100, offset: int = 0, cu
             status_code=500, detail=f"Failed to fetch item expenses: {str(e)}"
         ) from e
 
+
 @expense_items_router.get("/categories/")
-async def get_categories(user_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_categories(
+    user_id: Optional[str] = None, current_user: dict = current_user_dependency
+):
     """Get all unique categories"""
     try:
         # If user_id is specified, ensure it matches the current user
         if user_id and user_id != current_user.get("uid"):
-            raise HTTPException(status_code=403, detail="Cannot access another user's categories")
-        
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's categories"
+            )
+
         # If no user_id is specified, default to current user's categories
         if not user_id:
             user_id = current_user.get("uid")

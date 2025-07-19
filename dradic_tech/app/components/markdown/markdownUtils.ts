@@ -11,21 +11,21 @@ export function processMarkdownContent(content: string): string {
     (match, lang, code) => {
       const language = lang || "text";
       return `\`\`\`${language}\n${code}\n\`\`\``;
-    }
+    },
   );
 
   // Add callout blocks
   processed = processed.replace(
     /^> \[!NOTE\](.*$)/gm,
-    '<div class="callout callout-note">$1</div>'
+    '<div class="callout callout-note">$1</div>',
   );
   processed = processed.replace(
     /^> \[!WARNING\](.*$)/gm,
-    '<div class="callout callout-warning">$1</div>'
+    '<div class="callout callout-warning">$1</div>',
   );
   processed = processed.replace(
     /^> \[!TIP\](.*$)/gm,
-    '<div class="callout callout-tip">$1</div>'
+    '<div class="callout callout-tip">$1</div>',
   );
 
   return processed;
@@ -40,7 +40,7 @@ export function calculateReadingTime(content: string): number {
 
 // Extract table of contents
 export function extractTableOfContents(
-  content: string
+  content: string,
 ): Array<{ level: number; text: string; id: string }> {
   const toc: Array<{ level: number; text: string; id: string }> = [];
   const lines = content.split("\n");

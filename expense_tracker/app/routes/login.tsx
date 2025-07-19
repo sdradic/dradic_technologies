@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
-import { DradicTechLogo, TallyUpLogo } from "~/components/Icons";
-import { useTheme } from "~/contexts/ThemeContext";
+import { TallyUpLogo } from "~/components/Icons";
+
 import { useState, useEffect } from "react";
 import { ErrorXIcon } from "~/components/Icons";
 import Loader from "~/components/Loader";
@@ -10,7 +10,7 @@ import { ThemeToggle } from "~/components/ThemeToggle";
 export default function Login() {
   const { login, handleGuestLogin, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { toggleTheme } = useTheme();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function Login() {
     } catch (err: any) {
       setError(
         err.message ||
-          "Failed to sign in. Please check your credentials and try again."
+          "Failed to sign in. Please check your credentials and try again.",
       );
     }
   };

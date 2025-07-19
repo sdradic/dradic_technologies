@@ -129,7 +129,7 @@ const ExpenseModal = ({
 
       // Check if item already exists
       const existingItem = (items || []).find(
-        (item) => item.name.toLowerCase() === newItemForm.name.toLowerCase()
+        (item) => item.name.toLowerCase() === newItemForm.name.toLowerCase(),
       );
 
       if (existingItem) {
@@ -178,7 +178,7 @@ const ExpenseModal = ({
       if (isEditMode && expense) {
         const updatedExpense = await expensesApi.update(
           expense.id,
-          expenseData
+          expenseData,
         );
         onSubmit(updatedExpense);
       } else {
@@ -191,7 +191,7 @@ const ExpenseModal = ({
       setError(`Failed to ${isEditMode ? "update" : "create"} expense`);
       console.error(
         `Error ${isEditMode ? "updating" : "creating"} expense:`,
-        error
+        error,
       );
     } finally {
       setIsLoading(false);

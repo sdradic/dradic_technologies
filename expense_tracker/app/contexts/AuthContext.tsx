@@ -6,7 +6,7 @@ import { usersApi } from "~/modules/apis";
 
 // Convert Supabase User to your app's User type
 const mapSupabaseUser = async (
-  supabaseUser: SupabaseUser | null
+  supabaseUser: SupabaseUser | null,
 ): Promise<User | null> => {
   if (!supabaseUser) return null;
 
@@ -96,7 +96,7 @@ export function useAuthStore() {
       } catch (error) {
         console.error("Error in auth state change:", error);
         setAuthError(
-          "Failed to load user session. Please try refreshing the page."
+          "Failed to load user session. Please try refreshing the page.",
         );
       } finally {
         setIsLoading(false);
@@ -148,7 +148,7 @@ export function useAuthStore() {
           // If no session, the user might need to confirm their email
           // In this case, we'll create the user profile when they confirm
           console.log(
-            "User created but needs to confirm email. User profile will be created upon confirmation."
+            "User created but needs to confirm email. User profile will be created upon confirmation.",
           );
         }
 
@@ -237,7 +237,7 @@ export function useAuthStore() {
       signup,
       authError,
     }),
-    [isAuthenticated, user, isLoading, isGuest, authError]
+    [isAuthenticated, user, isLoading, isGuest, authError],
   );
 
   return contextValue;
@@ -262,7 +262,7 @@ export interface AuthStore {
   signup: (
     email: string,
     password: string,
-    name: string
+    name: string,
   ) => Promise<User | null>;
   isLoading: boolean;
   isGuest: boolean;

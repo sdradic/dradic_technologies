@@ -124,7 +124,7 @@ export function useAuthStore(isAdminRoute: boolean = false) {
       isLoading,
       authError,
     }),
-    [isAuthenticated, user, isLoading, authError, login, logout]
+    [isAuthenticated, user, isLoading, authError, login, logout],
   );
 
   return contextValue;

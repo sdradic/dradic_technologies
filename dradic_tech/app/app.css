@@ -2,8 +2,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    "Roboto", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
@@ -25,26 +26,26 @@ nav {
 
 @theme {
   /* Light mode colors (shades of cyan) */
-  --color-primary-50: #E6FBFC;
-  --color-primary-100: #CCF7F8;
-  --color-primary-200: #99EFF1;
-  --color-primary-300: #66E7EA;
-  --color-primary-400: #33DFE3;
-  --color-primary-500: #00BEC4;
-  --color-primary-600: #009BA0;
+  --color-primary-50: #e6fbfc;
+  --color-primary-100: #ccf7f8;
+  --color-primary-200: #99eff1;
+  --color-primary-300: #66e7ea;
+  --color-primary-400: #33dfe3;
+  --color-primary-500: #00bec4;
+  --color-primary-600: #009ba0;
   --color-primary-700: #007477;
-  --color-primary-800: #004D4F;
+  --color-primary-800: #004d4f;
   --color-primary-900: #002627;
   /* dark mode colors (obsidian) */
-  --color-dark: #1A1A1A;
-  --color-dark-50: #4D4D4D;
+  --color-dark: #1a1a1a;
+  --color-dark-50: #4d4d4d;
   --color-dark-100: #404040;
   --color-dark-200: #333333;
-  --color-dark-300: #2B2B2B;
+  --color-dark-300: #2b2b2b;
   --color-dark-400: #232323;
-  --color-dark-500: #1A1A1A;
+  --color-dark-500: #1a1a1a;
   --color-dark-600: #141414;
-  --color-dark-700: #0D0D0D;
+  --color-dark-700: #0d0d0d;
   --color-dark-800: #070707;
   --color-dark-900: #000000;
 }

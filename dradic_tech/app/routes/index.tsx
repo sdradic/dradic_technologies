@@ -1,7 +1,7 @@
 import type { Route } from "./+types/index";
 import { ChipSVG } from "~/components/Icons";
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_args: Route.MetaArgs) {
   return [
     { title: "Dradic Technologies Blog" },
     { name: "description", content: "Welcome to Dradic Technologies Blog!" },
@@ -14,7 +14,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex flex-col mt-4 justify-center items-center text-center mx-4 pt-4 pb-8">
         <h1 className="text-4xl md:text-6xl font-semibold">
-          Hi! I'm <span className="text-primary-500">Dusan Radic</span>, a
+          Hi! I&apos;m <span className="text-primary-500">Dusan Radic</span>, a
           software engineer and DevOps specialist.
         </h1>
         <p className="text-xl text-gray-500 dark:text-gray-400 text-center md:text-center mt-4">

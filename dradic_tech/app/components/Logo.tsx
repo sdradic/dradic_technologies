@@ -8,6 +8,15 @@ export const Logo = () => {
     <div
       className="flex items-center cursor-pointer"
       onClick={() => navigate("/")}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate("/");
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label="Navigate to home page"
     >
       <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-500" />
       <div className="hidden md:flex items-center">

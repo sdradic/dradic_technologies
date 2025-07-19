@@ -20,7 +20,7 @@ const getInitialTheme = (): Theme => {
 
     // Check system preference
     const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
+      "(prefers-color-scheme: dark)",
     ).matches;
     return systemPrefersDark ? "dark" : "light";
   }

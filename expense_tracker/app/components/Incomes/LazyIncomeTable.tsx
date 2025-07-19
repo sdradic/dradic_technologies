@@ -5,7 +5,7 @@ import { TableSkeleton } from "../SkeletonLoader";
 const LazyIncomeTable = React.lazy(() =>
   import("./IncomeTable").then((module) => ({
     default: module.IncomeTable,
-  }))
+  })),
 );
 
 interface LazyIncomeTableProps {
