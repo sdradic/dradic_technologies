@@ -236,6 +236,12 @@ class DashboardData(BaseModel):
     total_savings: float
 
 
+class DashboardDataWithExpenses(DashboardData):
+    """Extended dashboard data that includes actual expense objects for edit modal functionality"""
+
+    expenses: List[ExpenseWithDetails]
+
+
 # Response Models for API
 class IncomeSourceResponse(BaseModel):
     sources: List[IncomeSourceWithUser]

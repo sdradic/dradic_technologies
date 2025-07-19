@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
 import {
+  calculateCardsFromData,
+  getDemoIncomeAndExpenseData,
   getDemoIncomeData,
   getDemoIncomeSources,
-  getDemoMonthlyData,
   getEmptyIncomeData,
   getEmptyMonthlyData,
 } from "../mocks/mockData";
@@ -20,7 +21,8 @@ export function useDemoData() {
   const [guestExpenseItems, setGuestExpenseItems] = useState<ExpenseItem[]>([]);
 
   const initializeDemoData = useCallback(() => {
-    const demoData = getDemoMonthlyData();
+    // Get demo income and expense data
+    const { incomes, expenses } = getDemoIncomeAndExpenseData();
 
     // Create demo expense items
     const demoItems: ExpenseItem[] = [
@@ -47,36 +49,18 @@ export function useDemoData() {
       },
     ];
 
-    // Create demo expenses from the table data
-    const demoExpenses: ExpenseWithDetails[] = demoData.tableData.data.map(
-      (row: { [key: string]: string | number }) => ({
-        id: String(row.id),
-        item_id:
-          demoItems.find((item) => item.name === String(row.name))?.id ||
-          "demo-item-1",
-        date: String(row.date),
-        amount:
-          typeof row.amount === "number"
-            ? row.amount
-            : parseFloat(String(row.amount)),
-        currency: "CLP",
-        created_at: new Date().toISOString(),
-        item_name: String(row.name),
-        item_category: String(row.category),
-        item_is_fixed: false,
-        user_name: "Guest User",
-        user_email: "guest@example.com",
-        group_name: "",
-      }),
-    );
+    // Calculate cards from actual income and expense data
+    const cards = calculateCardsFromData(incomes, expenses, "CLP");
 
-    setGuestExpenses(demoExpenses);
+    setGuestExpenses(expenses);
     setGuestExpenseItems(demoItems);
+    setGuestIncomes(incomes);
 
     return {
-      cards: demoData.cards,
-      expenses: demoExpenses,
+      cards,
+      expenses,
       items: demoItems,
+      incomes,
     };
   }, []);
 

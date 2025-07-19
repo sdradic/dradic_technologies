@@ -234,10 +234,10 @@ const IncomeModal = ({
           </h2>
           {isEditMode && (
             <div
-              className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded-md p-2"
+              className="flex group items-center gap-2 cursor-pointer  rounded-md p-2"
               onClick={handleDelete}
             >
-              <TrashIcon className="w-6 h-6 stroke-gray-500" />
+              <TrashIcon className="w-6 h-6 stroke-gray-500 group-hover:stroke-red-500" />
             </div>
           )}
         </div>

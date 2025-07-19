@@ -11,7 +11,7 @@ const MonthlyIncomesPage = lazy(() =>
 );
 
 function IncomesContent() {
-  const { triggerReload, isReloading } = useReload();
+  const { triggerReload, isReloading, isInitialLoading } = useReload();
 
   const handleReload = async () => {
     await triggerReload();
@@ -24,6 +24,7 @@ function IncomesContent() {
           <HeaderButton
             onButtonClick={handleReload}
             isLoading={isReloading}
+            disabled={isInitialLoading}
             loadingText="Reloading..."
             buttonText="Reload Data"
             className="btn-secondary flex items-center gap-2 min-w-32"

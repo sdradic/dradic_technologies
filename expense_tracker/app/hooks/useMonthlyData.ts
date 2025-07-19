@@ -5,17 +5,18 @@ import type { SimpleTableProps } from "../components/SimpleTable";
 import { useAuth } from "../contexts/AuthContext";
 import { useReload } from "../contexts/ReloadContext";
 import { useDemoData } from "../demo/useDemoData";
-import { getEmptyMonthlyData } from "../mocks/mockData";
+import { calculateCardsFromData, getEmptyMonthlyData } from "../mocks/mockData";
 import { ApiError, dashboardApi } from "../modules/apis";
-import type { DashboardData } from "../modules/types";
+import type { DashboardData, ExpenseWithDetails } from "../modules/types";
 
 export function useMonthlyData() {
   const { user, isGuest } = useAuth();
-  const { onReloadRequest } = useReload();
+  const { onReloadRequest, setInitialLoading } = useReload();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchTime, setLastFetchTime] = useState<number | null>(null);
   const [hasInitialData, setHasInitialData] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Cache expiry time: 1 hour in milliseconds
   const CACHE_EXPIRY = 60 * 60 * 1000;
@@ -29,22 +30,28 @@ export function useMonthlyData() {
     data: [],
   });
   const [donutGraphData, setDonutGraphData] = useState<SimpleDonutGraphProps>({
-    title: "Expenses by category",
-    description: "Expenses by category",
+    title: "Categories",
+    description: "Top 4 Expenses Categories",
     data: [],
   });
+
+  // State for actual expense data (needed for edit modal)
+  const [authenticatedExpenses, setAuthenticatedExpenses] = useState<
+    ExpenseWithDetails[]
+  >([]);
 
   // Demo data management
   const {
     guestExpenses,
     guestExpenseItems,
+    guestIncomes,
     initializeDemoData,
     addDemoExpense,
     updateDemoExpense,
     deleteDemoExpense,
   } = useDemoData();
 
-  // Convert dashboard data to UI component props
+  // Convert dashboard data to UI props
   const convertDashboardToUIProps = useCallback(
     (dashboardData: DashboardData) => {
       // Convert cards
@@ -83,8 +90,14 @@ export function useMonthlyData() {
     [],
   );
 
+  // Stable fetch function that doesn't change on every render
   const fetchMonthlyData = useCallback(
     async (forceRefresh = false) => {
+      // Prevent duplicate calls during initialization
+      if (isInitializing && !forceRefresh) {
+        return;
+      }
+
       try {
         setIsLoading(true);
         setError(null);
@@ -117,8 +130,12 @@ export function useMonthlyData() {
         setDonutGraphData(uiProps.donutGraph);
         setTableData(uiProps.table);
 
+        // Set the actual expenses from the dashboard response
+        setAuthenticatedExpenses(dashboardData.expenses || []);
+
         setLastFetchTime(Date.now());
         setIsLoading(false);
+        setInitialLoading(false);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError(err instanceof ApiError ? err.message : "Failed to load data");
@@ -141,20 +158,37 @@ export function useMonthlyData() {
             data: [],
           },
         );
+        setAuthenticatedExpenses([]);
         setIsLoading(false);
+        setInitialLoading(false);
       }
     },
     [
       lastFetchTime,
       CACHE_EXPIRY,
       convertDashboardToUIProps,
-      getEmptyMonthlyData,
+      setInitialLoading,
+      isInitializing,
     ],
   );
 
-  // Initialize data
+  // Function to recalculate cards for guest mode
+  const recalculateGuestCards = useCallback(() => {
+    if (isGuest && guestIncomes && guestExpenses) {
+      const calculatedCards = calculateCardsFromData(
+        guestIncomes,
+        guestExpenses,
+        "CLP",
+      );
+      setCards(calculatedCards);
+    }
+  }, [isGuest, guestIncomes, guestExpenses]);
+
+  // Initialize data - only run once
   useEffect(() => {
-    if (hasInitialData) return; // Prevent multiple initializations
+    if (hasInitialData || isInitializing) return; // Prevent multiple initializations
+
+    setIsInitializing(true);
 
     if (isGuest) {
       // Use demo data for guest users
@@ -188,18 +222,22 @@ export function useMonthlyData() {
 
       const demoDonutData = {
         title: "Expenses by category",
-        description: "Expenses by category",
+        description: "Top 4 expense categories",
         data: Object.entries(categoryTotals)
           .map(([label, value]) => ({ label, value }))
-          .sort((a, b) => b.value - a.value),
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 4), // Limit to top 4 categories
       };
       setDonutGraphData(demoDonutData);
       setIsLoading(false);
+      setInitialLoading(false);
       setHasInitialData(true);
+      setIsInitializing(false);
     } else if (user) {
       // Fetch fresh data for authenticated users
       fetchMonthlyData(false);
       setHasInitialData(true);
+      setIsInitializing(false);
     } else {
       // No user and not a guest - show empty state
       const emptyData = getEmptyMonthlyData();
@@ -207,18 +245,28 @@ export function useMonthlyData() {
       setTableData(emptyData.tableData);
       setDonutGraphData(emptyData.donutGraphData);
       setIsLoading(false);
+      setInitialLoading(false);
       setHasInitialData(true);
+      setIsInitializing(false);
     }
   }, [
     user,
     isGuest,
     hasInitialData,
-    fetchMonthlyData,
+    isInitializing,
     initializeDemoData,
-    getEmptyMonthlyData,
+    setInitialLoading,
+    fetchMonthlyData,
   ]);
 
-  // Register the reload callback with the context
+  // Recalculate cards when guest data changes
+  useEffect(() => {
+    if (isGuest) {
+      recalculateGuestCards();
+    }
+  }, [isGuest, recalculateGuestCards]);
+
+  // Register the reload callback with the context - only once
   useEffect(() => {
     onReloadRequest(async () => {
       await fetchMonthlyData(true);
@@ -236,6 +284,9 @@ export function useMonthlyData() {
     // Demo data
     guestExpenses,
     guestExpenseItems,
+
+    // Authenticated user data
+    authenticatedExpenses,
 
     // Actions
     fetchMonthlyData,

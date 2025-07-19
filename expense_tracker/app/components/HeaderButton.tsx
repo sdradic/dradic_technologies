@@ -1,6 +1,7 @@
 interface HeaderButtonProps {
   onButtonClick: () => void | Promise<void>;
   isLoading?: boolean;
+  disabled?: boolean;
   loadingText?: string;
   buttonText?: string;
   className?: string;
@@ -10,23 +11,26 @@ interface HeaderButtonProps {
 export function HeaderButton({
   onButtonClick,
   isLoading = false,
+  disabled = false,
   loadingText = "",
   buttonText = "",
   className = "",
   buttonIcon,
 }: HeaderButtonProps) {
   const handleClick = async () => {
-    if (!isLoading) {
+    if (!isLoading && !disabled) {
       await onButtonClick();
     }
   };
 
+  const isButtonDisabled = isLoading || disabled;
+
   return (
     <button
       onClick={handleClick}
-      disabled={isLoading}
+      disabled={isButtonDisabled}
       className={`${className} flex items-center gap-2 ${
-        isLoading ? "opacity-50 pointer-events-none" : ""
+        isButtonDisabled ? "opacity-50 pointer-events-none" : ""
       }`}
     >
       {buttonIcon && buttonIcon}

@@ -2,6 +2,7 @@
 import { supabase } from "./supabase";
 import type {
   DashboardData,
+  DashboardDataWithExpenses,
   Expense,
   ExpenseCreate,
   ExpenseItem,
@@ -428,7 +429,7 @@ export const dashboardApi = {
     year: number,
     month: number,
     currency = "CLP",
-  ): Promise<DashboardData> => {
+  ): Promise<DashboardDataWithExpenses> => {
     const params = new URLSearchParams({ currency });
     return apiRequest(
       `/api/expense-tracker/expenses/dashboard/monthly/${year}/${month}?${params}`,

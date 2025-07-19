@@ -132,10 +132,10 @@ const EditIncomeModal = ({
         <div className="flex flex-row justify-between items-center mb-6">
           <h2 className="text-2xl text-left">Edit Income</h2>
           <div
-            className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded-md p-2"
+            className="flex group items-center gap-2 cursor-pointer  rounded-md p-2"
             onClick={handleDelete}
           >
-            <TrashIcon className="w-6 h-6 stroke-gray-500" />
+            <TrashIcon className="w-6 h-6 stroke-gray-500 group-hover:stroke-red-500" />
           </div>
         </div>
 

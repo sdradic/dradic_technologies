@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models import (
     DashboardCard,
-    DashboardData,
+    DashboardDataWithExpenses,
     DashboardDonutData,
     DashboardDonutGraph,
     DashboardTable,
@@ -361,14 +361,16 @@ async def get_currencies(current_user: dict = current_user_dependency):
         ) from e
 
 
-@expenses_router.get("/dashboard/monthly/{year}/{month}", response_model=DashboardData)
+@expenses_router.get(
+    "/dashboard/monthly/{year}/{month}", response_model=DashboardDataWithExpenses
+)
 async def get_monthly_dashboard(
     year: int,
     month: int,
     currency: str = "CLP",
     current_user: dict = current_user_dependency,
 ):
-    """Get unified monthly dashboard data including expenses, income, and summaries"""
+    """Get unified monthly dashboard data including expenses, income, and summaries with actual expense objects for edit modal"""
     try:
         # Validate month
         if month < 1 or month > 12:
@@ -378,18 +380,25 @@ async def get_monthly_dashboard(
 
         user_id = current_user.get("uid")
 
-        # Get expenses for the month
+        # Get expenses for the month with full details for edit modal
         expenses_query = """
             SELECT
                 e.id,
+                e.item_id,
                 e.amount,
                 e.currency,
                 e.date,
+                e.created_at,
                 ei.name as item_name,
-                ei.category as item_category
+                ei.category as item_category,
+                ei.is_fixed as item_is_fixed,
+                u.name as user_name,
+                u.email as user_email,
+                g.name as group_name
             FROM dradic_tech.expenses e
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             JOIN dradic_tech.users u ON ei.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE EXTRACT(YEAR FROM e.date) = :year
             AND EXTRACT(MONTH FROM e.date) = :month
             AND e.currency = :currency
@@ -460,17 +469,20 @@ async def get_monthly_dashboard(
             amount = float(expense["amount"])
             category_totals[category] = category_totals.get(category, 0) + amount
 
+        # Sort categories by amount and take only top 4
+        sorted_categories = sorted(
+            category_totals.items(), key=lambda x: x[1], reverse=True
+        )[:4]
+
         donut_data = [
             DashboardDonutData(label=cat, value=amount)
-            for cat, amount in sorted(
-                category_totals.items(), key=lambda x: x[1], reverse=True
-            )
+            for cat, amount in sorted_categories
             if amount > 0
         ]
 
         donut_graph = DashboardDonutGraph(
             title="Expenses by category",
-            description="Expenses by category",
+            description="Top 4 expense categories",
             data=donut_data,
         )
 
@@ -495,7 +507,10 @@ async def get_monthly_dashboard(
             data=table_rows,
         )
 
-        return DashboardData(
+        # Create full expense objects for edit modal
+        expenses = [ExpenseWithDetails(**expense) for expense in expenses_data]
+
+        return DashboardDataWithExpenses(
             year=year,
             month=month,
             currency=currency,
@@ -505,6 +520,7 @@ async def get_monthly_dashboard(
             total_expenses=total_expenses,
             total_income=total_income,
             total_savings=total_savings,
+            expenses=expenses,
         )
 
     except HTTPException:

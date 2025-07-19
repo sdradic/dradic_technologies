@@ -4,13 +4,16 @@ import type { ReactNode } from "react";
 interface ReloadContextType {
   triggerReload: () => void;
   isReloading: boolean;
+  isInitialLoading: boolean;
   onReloadRequest: (callback: () => void) => void;
+  setInitialLoading: (loading: boolean) => void;
 }
 
 const ReloadContext = createContext<ReloadContextType | undefined>(undefined);
 
 export function ReloadProvider({ children }: { children: ReactNode }) {
   const [isReloading, setIsReloading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [reloadCallback, setReloadCallback] = useState<(() => void) | null>(
     null,
   );
@@ -30,9 +33,19 @@ export function ReloadProvider({ children }: { children: ReactNode }) {
     setReloadCallback(() => callback);
   }, []);
 
+  const setInitialLoading = useCallback((loading: boolean) => {
+    setIsInitialLoading(loading);
+  }, []);
+
   return (
     <ReloadContext.Provider
-      value={{ triggerReload, isReloading, onReloadRequest }}
+      value={{
+        triggerReload,
+        isReloading,
+        isInitialLoading,
+        onReloadRequest,
+        setInitialLoading,
+      }}
     >
       {children}
     </ReloadContext.Provider>

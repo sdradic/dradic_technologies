@@ -2,13 +2,10 @@ import { ErrorXIcon } from "~/components/Icons";
 import { IncomeModal } from "~/components/Incomes/IncomeModal";
 import { LazyIncomeTableWrapper } from "~/components/Incomes/LazyIncomeTable";
 import { useAuth } from "~/contexts/AuthContext";
-import { useReload } from "~/contexts/ReloadContext";
 import { useIncomeData, useIncomeOperations } from "~/hooks";
-import { useEffect } from "react";
 
 const MonthlyIncomesPage = () => {
   const { user } = useAuth();
-  const { onReloadRequest } = useReload();
 
   // Data management - simplified
   const {
@@ -34,11 +31,6 @@ const MonthlyIncomesPage = () => {
     handleDeleteIncome,
     handleRowClick,
   } = useIncomeOperations();
-
-  // Set up reload callback
-  useEffect(() => {
-    onReloadRequest(() => fetchIncomeData(true));
-  }, [onReloadRequest, fetchIncomeData]);
 
   // Error state
   if (error) {

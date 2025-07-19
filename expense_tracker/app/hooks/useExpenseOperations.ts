@@ -136,6 +136,8 @@ export function useExpenseOperations() {
       if (expense) {
         setSelectedExpense(expense);
         setIsEditModalOpen(true);
+      } else {
+        console.warn("Expense not found for row:", row);
       }
     },
     [isGuest],

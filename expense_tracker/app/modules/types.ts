@@ -213,3 +213,7 @@ export interface DashboardData {
   total_income: number;
   total_savings: number;
 }
+
+export interface DashboardDataWithExpenses extends DashboardData {
+  expenses: ExpenseWithDetails[];
+}

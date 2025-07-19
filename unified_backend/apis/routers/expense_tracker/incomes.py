@@ -420,17 +420,20 @@ async def get_monthly_dashboard(
             amount = float(income["amount"])
             category_totals[category] = category_totals.get(category, 0) + amount
 
+        # Sort categories by amount and take only top 4
+        sorted_categories = sorted(
+            category_totals.items(), key=lambda x: x[1], reverse=True
+        )[:4]
+
         donut_data = [
             DashboardDonutData(label=cat, value=amount)
-            for cat, amount in sorted(
-                category_totals.items(), key=lambda x: x[1], reverse=True
-            )
+            for cat, amount in sorted_categories
             if amount > 0
         ]
 
         donut_graph = DashboardDonutGraph(
             title="Income by source category",
-            description="Income by source category",
+            description="Top 4 income source categories",
             data=donut_data,
         )
 

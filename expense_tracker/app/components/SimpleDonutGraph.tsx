@@ -30,6 +30,8 @@ const DonutGraphTitle = ({
   </div>
 );
 
+const colors = ["#7AD6C7", "#997AD6", "#D67A89", "#B7D67A"];
+
 const DonutGraphSegment = ({
   item,
   index,
@@ -60,13 +62,6 @@ const DonutGraphSegment = ({
       `A ${outerRadius} ${outerRadius} 0 0 0 ${100 + outerRadius} 100`,
       "Z",
     ].join(" ");
-
-    const colors = [
-      "var(--color-primary-300)",
-      "var(--color-primary-500)",
-      "var(--color-primary-700)",
-      "var(--color-primary-900)",
-    ];
 
     return (
       <path
@@ -102,13 +97,6 @@ const DonutGraphSegment = ({
     "Z",
   ].join(" ");
 
-  const colors = [
-    "var(--color-primary-300)",
-    "var(--color-primary-500)",
-    "var(--color-primary-700)",
-    "var(--color-primary-900)",
-  ];
-
   return (
     <path
       key={item.label}
@@ -124,13 +112,6 @@ const DonutGraphLegend = ({
 }: {
   data: { label: string; value: number }[];
 }) => {
-  const colors = [
-    "var(--color-primary-300)",
-    "var(--color-primary-500)",
-    "var(--color-primary-700)",
-    "var(--color-primary-900)",
-  ];
-
   return (
     <div className="flex flex-wrap justify-center gap-2 sm:gap-4 p-2 sm:p-4">
       {data.map((item, index) => (

@@ -9,7 +9,7 @@ import { useAuth } from "~/contexts/AuthContext";
 import { useMonthlyData, useExpenseOperations } from "~/hooks";
 
 export default function MonthlyExpensesPage() {
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
 
   // Simplified data management using unified API
   const {
@@ -20,6 +20,7 @@ export default function MonthlyExpensesPage() {
     donutGraphData,
     guestExpenses,
     guestExpenseItems,
+    authenticatedExpenses,
     fetchMonthlyData,
     addDemoExpense,
     updateDemoExpense,
@@ -65,9 +66,10 @@ export default function MonthlyExpensesPage() {
           donutGraphData={donutGraphData}
           tableData={tableData}
           onAddExpense={() => setIsModalOpen(true)}
-          onRowClick={(row) =>
-            handleRowClick(row, guestExpenses, guestExpenses)
-          }
+          onRowClick={(row) => {
+            const expenses = isGuest ? guestExpenses : authenticatedExpenses;
+            handleRowClick(row, expenses || [], expenses || []);
+          }}
         />
       )}
 

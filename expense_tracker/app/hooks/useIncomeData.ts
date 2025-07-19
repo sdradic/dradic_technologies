@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SimpleTableProps } from "../components/SimpleTable";
 import { useAuth } from "../contexts/AuthContext";
+import { useReload } from "../contexts/ReloadContext";
 import { useDemoData } from "../demo/useDemoData";
 import { ApiError, dashboardApi, incomeSourcesApi } from "../modules/apis";
 import { acceptedCurrencies } from "../modules/store";
@@ -11,11 +12,14 @@ type Currency = (typeof acceptedCurrencies)[number];
 
 export function useIncomeData() {
   const { user, isGuest } = useAuth();
+  const { setInitialLoading } = useReload();
   const { guestIncomes, initializeDemoIncomeData, getEmptyIncomeData } =
     useDemoData();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchTime, setLastFetchTime] = useState<number | null>(null);
+  const [hasInitialData, setHasInitialData] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Cache expiry time: 1 hour in milliseconds
   const CACHE_EXPIRY = 60 * 60 * 1000;
@@ -54,6 +58,11 @@ export function useIncomeData() {
     async (forceRefresh = false) => {
       if (!user && !isGuest) return;
 
+      // Prevent duplicate calls during initialization
+      if (isInitializing && !forceRefresh) {
+        return;
+      }
+
       // Check cache expiry for authenticated users
       if (!forceRefresh && lastFetchTime) {
         const timeSinceLastFetch = Date.now() - lastFetchTime;
@@ -88,6 +97,7 @@ export function useIncomeData() {
           });
           setAllIncomes(demoData.incomes);
           setIsLoading(false);
+          setInitialLoading(false);
           return;
         }
 
@@ -96,14 +106,11 @@ export function useIncomeData() {
         const year = now.getFullYear();
         const month = now.getMonth() + 1;
 
-        const dashboardData = await dashboardApi.getMonthlyIncomeDashboard(
-          year,
-          month,
-        );
-
-        const sourcesResponse = await incomeSourcesApi.getAll({
-          user_id: user?.id,
-        });
+        // Fetch data with Promise.all to avoid race conditions
+        const [dashboardData, sourcesResponse] = await Promise.all([
+          dashboardApi.getMonthlyIncomeDashboard(year, month),
+          incomeSourcesApi.getAll({ user_id: user?.id }),
+        ]);
 
         const uiProps = convertDashboardToUIProps(dashboardData);
 
@@ -139,9 +146,11 @@ export function useIncomeData() {
           sources: sourcesResponse.sources || [],
           lastFetchTime: currentTime,
         });
+        setInitialLoading(false);
       } catch (err) {
         console.error("Error fetching income data:", err);
         setError(err instanceof ApiError ? err.message : "Failed to load data");
+        setInitialLoading(false);
       } finally {
         setIsLoading(false);
       }
@@ -153,11 +162,17 @@ export function useIncomeData() {
       CACHE_EXPIRY,
       initializeDemoIncomeData,
       convertDashboardToUIProps,
+      setInitialLoading,
+      isInitializing,
     ],
   );
 
-  // Initialize data on mount
+  // Initialize data on mount - only run once
   useEffect(() => {
+    if (hasInitialData || isInitializing) return;
+
+    setIsInitializing(true);
+
     const initializeData = async () => {
       if (isGuest) {
         // For guests, always use demo data
@@ -181,12 +196,18 @@ export function useIncomeData() {
         });
         setAllIncomes(demoData.incomes);
         setIsLoading(false);
+        setInitialLoading(false);
+        setHasInitialData(true);
+        setIsInitializing(false);
         return;
       }
 
       if (!user) {
         // No user - show empty state
         setIsLoading(false);
+        setInitialLoading(false);
+        setHasInitialData(true);
+        setIsInitializing(false);
         return;
       }
 
@@ -248,6 +269,9 @@ export function useIncomeData() {
           sources: sourcesResponse.sources || [],
           lastFetchTime: currentTime,
         });
+        setInitialLoading(false);
+        setHasInitialData(true);
+        setIsInitializing(false);
       } catch (err) {
         console.error("Error fetching income data:", err);
         setError(err instanceof ApiError ? err.message : "Failed to load data");
@@ -275,6 +299,9 @@ export function useIncomeData() {
         );
         setSources([]);
         setAllIncomes([]);
+        setInitialLoading(false);
+        setHasInitialData(true);
+        setIsInitializing(false);
       } finally {
         setIsLoading(false);
       }
@@ -284,9 +311,12 @@ export function useIncomeData() {
   }, [
     user,
     isGuest,
+    hasInitialData,
+    isInitializing,
     initializeDemoIncomeData,
     convertDashboardToUIProps,
     getEmptyIncomeData,
+    setInitialLoading,
   ]);
 
   return {
