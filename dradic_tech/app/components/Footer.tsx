@@ -30,7 +30,12 @@ export default function Footer() {
               <span className="text-md text-gray-500 dark:text-gray-400">
                 Subscribe to our newsletter
               </span>
-              <SimpleInput />
+              <SimpleInput
+                placeholder="Enter your email"
+                value=""
+                onChange={() => {}}
+                buttonText="Subscribe"
+              />
               <div className="md:hidden flex separator mt-4"></div>
             </div>
           )}

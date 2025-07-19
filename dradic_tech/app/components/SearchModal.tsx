@@ -96,6 +96,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            placeholder="Search for a post..."
           />
 
           {/* Results */}

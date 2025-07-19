@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { MenuIcon, ChevronDownIcon, DradicTechLogo } from "./Icons";
 import type { NavItem } from "~/modules/types";
-import { Logo } from "./Logo";
 
 interface UnifiedNavProps {
   navConfig: NavItem[];
@@ -66,7 +65,7 @@ const DropdownButton = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className={`flex items-center gap-1 text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer px-2 py-1 text-md rounded-md ${
+        className={`flex group items-center gap-1 text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer px-2 py-1 text-md rounded-md ${
           selectedPath === item.path
             ? "border-b-2 border-primary-500 dark:border-primary-500 rounded-none"
             : ""
@@ -75,7 +74,7 @@ const DropdownButton = ({
       >
         {item.label}
         <ChevronDownIcon
-          className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white ${
+          className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white group-hover:stroke-primary-500 dark:group-hover:stroke-primary-500 ${
             isOpen ? "rotate-180" : ""
           }`}
         />

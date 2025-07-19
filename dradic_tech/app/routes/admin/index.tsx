@@ -51,7 +51,11 @@ export default function AdminHome() {
             New Post
           </button>
         </div>
-        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          placeholder="Search for a post..."
+        />
         <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700">
           <PostsList isAdmin={true} searchQuery={searchQuery} />
         </ul>

@@ -24,7 +24,12 @@ export default function Home() {
           insights with you.
         </p>
         {/* Subscribe Bar */}
-        <SimpleInput />
+        <SimpleInput
+          placeholder="Enter your email"
+          value=""
+          onChange={() => {}}
+          buttonText="Subscribe"
+        />
       </div>
       {/* Recent Posts */}
       <div className="flex flex-col mt-6 justify-center text-left mx-4">
