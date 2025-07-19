@@ -31,7 +31,7 @@ export function useAuthStore(isAdminRoute: boolean = false) {
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Listen for auth state changes only on admin routes
+  // Check for existing session and listen for auth state changes only on admin routes
   useEffect(() => {
     if (!isAdminRoute) {
       // For non-admin routes, just set loading to false and return
@@ -44,6 +44,51 @@ export function useAuthStore(isAdminRoute: boolean = false) {
     // Set initial loading state
     setIsLoading(true);
 
+    // First, check for an existing session
+    const checkExistingSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("Error getting session:", error);
+          if (isMounted) {
+            setAuthError("Failed to load user session");
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        if (session?.user) {
+          const appUser = mapSupabaseUser(session.user);
+          if (isMounted) {
+            setUser(appUser);
+            setIsAuthenticated(true);
+          }
+        } else {
+          if (isMounted) {
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking existing session:", error);
+        if (isMounted) {
+          setAuthError("Failed to load user session");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Check existing session first
+    checkExistingSession();
+
+    // Then listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -68,10 +113,6 @@ export function useAuthStore(isAdminRoute: boolean = false) {
           setAuthError("Failed to load user session");
         }
         throw error;
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
       }
     });
 

@@ -1,7 +1,6 @@
 import { ErrorXIcon } from "~/components/Icons";
 import { ExpenseModal } from "~/components/ExpenseModal";
 import { MonthlyCards, MonthlyCharts } from "~/components/Expenses/Monthly";
-
 import {
   CardsSkeleton,
   ChartsTableSkeleton,
@@ -12,23 +11,19 @@ import { useMonthlyData, useExpenseOperations } from "~/hooks";
 export default function MonthlyExpensesPage() {
   const { user } = useAuth();
 
-  // Data management
+  // Simplified data management using unified API
   const {
-    isCardsLoading,
-    isChartsLoading,
-    isTableLoading,
+    isLoading,
     error,
     cards,
     tableData,
     donutGraphData,
-    allExpenses,
     guestExpenses,
     guestExpenseItems,
     fetchMonthlyData,
     addDemoExpense,
     updateDemoExpense,
     deleteDemoExpense,
-    updateTableAndChartData,
   } = useMonthlyData();
 
   // Expense operations
@@ -60,17 +55,19 @@ export default function MonthlyExpensesPage() {
   return (
     <div className="sm:p-6">
       {/* Cards Section */}
-      {isCardsLoading ? <CardsSkeleton /> : <MonthlyCards cards={cards} />}
+      {isLoading ? <CardsSkeleton /> : <MonthlyCards cards={cards} />}
 
       {/* Charts and Table Section */}
-      {isChartsLoading || isTableLoading ? (
+      {isLoading ? (
         <ChartsTableSkeleton />
       ) : (
         <MonthlyCharts
           donutGraphData={donutGraphData}
           tableData={tableData}
           onAddExpense={() => setIsModalOpen(true)}
-          onRowClick={(row) => handleRowClick(row, allExpenses, guestExpenses)}
+          onRowClick={(row) =>
+            handleRowClick(row, guestExpenses, guestExpenses)
+          }
         />
       )}
 
@@ -83,7 +80,7 @@ export default function MonthlyExpensesPage() {
             expenseData,
             {
               addDemoExpense,
-              updateTableAndChartData,
+              updateTableAndChartData: () => fetchMonthlyData(true),
               guestExpenses,
             },
             () => fetchMonthlyData(true),
@@ -105,7 +102,7 @@ export default function MonthlyExpensesPage() {
             expenseData,
             {
               updateDemoExpense,
-              updateTableAndChartData,
+              updateTableAndChartData: () => fetchMonthlyData(true),
               guestExpenses,
             },
             () => fetchMonthlyData(true),
@@ -119,7 +116,7 @@ export default function MonthlyExpensesPage() {
             expenseId,
             {
               deleteDemoExpense,
-              updateTableAndChartData,
+              updateTableAndChartData: () => fetchMonthlyData(true),
               guestExpenses,
             },
             () => fetchMonthlyData(true),

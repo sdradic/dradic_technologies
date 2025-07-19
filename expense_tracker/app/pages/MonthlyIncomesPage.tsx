@@ -10,17 +10,15 @@ const MonthlyIncomesPage = () => {
   const { user } = useAuth();
   const { onReloadRequest } = useReload();
 
-  // Data management
+  // Data management - simplified
   const {
-    isTableLoading,
+    isLoading,
     error,
     tableData,
     allIncomes,
     sources,
     guestIncomes,
     fetchIncomeData,
-    updateTableData,
-    setGuestIncomes,
   } = useIncomeData();
 
   // Income operations
@@ -67,26 +65,27 @@ const MonthlyIncomesPage = () => {
       <LazyIncomeTableWrapper
         tableData={tableData}
         onAddIncome={() => setIsModalOpen(true)}
-        onRowClick={(row) => handleRowClick(row, allIncomes, guestIncomes)}
-        isLoading={isTableLoading}
+        onRowClick={(row) =>
+          handleRowClick(row, allIncomes || [], guestIncomes)
+        }
+        isLoading={isLoading}
       />
 
       {/* Add Income Modal */}
       <IncomeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={(incomeData) =>
-          handleAddIncome(
+        onSubmit={async (incomeData) => {
+          await handleAddIncome(
             incomeData,
             {
-              setGuestIncomes,
-              updateTableData,
+              updateTableData: () => fetchIncomeData(true), // Refresh data after add
               guestIncomes,
-              sources,
+              guestIncomeSources: sources,
             },
             () => fetchIncomeData(true),
-          )
-        }
+          );
+        }}
         userId={user?.id || "mock-user-id"}
         sources={sources}
       />
@@ -98,32 +97,30 @@ const MonthlyIncomesPage = () => {
           setIsEditModalOpen(false);
           setSelectedIncome(null);
         }}
-        onSubmit={(incomeData) =>
-          handleEditIncome(
+        onSubmit={async (incomeData) => {
+          await handleEditIncome(
             incomeData,
             {
-              setGuestIncomes,
-              updateTableData,
+              updateTableData: () => fetchIncomeData(true), // Refresh data after edit
               guestIncomes,
-              sources,
+              guestIncomeSources: sources,
             },
             () => fetchIncomeData(true),
-          )
-        }
+          );
+        }}
         userId={user?.id || "mock-user-id"}
         income={selectedIncome}
         sources={sources}
-        onDelete={(incomeId) =>
-          handleDeleteIncome(
+        onDelete={async (incomeId) => {
+          await handleDeleteIncome(
             incomeId,
             {
-              setGuestIncomes,
-              updateTableData,
+              updateTableData: () => fetchIncomeData(true), // Refresh data after delete
               guestIncomes,
             },
             () => fetchIncomeData(true),
-          )
-        }
+          );
+        }}
       />
     </div>
   );

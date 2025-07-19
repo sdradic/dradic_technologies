@@ -74,11 +74,52 @@ export function useAuthStore() {
   const [isGuest, setIsGuest] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Listen for auth state changes
+  // Check for existing session and listen for auth state changes
   useEffect(() => {
     setIsLoading(true);
     setAuthError(null);
 
+    // First, check for an existing session
+    const checkExistingSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("Error getting session:", error);
+          setAuthError(
+            "Failed to load user session. Please try refreshing the page.",
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        if (session?.user) {
+          const appUser = await mapSupabaseUser(session.user);
+          setUser(appUser);
+          setIsAuthenticated(true);
+          setIsGuest(false);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsGuest(false);
+        }
+      } catch (error) {
+        console.error("Error checking existing session:", error);
+        setAuthError(
+          "Failed to load user session. Please try refreshing the page.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Check existing session first
+    checkExistingSession();
+
+    // Then listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -98,8 +139,6 @@ export function useAuthStore() {
         setAuthError(
           "Failed to load user session. Please try refreshing the page.",
         );
-      } finally {
-        setIsLoading(false);
       }
     });
 

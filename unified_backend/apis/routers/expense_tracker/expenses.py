@@ -1,5 +1,5 @@
 import logging as logger
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 
@@ -7,6 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models import (
     CategorySummary,
+    DashboardCard,
+    DashboardData,
+    DashboardDonutData,
+    DashboardDonutGraph,
+    DashboardTable,
+    DashboardTableRow,
     Expense,
     ExpenseCreate,
     ExpenseResponse,
@@ -436,4 +442,159 @@ async def get_currencies(current_user: dict = current_user_dependency):
         logger.error(f"Failed to fetch currencies: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch currencies: {str(e)}"
+        ) from e
+
+
+@expenses_router.get("/dashboard/monthly/{year}/{month}", response_model=DashboardData)
+async def get_monthly_dashboard(
+    year: int,
+    month: int,
+    currency: str = "CLP",
+    current_user: dict = current_user_dependency,
+):
+    """Get unified monthly dashboard data including expenses, income, and summaries"""
+    try:
+        # Validate month
+        if month < 1 or month > 12:
+            raise HTTPException(
+                status_code=400, detail="Month must be between 1 and 12"
+            )
+
+        user_id = current_user.get("uid")
+
+        # Get expenses for the month
+        expenses_query = """
+            SELECT
+                e.id,
+                e.amount,
+                e.currency,
+                e.date,
+                ei.name as item_name,
+                ei.category as item_category
+            FROM dradic_tech.expenses e
+            JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
+            JOIN dradic_tech.users u ON ei.user_id = u.id
+            WHERE EXTRACT(YEAR FROM e.date) = :year
+            AND EXTRACT(MONTH FROM e.date) = :month
+            AND e.currency = :currency
+            AND u.id = :user_id
+            ORDER BY e.date DESC
+        """
+
+        # Get income for the month
+        income_query = """
+            SELECT
+                i.id,
+                i.amount,
+                i.currency,
+                i.date,
+                i.description,
+                ins.name as source_name
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources ins ON i.source_id = ins.id
+            JOIN dradic_tech.users u ON ins.user_id = u.id
+            WHERE EXTRACT(YEAR FROM i.date) = :year
+            AND EXTRACT(MONTH FROM i.date) = :month
+            AND i.currency = :currency
+            AND u.id = :user_id
+            ORDER BY i.date DESC
+        """
+
+        params = {
+            "year": year,
+            "month": month,
+            "currency": currency,
+            "user_id": user_id,
+        }
+
+        expenses_data = DatabaseModel.execute_query(expenses_query, params)
+        income_data = DatabaseModel.execute_query(income_query, params)
+
+        # Calculate totals
+        total_expenses = sum(float(exp["amount"]) for exp in expenses_data)
+        total_income = sum(float(inc["amount"]) for inc in income_data)
+        total_savings = total_income - total_expenses
+
+        # Create dashboard cards
+        cards = [
+            DashboardCard(
+                title="Total Income",
+                description="Total income for the month",
+                value=total_income,
+                currency=currency,
+            ),
+            DashboardCard(
+                title="Total Expenses",
+                description="Total expenses for the month",
+                value=total_expenses,
+                currency=currency,
+            ),
+            DashboardCard(
+                title="Total Savings",
+                description="Total savings for the month",
+                value=total_savings,
+                currency=currency,
+            ),
+        ]
+
+        # Create donut graph data (group expenses by category)
+        category_totals: dict[str, float] = {}
+        for expense in expenses_data:
+            category = expense["item_category"] or "Uncategorized"
+            amount = float(expense["amount"])
+            category_totals[category] = category_totals.get(category, 0) + amount
+
+        donut_data = [
+            DashboardDonutData(label=cat, value=amount)
+            for cat, amount in sorted(
+                category_totals.items(), key=lambda x: x[1], reverse=True
+            )
+            if amount > 0
+        ]
+
+        donut_graph = DashboardDonutGraph(
+            title="Expenses by category",
+            description="Expenses by category",
+            data=donut_data,
+        )
+
+        # Create table data
+        table_rows = []
+        for expense in expenses_data:
+            table_rows.append(
+                DashboardTableRow(
+                    id=str(expense["id"]),
+                    name=expense["item_name"],
+                    category=expense["item_category"] or "Uncategorized",
+                    amount=f"{currency} {abs(float(expense['amount'])):,.0f}",
+                    date=expense["date"].strftime("%m/%d/%Y"),
+                    description=expense["item_name"],
+                )
+            )
+
+        table = DashboardTable(
+            title=f"{datetime(year, month, 1).strftime('%B')}",
+            description="Click on an expense to edit it.",
+            columns=["Name", "Category", "Amount", "Date", "Description"],
+            data=table_rows,
+        )
+
+        return DashboardData(
+            year=year,
+            month=month,
+            currency=currency,
+            cards=cards,
+            donut_graph=donut_graph,
+            table=table,
+            total_expenses=total_expenses,
+            total_income=total_income,
+            total_savings=total_savings,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to fetch dashboard data: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch dashboard data: {str(e)}"
         ) from e

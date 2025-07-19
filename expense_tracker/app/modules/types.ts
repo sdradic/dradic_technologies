@@ -87,14 +87,6 @@ export interface CategorySummary {
   count: number;
 }
 
-export interface MonthlySummary {
-  year: number;
-  month: number;
-  total_amount: number;
-  currency: string;
-  categories: CategorySummary[];
-}
-
 export interface ExpenseItemResponse {
   items: ExpenseItemWithUser[];
   total_count: number;
@@ -163,10 +155,8 @@ export interface IncomeSummary {
   count: number;
 }
 
-export type MonthlyIncomeSummary = MonthlySummary;
-
 export interface IncomeSourceResponse {
-  items: IncomeSourceWithUser[];
+  sources: IncomeSourceWithUser[];
   total_count: number;
 }
 
@@ -174,4 +164,52 @@ export interface IncomeResponse {
   incomes: IncomeWithDetails[];
   total_count: number;
   summary: IncomeSummary;
+}
+
+// Dashboard Types for unified API
+export interface DashboardCard {
+  title: string;
+  description: string;
+  value: number;
+  currency: string;
+  previous_value: number;
+}
+
+export interface DashboardDonutData {
+  label: string;
+  value: number;
+}
+
+export interface DashboardDonutGraph {
+  title: string;
+  description: string;
+  data: DashboardDonutData[];
+}
+
+export interface DashboardTableRow {
+  id: string;
+  name: string;
+  category: string;
+  amount: string;
+  date: string;
+  description: string;
+}
+
+export interface DashboardTable {
+  title: string;
+  description: string;
+  columns: string[];
+  data: DashboardTableRow[];
+}
+
+export interface DashboardData {
+  year: number;
+  month: number;
+  currency: string;
+  cards: DashboardCard[];
+  donut_graph: DashboardDonutGraph;
+  table: DashboardTable;
+  total_expenses: number;
+  total_income: number;
+  total_savings: number;
 }

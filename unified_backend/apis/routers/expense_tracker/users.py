@@ -72,7 +72,7 @@ async def get_users(
         # Build the query with optional group filter
         query = """
             SELECT
-                u.id, u.name, u.email, u.group_id, u.created_at, u.updated_at,
+                u.id, u.name, u.email, u.group_id, u.created_at,
                 g.name as group_name, g.description as group_description
             FROM dradic_tech.users u
             LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
@@ -100,7 +100,7 @@ async def get_user(user_id: str, current_user: dict = current_user_dependency):
     try:
         query = """
             SELECT
-                u.id, u.name, u.email, u.group_id, u.created_at, u.updated_at,
+                u.id, u.name, u.email, u.group_id, u.created_at,
                 g.name as group_name, g.description as group_description
             FROM dradic_tech.users u
             LEFT JOIN dradic_tech.groups g ON u.group_id = g.id

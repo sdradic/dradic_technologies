@@ -73,12 +73,21 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppContent() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   // Public routes that don't require authentication
   const publicRoutes = ["/login", "/logout", "/404"];
   const isPublicRoute = publicRoutes.includes(location.pathname);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader />
+      </div>
+    );
+  }
 
   // Redirect to login if not authenticated and trying to access protected route
   if (!isAuthenticated && !isPublicRoute) {

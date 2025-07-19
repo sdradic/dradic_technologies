@@ -16,12 +16,12 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [isGuestLoading, setIsGuestLoading] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (but not while loading)
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isLoading) {
       navigate("/", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

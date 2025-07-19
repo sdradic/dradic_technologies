@@ -10,7 +10,7 @@ export default function AdminLogin() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const hasNavigated = useRef(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (but not while loading)
   useEffect(() => {
     if (!isAuthLoading && !hasNavigated.current) {
       setIsCheckingAuth(false);
@@ -21,8 +21,20 @@ export default function AdminLogin() {
     }
   }, [isAuthLoading, isAuthenticated, navigate]);
 
+  // Show loading while checking authentication
   if (isCheckingAuth || isAuthLoading) {
-    return null;
+    return (
+      <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
+        <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
+          <div className="flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              Checking authentication...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleLogin = async (email: string, password: string) => {

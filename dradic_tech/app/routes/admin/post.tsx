@@ -1,17 +1,29 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { fetchPostContent } from "~/modules/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Loader from "~/components/Loader";
 import PostEditor from "~/components/PostEditor";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 import { localState } from "~/modules/utils";
+import { useAuth } from "~/contexts/AuthContext";
 
 export default function AdminPost({ params }: { params: { slug: string } }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const postFromState = location.state?.post;
   const [existingPost, setExistingPost] =
     useState<BlogPostWithSeparatedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasNavigated = useRef(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated && !hasNavigated.current) {
+      hasNavigated.current = true;
+      navigate("/admin/login");
+    }
+  }, [isAuthLoading, isAuthenticated, navigate]);
 
   useEffect(() => {
     const loadPost = async () => {
@@ -73,6 +85,20 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
 
     loadPost();
   }, [params.slug, postFromState]);
+
+  // Show loading state while checking authentication
+  if (isAuthLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader />
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (isLoading) {
     return (

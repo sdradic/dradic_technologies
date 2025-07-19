@@ -50,7 +50,8 @@ const EditIncomeModal = ({
   });
   // Use preloadedSources directly if available, otherwise use local state
   const [localSources, setLocalSources] = useState<IncomeSource[]>([]);
-  const sources = preloadedSources.length > 0 ? preloadedSources : localSources;
+  const sources =
+    preloadedSources.length > 0 ? preloadedSources : localSources || [];
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -71,8 +72,8 @@ const EditIncomeModal = ({
   useEffect(() => {
     const fetchSources = async () => {
       try {
-        const response = await incomeSourcesApi.getAll(userId);
-        setLocalSources(response.items);
+        const response = await incomeSourcesApi.getAll({ user_id: userId });
+        setLocalSources(response.sources || []);
       } catch (error) {
         setError("Failed to fetch income sources");
         console.error("Error fetching income sources:", error);

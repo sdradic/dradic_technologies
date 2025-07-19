@@ -16,6 +16,17 @@ body {
   }
 }
 
+/* Prevent theme flash by setting initial background */
+html:not(.dark) {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html.dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
 nav {
   @apply bg-white dark:bg-dark;
 }

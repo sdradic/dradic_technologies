@@ -77,7 +77,7 @@ async def get_income_sources(
         # Build the query with filters
         query = """
             SELECT
-                isc.id, isc.name, isc.category, isc.user_id,
+                isc.id, isc.name, isc.category, isc.user_id, isc.created_at, isc.updated_at,
                 u.name as user_name, u.email as user_email
             FROM dradic_tech.income_sources isc
             JOIN dradic_tech.users u ON isc.user_id = u.id
@@ -122,7 +122,7 @@ async def get_income_source(
     try:
         query = """
             SELECT
-                isc.id, isc.name, isc.category, isc.user_id,
+                isc.id, isc.name, isc.category, isc.user_id, isc.created_at, isc.updated_at,
                 u.name as user_name, u.email as user_email
             FROM dradic_tech.income_sources isc
             JOIN dradic_tech.users u ON isc.user_id = u.id
@@ -293,7 +293,7 @@ async def get_source_incomes(
 
         query = """
             SELECT
-                i.id, i.source_id, i.date, i.amount, i.currency, i.created_at,
+                i.id, i.source_id, i.date, i.amount, i.currency, i.created_at, i.updated_at,
                 isc.name as source_name, isc.category as source_category,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name

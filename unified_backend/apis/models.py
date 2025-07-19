@@ -188,6 +188,54 @@ class MonthlyIncomeSummary(MonthlySummary):
     pass
 
 
+# Dashboard Models for unified data
+class DashboardCard(BaseModel):
+    title: str
+    description: str
+    value: float
+    currency: str
+    previous_value: float = 0.0
+
+
+class DashboardDonutData(BaseModel):
+    label: str
+    value: float
+
+
+class DashboardDonutGraph(BaseModel):
+    title: str
+    description: str
+    data: List[DashboardDonutData]
+
+
+class DashboardTableRow(BaseModel):
+    id: str
+    name: str
+    category: str
+    amount: str
+    date: str
+    description: str
+
+
+class DashboardTable(BaseModel):
+    title: str
+    description: str
+    columns: List[str]
+    data: List[DashboardTableRow]
+
+
+class DashboardData(BaseModel):
+    year: int
+    month: int
+    currency: str
+    cards: List[DashboardCard]
+    donut_graph: DashboardDonutGraph
+    table: DashboardTable
+    total_expenses: float
+    total_income: float
+    total_savings: float
+
+
 # Response Models for API
 class IncomeSourceResponse(BaseModel):
     sources: List[IncomeSourceWithUser]

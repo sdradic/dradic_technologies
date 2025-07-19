@@ -1,11 +1,17 @@
 import logging as logger
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from models import (
     CategorySummary,
+    DashboardCard,
+    DashboardData,
+    DashboardDonutData,
+    DashboardDonutGraph,
+    DashboardTable,
+    DashboardTableRow,
     Income,
     IncomeCreate,
     IncomeResponse,
@@ -28,22 +34,24 @@ async def create_income(
 ):
     """Create a new income record"""
     try:
-        # Validate income source exists and belongs to current user
-        source_check_query = """
-            SELECT user_id FROM dradic_tech.income_sources WHERE id = :source_id
+        # Verify the income source belongs to the current user
+        source_query = """
+            SELECT user_id FROM dradic_tech.income_sources
+            WHERE id = :source_id
         """
-        source_result = DatabaseModel.execute_query(
-            source_check_query, {"source_id": income.source_id}
+        source_data = DatabaseModel.execute_query(
+            source_query, {"source_id": income.source_id}
         )
 
-        if not source_result:
-            raise HTTPException(status_code=400, detail="Income source not found")
+        if not source_data:
+            raise HTTPException(status_code=404, detail="Income source not found")
 
-        if source_result[0]["user_id"] != current_user.get("uid"):
+        if source_data[0]["user_id"] != current_user.get("uid"):
             raise HTTPException(
                 status_code=403, detail="Cannot create income for another user's source"
             )
 
+        # Insert the income record
         income_data = income.dict()
         new_income = DatabaseModel.insert_record("incomes", income_data)
         return Income(**new_income)
@@ -83,7 +91,8 @@ async def get_incomes(
         # Build the query with filters
         query = """
             SELECT
-                i.id, i.source_id, i.date, i.amount, i.currency, i.created_at,
+                i.id, i.source_id, i.amount, i.currency, i.date, i.description,
+                i.created_at, i.updated_at,
                 isc.name as source_name, isc.category as source_category,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
@@ -91,7 +100,7 @@ async def get_incomes(
             JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
             JOIN dradic_tech.users u ON isc.user_id = u.id
             LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
-            WHERE u.id = :user_id
+            WHERE isc.user_id = :user_id
         """
         params = {"user_id": user_id}
 
@@ -157,15 +166,13 @@ async def get_incomes(
 
         summary_data = DatabaseModel.execute_query(summary_query, summary_params)
 
-        # For simplicity, return the first currency's summary or defaults
-        if summary_data:
-            summary = IncomeSummary(
-                total_amount=float(summary_data[0]["total_amount"] or 0),
-                currency=summary_data[0]["currency"],
-                count=int(summary_data[0]["count"] or 0),
-            )
-        else:
-            summary = IncomeSummary(total_amount=0.0, currency="CLP", count=0)
+        summary = IncomeSummary(
+            total_amount=float(summary_data[0]["total_amount"] or 0)
+            if summary_data
+            else 0.0,
+            currency=summary_data[0]["currency"] if summary_data else "CLP",
+            count=int(summary_data[0]["count"] or 0) if summary_data else 0,
+        )
 
         return IncomeResponse(
             incomes=[IncomeWithDetails(**income) for income in incomes],
@@ -181,10 +188,166 @@ async def get_incomes(
         ) from e
 
 
+@incomes_router.get("/{income_id}", response_model=IncomeWithDetails)
+async def get_income(income_id: str, current_user: dict = current_user_dependency):
+    """Get a specific income by ID"""
+    try:
+        query = """
+            SELECT
+                i.id, i.source_id, i.amount, i.currency, i.date, i.description,
+                i.created_at, i.updated_at,
+                isc.name as source_name, isc.category as source_category,
+                u.name as user_name, u.email as user_email,
+                g.name as group_name
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            JOIN dradic_tech.users u ON isc.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
+            WHERE i.id = :income_id
+        """
+        incomes = DatabaseModel.execute_query(query, {"income_id": income_id})
+
+        if not incomes:
+            raise HTTPException(status_code=404, detail="Income not found")
+
+        income = incomes[0]
+
+        # Ensure user can only access their own incomes
+        if income["user_name"] != current_user.get("name"):
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's income"
+            )
+
+        return IncomeWithDetails(**income)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to fetch income: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch income: {str(e)}"
+        ) from e
+
+
+@incomes_router.put("/{income_id}", response_model=Income)
+async def update_income(
+    income_id: str,
+    income: IncomeCreate,
+    current_user: dict = current_user_dependency,
+):
+    """Update an income record"""
+    try:
+        # Verify the income belongs to the current user
+        verify_query = """
+            SELECT i.id, isc.user_id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            WHERE i.id = :income_id
+        """
+        verify_data = DatabaseModel.execute_query(
+            verify_query, {"income_id": income_id}
+        )
+
+        if not verify_data:
+            raise HTTPException(status_code=404, detail="Income not found")
+
+        if verify_data[0]["user_id"] != current_user.get("uid"):
+            raise HTTPException(
+                status_code=403, detail="Cannot update another user's income"
+            )
+
+        # Verify the new source belongs to the current user
+        source_query = """
+            SELECT user_id FROM dradic_tech.income_sources
+            WHERE id = :source_id
+        """
+        source_data = DatabaseModel.execute_query(
+            source_query, {"source_id": income.source_id}
+        )
+
+        if not source_data:
+            raise HTTPException(status_code=404, detail="Income source not found")
+
+        if source_data[0]["user_id"] != current_user.get("uid"):
+            raise HTTPException(
+                status_code=403, detail="Cannot use another user's income source"
+            )
+
+        # Update the income record
+        update_query = """
+            UPDATE dradic_tech.incomes
+            SET source_id = :source_id, amount = :amount, currency = :currency,
+                date = :date, description = :description, updated_at = NOW()
+            WHERE id = :income_id
+            RETURNING id, source_id, amount, currency, date, description, created_at, updated_at
+        """
+        result = DatabaseModel.execute_query(
+            update_query,
+            {
+                "income_id": income_id,
+                "source_id": income.source_id,
+                "amount": income.amount,
+                "currency": income.currency,
+                "date": income.date,
+                "description": income.description,
+            },
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=500, detail="Failed to update income record"
+            )
+
+        return Income(**result[0])
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to update income: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update income: {str(e)}"
+        ) from e
+
+
+@incomes_router.delete("/{income_id}")
+async def delete_income(income_id: str, current_user: dict = current_user_dependency):
+    """Delete an income record"""
+    try:
+        # Verify the income belongs to the current user
+        verify_query = """
+            SELECT i.id, isc.user_id
+            FROM dradic_tech.incomes i
+            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
+            WHERE i.id = :income_id
+        """
+        verify_data = DatabaseModel.execute_query(
+            verify_query, {"income_id": income_id}
+        )
+
+        if not verify_data:
+            raise HTTPException(status_code=404, detail="Income not found")
+
+        if verify_data[0]["user_id"] != current_user.get("uid"):
+            raise HTTPException(
+                status_code=403, detail="Cannot delete another user's income"
+            )
+
+        # Delete the income record
+        delete_query = "DELETE FROM dradic_tech.incomes WHERE id = :income_id"
+        DatabaseModel.execute_query(delete_query, {"income_id": income_id})
+
+        return {"message": "Income deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete income: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to delete income: {str(e)}"
+        ) from e
+
+
 @incomes_router.get("/summary/monthly/{year}/{month}", response_model=MonthlySummary)
 async def get_monthly_summary(
-    year: int = Query(..., ge=2000, le=2100),
-    month: int = Query(..., ge=1, le=12),
+    year: int = Path(..., ge=2000, le=2100),
+    month: int = Path(..., ge=1, le=12),
     currency: str = "CLP",
     current_user: dict = current_user_dependency,
 ):
@@ -258,144 +421,135 @@ async def get_monthly_summary(
         ) from e
 
 
-@incomes_router.get("/{income_id}", response_model=IncomeWithDetails)
-async def get_income(income_id: str, current_user: dict = current_user_dependency):
-    """Get a specific income by ID"""
-    try:
-        query = """
-            SELECT
-                i.id, i.source_id, i.date, i.amount, i.currency, i.created_at,
-                isc.name as source_name, isc.category as source_category,
-                u.name as user_name, u.email as user_email,
-                g.name as group_name
-            FROM dradic_tech.incomes i
-            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
-            JOIN dradic_tech.users u ON isc.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
-            WHERE i.id = :income_id
-        """
-        incomes = DatabaseModel.execute_query(query, {"income_id": income_id})
-
-        if not incomes:
-            raise HTTPException(status_code=404, detail="Income not found")
-
-        income = incomes[0]
-
-        # Double check with user_id from income_sources
-        user_check_query = """
-            SELECT isc.user_id FROM dradic_tech.income_sources isc
-            JOIN dradic_tech.incomes i ON i.source_id = isc.id
-            WHERE i.id = :income_id
-        """
-        user_check = DatabaseModel.execute_query(
-            user_check_query, {"income_id": income_id}
-        )
-
-        if not user_check or user_check[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(
-                status_code=403, detail="Cannot access another user's income"
-            )
-
-        return IncomeWithDetails(**income)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to fetch income: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch income: {str(e)}"
-        ) from e
-
-
-@incomes_router.put("/{income_id}", response_model=Income)
-async def update_income(
-    income_id: str, income: IncomeCreate, current_user: dict = current_user_dependency
+@incomes_router.get("/dashboard/monthly/{year}/{month}", response_model=DashboardData)
+async def get_monthly_dashboard(
+    year: int,
+    month: int,
+    currency: str = "CLP",
+    current_user: dict = current_user_dependency,
 ):
-    """Update an income"""
+    """Get unified monthly income dashboard data"""
     try:
-        # First check if the income exists and belongs to the current user
-        existing_income_query = """
-            SELECT i.id, isc.user_id
+        # Validate month
+        if month < 1 or month > 12:
+            raise HTTPException(
+                status_code=400, detail="Month must be between 1 and 12"
+            )
+
+        user_id = current_user.get("uid")
+
+        # Get incomes for the month
+        incomes_query = """
+            SELECT
+                i.id,
+                i.amount,
+                i.currency,
+                i.date,
+                i.description,
+                ins.name as source_name,
+                ins.category as source_category
             FROM dradic_tech.incomes i
-            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
-            WHERE i.id = :income_id
+            JOIN dradic_tech.income_sources ins ON i.source_id = ins.id
+            JOIN dradic_tech.users u ON ins.user_id = u.id
+            WHERE EXTRACT(YEAR FROM i.date) = :year
+            AND EXTRACT(MONTH FROM i.date) = :month
+            AND i.currency = :currency
+            AND u.id = :user_id
+            ORDER BY i.date DESC
         """
-        existing_incomes = DatabaseModel.execute_query(
-            existing_income_query, {"income_id": income_id}
+
+        params = {
+            "year": year,
+            "month": month,
+            "currency": currency,
+            "user_id": user_id,
+        }
+
+        incomes_data = DatabaseModel.execute_query(incomes_query, params)
+
+        # Calculate total
+        total_income = sum(float(inc["amount"]) for inc in incomes_data)
+
+        # Create dashboard cards
+        cards = [
+            DashboardCard(
+                title="Total Income",
+                description="Total income for the month",
+                value=total_income,
+                currency=currency,
+            ),
+            DashboardCard(
+                title="Income Sources",
+                description="Number of income sources used",
+                value=len(set(inc["source_name"] for inc in incomes_data)),
+                currency="",  # Not a currency value
+            ),
+            DashboardCard(
+                title="Income Count",
+                description="Number of income records",
+                value=len(incomes_data),
+                currency="",  # Not a currency value
+            ),
+        ]
+
+        # Create donut graph data (group incomes by source category)
+        category_totals: dict[str, float] = {}
+        for income in incomes_data:
+            category = income["source_category"] or "Uncategorized"
+            amount = float(income["amount"])
+            category_totals[category] = category_totals.get(category, 0) + amount
+
+        donut_data = [
+            DashboardDonutData(label=cat, value=amount)
+            for cat, amount in sorted(
+                category_totals.items(), key=lambda x: x[1], reverse=True
+            )
+            if amount > 0
+        ]
+
+        donut_graph = DashboardDonutGraph(
+            title="Income by source category",
+            description="Income by source category",
+            data=donut_data,
         )
 
-        if not existing_incomes:
-            raise HTTPException(status_code=404, detail="Income not found")
-
-        if existing_incomes[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(
-                status_code=403, detail="Cannot update another user's income"
+        # Create table data
+        table_rows = []
+        for income in incomes_data:
+            table_rows.append(
+                DashboardTableRow(
+                    id=str(income["id"]),
+                    name=income["source_name"],
+                    category=income["source_category"] or "Uncategorized",
+                    amount=f"{currency} {abs(float(income['amount'])):,.0f}",
+                    date=income["date"].strftime("%m/%d/%Y"),
+                    description=income["description"] or income["source_name"],
+                )
             )
 
-        # Validate income source exists and belongs to current user
-        source_check_query = """
-            SELECT user_id FROM dradic_tech.income_sources WHERE id = :source_id
-        """
-        source_result = DatabaseModel.execute_query(
-            source_check_query, {"source_id": income.source_id}
+        table = DashboardTable(
+            title=f"{datetime(year, month, 1).strftime('%B')}",
+            description="Click on an income to edit it.",
+            columns=["Source", "Category", "Amount", "Date", "Description"],
+            data=table_rows,
         )
 
-        if not source_result:
-            raise HTTPException(status_code=400, detail="Income source not found")
+        return DashboardData(
+            year=year,
+            month=month,
+            currency=currency,
+            cards=cards,
+            donut_graph=donut_graph,
+            table=table,
+            total_expenses=0.0,  # Not applicable for income dashboard
+            total_income=total_income,
+            total_savings=total_income,  # All income is savings in this context
+        )
 
-        if source_result[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(
-                status_code=403, detail="Cannot use another user's income source"
-            )
-
-        income_data = income.dict(exclude_unset=True)
-        updated_income = DatabaseModel.update_record("incomes", income_id, income_data)
-
-        if not updated_income:
-            raise HTTPException(status_code=404, detail="Income not found")
-
-        return Income(**updated_income)
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to update income: {str(e)}")
+        logger.error(f"Failed to fetch income dashboard data: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to update income: {str(e)}"
-        ) from e
-
-
-@incomes_router.delete("/{income_id}")
-async def delete_income(income_id: str, current_user: dict = current_user_dependency):
-    """Delete an income"""
-    try:
-        # First check if the income exists and belongs to the current user
-        existing_income_query = """
-            SELECT i.id, isc.user_id
-            FROM dradic_tech.incomes i
-            JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
-            WHERE i.id = :income_id
-        """
-        existing_incomes = DatabaseModel.execute_query(
-            existing_income_query, {"income_id": income_id}
-        )
-
-        if not existing_incomes:
-            raise HTTPException(status_code=404, detail="Income not found")
-
-        if existing_incomes[0]["user_id"] != current_user.get("uid"):
-            raise HTTPException(
-                status_code=403, detail="Cannot delete another user's income"
-            )
-
-        deleted = DatabaseModel.delete_record("incomes", income_id)
-
-        if not deleted:
-            raise HTTPException(status_code=404, detail="Income not found")
-
-        return {"message": "Income deleted successfully"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to delete income: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to delete income: {str(e)}"
+            status_code=500, detail=f"Failed to fetch income dashboard data: {str(e)}"
         ) from e

@@ -9,7 +9,7 @@ import type {
   IncomeSource,
   IncomeSourceCreate,
 } from "~/modules/types";
-import { incomeSourcesApi, incomesApi } from "~/modules/apis";
+import { incomeSourcesApi } from "~/modules/apis";
 
 const currencies = [
   { value: "USD", label: "USD" },
@@ -62,7 +62,7 @@ const IncomeModal = ({
   const sources =
     preloadedSources && preloadedSources.length > 0
       ? preloadedSources
-      : localSources;
+      : localSources || [];
 
   const [incomeForm, setIncomeForm] = useState<IncomeFormData>({
     source_id: "",
@@ -114,7 +114,7 @@ const IncomeModal = ({
     try {
       setError(null);
       const response = await incomeSourcesApi.getAll({ user_id: userId });
-      setLocalSources(response.items);
+      setLocalSources(response.sources || []);
     } catch (error) {
       setError("Failed to fetch income sources");
       console.error("Error fetching income sources:", error);
@@ -153,7 +153,7 @@ const IncomeModal = ({
       } as IncomeSourceCreate);
 
       // Add to local sources
-      setLocalSources((prev) => [...prev, newSource]);
+      setLocalSources((prev) => [...(prev || []), newSource]);
 
       // Select the new source
       setIncomeForm((prev) => ({ ...prev, source_id: newSource.id }));
@@ -184,14 +184,9 @@ const IncomeModal = ({
         description: incomeForm.description || undefined,
       };
 
-      if (isEditMode && income) {
-        const updatedIncome = await incomesApi.update(income.id, incomeData);
-        onSubmit(updatedIncome);
-      } else {
-        const newIncome = await incomesApi.create(incomeData);
-        onSubmit(newIncome);
-      }
-
+      // Just call the onSubmit callback with the form data
+      // Let the parent component handle the API calls
+      await onSubmit(incomeData);
       onClose();
     } catch (error) {
       setError(`Failed to ${isEditMode ? "update" : "create"} income`);
@@ -211,11 +206,8 @@ const IncomeModal = ({
     try {
       if (onDelete) {
         await onDelete(income.id);
-      } else {
-        await incomesApi.delete(income.id);
+        onClose();
       }
-      onSubmit(income); // Trigger refresh
-      onClose();
     } catch (error) {
       setError("Failed to delete income");
       console.error("Error deleting income:", error);

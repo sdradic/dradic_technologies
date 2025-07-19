@@ -1,6 +1,7 @@
 // API Configuration
 import { supabase } from "./supabase";
 import type {
+  DashboardData,
   Expense,
   ExpenseCreate,
   ExpenseItem,
@@ -19,8 +20,6 @@ import type {
   IncomeSourceResponse,
   IncomeSourceWithUser,
   IncomeWithDetails,
-  MonthlyIncomeSummary,
-  MonthlySummary,
   User,
   UserCreate,
   UserWithGroup,
@@ -291,20 +290,6 @@ export const expensesApi = {
       method: "DELETE",
     }),
 
-  // Get monthly summary
-  getMonthlySummary: (
-    year: number,
-    month: number,
-    userId?: string,
-    currency = "CLP",
-  ): Promise<MonthlySummary> => {
-    const params = new URLSearchParams({ currency });
-    if (userId) params.append("user_id", userId);
-    return apiRequest(
-      `/api/expense-tracker/expenses/summary/monthly/${year}/${month}?${params}`,
-    );
-  },
-
   // Get all currencies
   getCurrencies: (userId?: string): Promise<string[]> => {
     const params = userId ? `?user_id=${userId}` : "";
@@ -434,18 +419,31 @@ export const incomesApi = {
     apiRequest(`/api/expense-tracker/incomes/${id}`, {
       method: "DELETE",
     }),
+};
 
-  // Get monthly income summary
-  getMonthlySummary: (
+// Dashboard API
+export const dashboardApi = {
+  // Get unified monthly dashboard data
+  getMonthlyDashboard: (
     year: number,
     month: number,
-    userId?: string,
     currency = "CLP",
-  ): Promise<MonthlyIncomeSummary> => {
+  ): Promise<DashboardData> => {
     const params = new URLSearchParams({ currency });
-    if (userId) params.append("user_id", userId);
     return apiRequest(
-      `/api/expense-tracker/incomes/summary/monthly/${year}/${month}?${params}`,
+      `/api/expense-tracker/expenses/dashboard/monthly/${year}/${month}?${params}`,
+    );
+  },
+
+  // Get unified monthly income dashboard data
+  getMonthlyIncomeDashboard: (
+    year: number,
+    month: number,
+    currency = "CLP",
+  ): Promise<DashboardData> => {
+    const params = new URLSearchParams({ currency });
+    return apiRequest(
+      `/api/expense-tracker/incomes/dashboard/monthly/${year}/${month}?${params}`,
     );
   },
 };

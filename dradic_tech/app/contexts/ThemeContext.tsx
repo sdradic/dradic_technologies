@@ -24,6 +24,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     setTheme(initialTheme);
     setMounted(true);
+
+    // Ensure the theme is applied to document (in case the head script didn't run)
+    if (initialTheme === "dark") {
+      document.documentElement.className = "dark";
+    } else {
+      document.documentElement.className = "";
+    }
   }, []);
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -42,8 +49,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (mounted) {
-      // Only apply theme to document after component is mounted
-      document.documentElement.className = theme;
+      // Apply theme to document and save to local state
+      if (theme === "dark") {
+        document.documentElement.className = "dark";
+      } else {
+        document.documentElement.className = "";
+      }
       localState.setTheme(theme);
     }
   }, [theme, mounted]);

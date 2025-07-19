@@ -29,6 +29,7 @@ export function useIncomeOperations() {
     ) => {
       try {
         setError(null);
+        console.log("Adding income:", incomeData);
 
         if (isGuest && demoOperations) {
           // Handle locally for guest users
@@ -41,7 +42,9 @@ export function useIncomeOperations() {
           setIsModalOpen(false);
         } else if (fetchIncomeData) {
           // Handle via API for authenticated users
+          console.log("Calling incomesApi.create...");
           await incomesApi.create(incomeData);
+          console.log("Income created successfully, fetching updated data...");
           await fetchIncomeData();
           setIsModalOpen(false);
         }
@@ -67,6 +70,12 @@ export function useIncomeOperations() {
     ) => {
       try {
         setError(null);
+        console.log(
+          "Editing income:",
+          incomeData,
+          "selectedIncome:",
+          selectedIncome,
+        );
 
         if (isGuest && demoOperations && selectedIncome) {
           // Handle locally for guest users
@@ -99,8 +108,11 @@ export function useIncomeOperations() {
           demoOperations.updateTableData(updatedIncomes);
           setIsEditModalOpen(false);
           setSelectedIncome(null);
-        } else if (fetchIncomeData) {
+        } else if (fetchIncomeData && selectedIncome) {
           // Handle via API for authenticated users
+          console.log("Calling incomesApi.update...");
+          await incomesApi.update(selectedIncome.id, incomeData);
+          console.log("Income updated successfully, fetching updated data...");
           await fetchIncomeData();
           setIsEditModalOpen(false);
           setSelectedIncome(null);
@@ -126,6 +138,7 @@ export function useIncomeOperations() {
     ) => {
       try {
         setError(null);
+        console.log("Deleting income:", incomeId);
 
         if (isGuest && demoOperations) {
           // Handle locally for guest users
@@ -136,7 +149,9 @@ export function useIncomeOperations() {
           demoOperations.updateTableData(updatedIncomes);
         } else if (fetchIncomeData) {
           // Handle via API for authenticated users
+          console.log("Calling incomesApi.delete...");
           await incomesApi.delete(incomeId);
+          console.log("Income deleted successfully, fetching updated data...");
           await fetchIncomeData();
         }
       } catch (err) {
