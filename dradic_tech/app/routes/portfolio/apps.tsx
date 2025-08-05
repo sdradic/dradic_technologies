@@ -20,7 +20,7 @@ export default function Apps() {
 const AppCard = ({
   title,
   description,
-  image = "~/assets/blog_post_placeholder.webp",
+  image = "/blog_post_placeholder.webp",
   link,
 }: {
   title: string;

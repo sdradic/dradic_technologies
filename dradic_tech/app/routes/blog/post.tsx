@@ -157,7 +157,7 @@ export default function Post({ params }: Route.ComponentProps) {
         src={
           renderedPost.metadata.image
             ? renderedPost.metadata.image
-            : "~/assets/blog_post_placeholder.webp"
+            : "/blog_post_placeholder.webp"
         }
         alt={renderedPost.metadata.image}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
