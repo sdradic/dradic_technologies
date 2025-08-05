@@ -116,21 +116,26 @@ export const DatePicker = ({
       className={`relative ${className} ${disabled ? "opacity-50" : ""}`}
       ref={datePickerRef}
     >
-      <div
+      <button
+        type="button"
         onClick={handleToggle}
-        className={`w-full px-4 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-          disabled ? "cursor-not-allowed" : "cursor-pointer"
-        }`}
+        className={`w-full px-4 py-2 text-left bg-white dark:bg-gray-800 border rounded-lg transition-colors
+          ${isOpen ? "border-primary-500 ring-2 ring-primary-500" : "border-gray-300 dark:border-gray-700"}
+          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+          ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
+        `}
+        disabled={disabled}
+        tabIndex={0}
       >
         <div className="flex items-center justify-between">
           <span className="block truncate">{value || "Select a date"}</span>
           <CalendarIcon
             className={`w-5 h-5 ml-2 transition-transform duration-200 ${
-              isOpen ? "transform rotate-180" : ""
+              isOpen ? "stroke-primary-500" : "stroke-gray-500"
             }`}
           />
         </div>
-      </div>
+      </button>
 
       {isOpen && (
         <div

@@ -32,24 +32,11 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function HydrateFallback() {
-  const location = useLocation();
-  const isAuthRoute = !["/", "/login", "/logout", "/404"].includes(
-    location.pathname,
-  );
-
   return (
     <ThemeProvider>
-      {isAuthRoute ? (
-        <AuthProvider>
-          <div className="flex flex-col items-center justify-center min-h-screen">
-            <Loader />
-          </div>
-        </AuthProvider>
-      ) : (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <Loader />
-        </div>
-      )}
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader />
+      </div>
     </ThemeProvider>
   );
 }
@@ -77,7 +64,7 @@ function AppContent() {
   const location = useLocation();
 
   // Public routes that don't require authentication
-  const publicRoutes = ["/login", "/logout", "/404"];
+  const publicRoutes = ["/login", "/404"];
   const isPublicRoute = publicRoutes.includes(location.pathname);
 
   // Show loading while checking authentication
@@ -85,6 +72,15 @@ function AppContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Loader />
+      </div>
+    );
+  }
+
+  // Special handling for logout route - allow authenticated users to access it
+  if (location.pathname === "/logout") {
+    return (
+      <div>
+        <Outlet />
       </div>
     );
   }

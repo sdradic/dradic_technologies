@@ -1,13 +1,25 @@
-import { useNavigate } from "react-router";
 import { useAuth } from "~/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 import Loader from "~/components/Loader";
 import { TallyUpLogo } from "~/components/Icons";
 
 export default function Logout() {
-  const { logout, handleGuestLogin, isGuest } = useAuth();
+  const { logout, handleGuestLogin, isGuest, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const hasTriggeredLogout = useRef(false);
+
   useEffect(() => {
+    // If already logged out, redirect immediately
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    // Only trigger logout once
+    if (hasTriggeredLogout.current) return;
+    hasTriggeredLogout.current = true;
+
     const performLogout = async () => {
       try {
         if (isGuest) {
@@ -15,21 +27,16 @@ export default function Logout() {
         } else {
           await logout();
         }
-        // Always navigate to login after logout attempt
-        navigate("/login", { replace: true });
       } catch (error) {
-        console.error("Error during logout:", error);
-        navigate("/login", { replace: true });
+        console.error("Logout error:", error);
+        navigate("/login");
       }
     };
 
-    // Add a small delay to ensure any UI updates complete
-    const timer = setTimeout(() => {
-      performLogout();
-    }, 100);
+    performLogout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, navigate]); // Intentionally excluding logout functions to prevent infinite loops
 
-    return () => clearTimeout(timer);
-  }, [logout, navigate, isGuest, handleGuestLogin]);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 sm:px-2 px-8 max-h-screen">
       <div className="flex flex-col items-center justify-center max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow">

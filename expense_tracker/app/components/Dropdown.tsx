@@ -46,13 +46,14 @@ export const Dropdown = ({
     >
       <button
         type="button"
-        className={`inline-flex justify-between w-full rounded-md border border-gray-200 dark:border-gray-700 px-4 py-2 bg-white dark:bg-gray-800 text-sm  text-gray-700 dark:text-gray-100 ${
-          !disabled
-            ? " focus:outline-none cursor-pointer"
-            : "cursor-not-allowed"
-        }`}
+        className={`inline-flex justify-between w-full rounded-md border px-4 py-2 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100
+          border-gray-200 dark:border-gray-700
+          ${!disabled ? "focus:outline-none cursor-pointer" : "cursor-not-allowed"}
+          ${isOpen ? "ring-2 ring-primary-500 border-primary-500 dark:border-primary-500" : ""}
+        `}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
+        tabIndex={0}
       >
         <div className="flex items-center justify-between w-full py-0.5">
           <span className="block truncate">

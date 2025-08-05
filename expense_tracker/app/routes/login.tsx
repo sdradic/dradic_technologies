@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { TallyUpLogo } from "~/components/Icons";
 
 import { useState, useEffect } from "react";
-import { ErrorXIcon } from "~/components/Icons";
+import { ErrorXIcon, EyeIcon, EyeSlashIcon } from "~/components/Icons";
 import Loader from "~/components/Loader";
 import { ThemeToggle } from "~/components/ThemeToggle";
 
@@ -15,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already authenticated (but not while loading)
   useEffect(() => {
@@ -28,7 +29,6 @@ export default function Login() {
     setError(null);
     try {
       await login(email, password);
-      navigate("/", { replace: true });
     } catch (err: unknown) {
       setError(
         err instanceof Error
@@ -95,22 +95,37 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
                 placeholder="Email address"
+                autoComplete="username"
               />
             </div>
             <div>
               <label htmlFor="password" className="">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
+                  placeholder="Password"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 stroke-gray-400 dark:stroke-dark-200" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 stroke-gray-400 dark:stroke-dark-200" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           <button

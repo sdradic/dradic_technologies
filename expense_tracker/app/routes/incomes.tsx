@@ -1,30 +1,37 @@
-import { lazy } from "react";
 import { HeaderControls } from "~/components/HeaderControls";
 import { HeaderButton } from "~/components/HeaderButton";
-import { ReloadProvider, useReload } from "~/contexts/ReloadContext";
 import { ReloadIcon } from "~/components/Icons";
+import { Suspense, useState } from "react";
+import { useAuth } from "~/contexts/AuthContext";
+import Loader from "~/components/Loader";
+import { CreateEditModal } from "~/components/CreateEditModal";
+import { IncomesTableData } from "~/hooks/useIncomesTableData";
 
-const MonthlyIncomesPage = lazy(() =>
-  import("../pages/MonthlyIncomesPage").then((module) => ({
-    default: module.MonthlyIncomesPage,
-  })),
-);
+export default function Incomes() {
+  const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
 
-function IncomesContent() {
-  const { triggerReload, isReloading, isInitialLoading } = useReload();
-
-  const handleReload = async () => {
-    await triggerReload();
+  const handleReload = () => setReloadTrigger((prev) => prev + 1);
+  const handleSave = (data: any) => {
+    console.log(data);
   };
 
   return (
     <div className="p-4 rounded-xl">
+      <CreateEditModal
+        mode="income"
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        onSave={handleSave}
+        userId={user?.id}
+      />
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls>
           <HeaderButton
             onButtonClick={handleReload}
-            isLoading={isReloading}
-            disabled={isInitialLoading}
+            isLoading={false}
+            disabled={false}
             loadingText="Reloading..."
             buttonText="Reload Data"
             className="btn-secondary flex items-center gap-2 min-w-32"
@@ -34,18 +41,17 @@ function IncomesContent() {
           />
         </HeaderControls>
         <div className="separator my-4" />
-        <div className="flex flex-col gap-4 p-4">
-          <MonthlyIncomesPage />
+        <div className="flex flex-col gap-4">
+          <div className="p-4">
+            <Suspense fallback={<Loader message="Loading incomes..." />}>
+              <IncomesTableData
+                setIsModalOpen={setIsModalOpen}
+                reloadTrigger={reloadTrigger}
+              />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function Incomes() {
-  return (
-    <ReloadProvider>
-      <IncomesContent />
-    </ReloadProvider>
   );
 }

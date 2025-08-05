@@ -141,6 +141,7 @@ class IncomeSource(IncomeSourceBase):
     id: str
     created_at: datetime
     updated_at: datetime
+    is_recurring: bool
 
 
 class IncomeSourceWithUser(IncomeSource):

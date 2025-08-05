@@ -144,6 +144,7 @@ export interface IncomeCreate {
 export interface IncomeWithDetails extends Income {
   source_name: string;
   source_category?: string;
+  source_is_recurring: boolean;
   user_name: string;
   user_email: string;
   group_name?: string;

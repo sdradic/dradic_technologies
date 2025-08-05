@@ -38,7 +38,7 @@ export const SimpleModal = ({
 
   return (
     <div
-      className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50 px-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
       onClick={handleBackdropClick}
     >
       <div

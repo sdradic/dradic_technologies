@@ -1,8 +1,18 @@
-import { createContext, useContext, useMemo, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import type { ReactNode } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "../modules/supabase";
 import { usersApi } from "~/modules/apis";
+
+// Cache for user data to prevent redundant API calls
+const userCache = new Map<string, User>();
 
 // Convert Supabase User to your app's User type
 const mapSupabaseUser = async (
@@ -10,58 +20,26 @@ const mapSupabaseUser = async (
 ): Promise<User | null> => {
   if (!supabaseUser) return null;
 
+  // Check cache first
+  if (userCache.has(supabaseUser.id)) {
+    return userCache.get(supabaseUser.id)!;
+  }
+
   const user = await usersApi
     .getById(supabaseUser.id)
     .then((user) => {
-      return {
+      const appUser = {
         id: user.id,
         name: user.name,
         email: user.email,
       };
+      // Cache the result
+      userCache.set(supabaseUser.id, appUser);
+      return appUser;
     })
-    .catch(async (error) => {
+    .catch((error) => {
       console.error("Error fetching user:", error);
-
-      // If user doesn't exist in backend, try to create it
-      if (error.status === 404) {
-        try {
-          console.log("User not found in backend, creating profile...");
-          const createdUser = await usersApi.create({
-            id: supabaseUser.id,
-            name:
-              supabaseUser.user_metadata?.name ||
-              supabaseUser.email?.split("@")[0] ||
-              "Unknown",
-            email: supabaseUser.email || "",
-          });
-          return {
-            id: createdUser.id,
-            name: createdUser.name,
-            email: createdUser.email,
-          };
-        } catch (createError) {
-          console.error("Error creating user profile:", createError);
-          // Return a basic user object with Supabase data as fallback
-          return {
-            id: supabaseUser.id,
-            name:
-              supabaseUser.user_metadata?.name ||
-              supabaseUser.email?.split("@")[0] ||
-              "Unknown",
-            email: supabaseUser.email || "",
-          };
-        }
-      }
-
-      // For other errors, return a basic user object with Supabase data
-      return {
-        id: supabaseUser.id,
-        name:
-          supabaseUser.user_metadata?.name ||
-          supabaseUser.email?.split("@")[0] ||
-          "Unknown",
-        email: supabaseUser.email || "",
-      };
+      throw error;
     });
 
   return user;
@@ -73,9 +51,15 @@ export function useAuthStore() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const isInitialized = useRef(false);
+  const currentUserRef = useRef<User | null>(null);
 
   // Check for existing session and listen for auth state changes
   useEffect(() => {
+    // Prevent multiple initializations
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     setIsLoading(true);
     setAuthError(null);
 
@@ -99,10 +83,12 @@ export function useAuthStore() {
         if (session?.user) {
           const appUser = await mapSupabaseUser(session.user);
           setUser(appUser);
+          currentUserRef.current = appUser;
           setIsAuthenticated(true);
           setIsGuest(false);
         } else {
           setUser(null);
+          currentUserRef.current = null;
           setIsAuthenticated(false);
           setIsGuest(false);
         }
@@ -123,14 +109,33 @@ export function useAuthStore() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Skip the initial session event since we already handled it
+      if (event === "INITIAL_SESSION") {
+        return;
+      }
+
       try {
         if (session?.user) {
+          // Clear cache for previous user if different
+          if (
+            currentUserRef.current &&
+            currentUserRef.current.id !== session.user.id
+          ) {
+            userCache.delete(currentUserRef.current.id);
+          }
+
           const appUser = await mapSupabaseUser(session.user);
           setUser(appUser);
+          currentUserRef.current = appUser;
           setIsAuthenticated(true);
           setIsGuest(false);
         } else {
+          // Clear cache when user logs out
+          if (currentUserRef.current) {
+            userCache.delete(currentUserRef.current.id);
+          }
           setUser(null);
+          currentUserRef.current = null;
           setIsAuthenticated(false);
           setIsGuest(false);
         }
@@ -144,69 +149,6 @@ export function useAuthStore() {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const signup = async (email: string, password: string, name: string) => {
-    try {
-      setIsLoading(true);
-      setAuthError(null);
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name,
-          },
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        // Wait a moment for the session to be available
-        // In some cases, the session might not be immediately available
-        let session = data.session;
-        if (!session) {
-          // Wait for the session to be established
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          const { data: sessionData } = await supabase.auth.getSession();
-          session = sessionData.session;
-        }
-
-        // Only create user profile if we have a valid session
-        if (session) {
-          // Create user profile in your backend
-          await usersApi.create({
-            id: data.user.id,
-            name,
-            email,
-          });
-        } else {
-          // If no session, the user might need to confirm their email
-          // In this case, we'll create the user profile when they confirm
-          console.log(
-            "User created but needs to confirm email. User profile will be created upon confirmation.",
-          );
-        }
-
-        return mapSupabaseUser(data.user);
-      }
-
-      return null;
-    } catch (error: unknown) {
-      console.error("Signup error:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "An error occurred during signup";
-      setAuthError(errorMessage);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -222,7 +164,17 @@ export function useAuthStore() {
         throw error;
       }
 
-      return mapSupabaseUser(data.user);
+      // Immediately update auth state after successful login
+      if (data.user) {
+        const appUser = await mapSupabaseUser(data.user);
+        setUser(appUser);
+        currentUserRef.current = appUser;
+        setIsAuthenticated(true);
+        setIsGuest(false);
+        return appUser;
+      }
+
+      return null;
     } catch (error: unknown) {
       console.error("Login error:", error);
       const errorMessage =
@@ -260,7 +212,20 @@ export function useAuthStore() {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Supabase logout error:", error);
+        throw error;
+      }
+
+      // Immediately update auth state after successful logout
+      setUser(null);
+      currentUserRef.current = null;
+      setIsAuthenticated(false);
+      setIsGuest(false);
+
+      // Clear user cache on logout
+      userCache.clear();
+      isInitialized.current = false;
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
@@ -279,7 +244,6 @@ export function useAuthStore() {
       logout,
       isLoading,
       isGuest,
-      signup,
       authError,
     }),
     [isAuthenticated, user, isLoading, isGuest, authError],
@@ -304,11 +268,6 @@ export interface AuthStore {
   login: (email: string, password: string) => Promise<User | null>;
   handleGuestLogin: (isLoggingIn: boolean) => void;
   logout: () => Promise<void>;
-  signup: (
-    email: string,
-    password: string,
-    name: string,
-  ) => Promise<User | null>;
   isLoading: boolean;
   isGuest: boolean;
   authError: string | null;

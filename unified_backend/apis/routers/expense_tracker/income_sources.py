@@ -78,7 +78,7 @@ async def get_income_sources(
         query = """
             SELECT
                 isc.id, isc.name, isc.category, isc.user_id, isc.created_at, isc.updated_at,
-                u.name as user_name, u.email as user_email
+                u.name as user_name, u.email as user_email, isc.is_recurring
             FROM dradic_tech.income_sources isc
             JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE isc.user_id = :user_id
@@ -123,7 +123,7 @@ async def get_income_source(
         query = """
             SELECT
                 isc.id, isc.name, isc.category, isc.user_id, isc.created_at, isc.updated_at,
-                u.name as user_name, u.email as user_email
+                u.name as user_name, u.email as user_email, isc.is_recurring
             FROM dradic_tech.income_sources isc
             JOIN dradic_tech.users u ON isc.user_id = u.id
             WHERE isc.id = :source_id

@@ -92,6 +92,7 @@ async def get_incomes(
                 i.id, i.source_id, i.amount, i.currency, i.date, i.description,
                 i.created_at, i.updated_at,
                 isc.name as source_name, isc.category as source_category,
+                isc.is_recurring as source_is_recurring,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
             FROM dradic_tech.incomes i
@@ -195,6 +196,7 @@ async def get_income(income_id: str, current_user: dict = current_user_dependenc
                 i.id, i.source_id, i.amount, i.currency, i.date, i.description,
                 i.created_at, i.updated_at,
                 isc.name as source_name, isc.category as source_category,
+                isc.is_recurring as source_is_recurring,
                 u.name as user_name, u.email as user_email,
                 g.name as group_name
             FROM dradic_tech.incomes i

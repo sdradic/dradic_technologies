@@ -429,10 +429,11 @@ export const dashboardApi = {
     year: number,
     month: number,
     currency = "CLP",
+    user_id: string,
   ): Promise<DashboardDataWithExpenses> => {
-    const params = new URLSearchParams({ currency });
+    const params = new URLSearchParams({ currency, user_id });
     return apiRequest(
-      `/api/expense-tracker/expenses/dashboard/monthly/${year}/${month}?${params}`,
+      `/api/expense-tracker/expenses/dashboard/monthly/${year}/${month}?${params.toString()}`,
     );
   },
 

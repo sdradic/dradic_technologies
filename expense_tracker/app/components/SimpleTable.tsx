@@ -138,7 +138,7 @@ export default function SimpleTable({
           data.map((row) => (
             <div
               key={row.id}
-              className={`border-y border-gray-200 dark:border-gray-500 p-4 ${
+              className={`border-t border-gray-200 dark:border-gray-500 p-4 ${
                 onRowClick
                   ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   : ""
@@ -148,7 +148,7 @@ export default function SimpleTable({
               {columns.map((column) => (
                 <div
                   key={column}
-                  className="flex justify-between items-center py-2"
+                  className="flex justify-between items-center py-1"
                 >
                   <span className=" text-gray-500 dark:text-gray-400">
                     {column}:

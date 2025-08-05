@@ -1,24 +1,21 @@
-# Expense Tracker
+# Expense Tracker (Simplified)
 
-A comprehensive personal finance management application for tracking expenses, income, and financial goals with beautiful visualizations and insights.
+A simplified personal finance management application showcasing UI components and design patterns. This version focuses on the visual presentation and user interface without the full expense tracking functionality.
 
 ## 🚀 Features
 
-- **Expense Tracking**: Log and categorize daily expenses
-- **Income Management**: Track multiple income sources
-- **Visual Analytics**: Beautiful charts and graphs for financial insights
-- **Category Management**: Custom categories and groups
-- **Monthly/Yearly Reports**: Comprehensive financial reporting
-- **User Authentication**: Secure login and user management
+- **UI Components**: Beautiful, reusable components for financial applications
 - **Responsive Design**: Works perfectly on desktop and mobile
 - **Dark/Light Theme**: Toggle between themes for comfortable viewing
+- **Authentication UI**: Login and user management interface
+- **Component Library**: Cards, tables, charts, and form components
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React Router v7, TypeScript, Tailwind CSS
-- **Backend**: FastAPI (unified backend)
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
+- **Backend**: FastAPI (unified backend) - APIs available but not integrated
+- **Database**: Supabase (PostgreSQL) - configured but not used in simplified version
+- **Authentication**: Supabase Auth - UI only
 - **Charts**: Custom chart components
 - **Build Tool**: Vite
 - **Package Manager**: pnpm
@@ -88,212 +85,88 @@ VITE_DEFAULT_CURRENCY=USD
 expense_tracker/
 ├── app/
 │   ├── components/          # Reusable UI components
-│   │   ├── AddIncomeModal.tsx
 │   │   ├── CardCarrousel.tsx
 │   │   ├── DatePicker.tsx
 │   │   ├── Dropdown.tsx
-│   │   ├── ExpenseModal.tsx
 │   │   ├── HeaderControls.tsx
-│   │   ├── IncomeModal.tsx
+│   │   ├── Icons.tsx
+│   │   ├── Loader.tsx
 │   │   ├── Navbar.tsx
 │   │   ├── PageHeader.tsx
-│   │   ├── ProtectedRoute.tsx
-│   │   ├── Sidebar.tsx
 │   │   ├── SimpleCard.tsx
 │   │   ├── SimpleDonutGraph.tsx
 │   │   ├── SimpleModal.tsx
 │   │   ├── SimpleTable.tsx
+│   │   ├── SkeletonLoader.tsx
 │   │   ├── ThemeToggle.tsx
-│   │   ├── UserProfile.tsx
-│   │   └── ...
-│   ├── contexts/           # React contexts
-│   │   ├── AuthContext.tsx
-│   │   └── ThemeContext.tsx
-│   ├── mocks/              # Mock data for development
-│   │   └── mockData.ts
-│   ├── modules/            # Utility modules
-│   │   ├── apis.ts        # API client functions
-│   │   ├── store.ts       # State management
-│   │   ├── supabase.ts    # Supabase client
-│   │   ├── types.ts       # TypeScript type definitions
-│   │   └── utils.ts       # Utility functions
-│   ├── pages/             # Page components
-│   │   ├── GroupsPage.tsx
-│   │   ├── MonthlyExpensesPage.tsx
-│   │   ├── MonthlyIncomesPage.tsx
-│   │   └── YearlyPage.tsx
-│   ├── routes/            # Route components
-│   │   ├── _layout.tsx
+│   │   └── UserProfile.tsx
+│   ├── contexts/            # React contexts
+│   │   ├── AuthContext.tsx  # Authentication context
+│   │   ├── ReloadContext.tsx # Reload state management
+│   │   └── ThemeContext.tsx # Theme management
+│   ├── modules/             # Core modules
+│   │   ├── apis.ts          # API functions
+│   │   ├── store.ts         # Global state
+│   │   ├── supabase.ts      # Supabase client
+│   │   ├── types.ts         # TypeScript types
+│   │   └── utils.ts         # Utility functions
+│   ├── routes/              # Application routes
+│   │   ├── 404.tsx
+│   │   ├── about.tsx
 │   │   ├── dashboard.tsx
 │   │   ├── expenses.tsx
 │   │   ├── incomes.tsx
 │   │   ├── login.tsx
-│   │   ├── settings.tsx
-│   │   └── ...
-│   └── root.tsx           # Root component
-├── public/                # Static assets
-└── package.json
+│   │   ├── logout.tsx
+│   │   └── settings.tsx
+│   ├── app.css              # Global styles
+│   ├── root.tsx             # Root component
+│   └── routes.ts            # Route configuration
+├── public/                  # Static assets
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-## 🎨 Key Components
+## 🎨 Component Overview
 
-### Dashboard
+### Core Components
 
-Comprehensive financial overview with:
+- **SimpleCard**: Displays financial data in card format
+- **SimpleTable**: Data table with sorting and actions
+- **SimpleDonutGraph**: Chart component for data visualization
+- **CardCarrousel**: Mobile-friendly card carousel
+- **HeaderControls**: Page header with controls
+- **ThemeToggle**: Dark/light theme switcher
 
-- Monthly expense summary
-- Income vs expense comparison
-- Category breakdown charts
-- Recent transactions list
-- Quick action buttons
+### Layout Components
 
-### Expense Management
+- **Navbar**: Mobile navigation
+- **Sidebar**: Desktop navigation
+- **PageHeader**: Page title and breadcrumbs
+- **Loader**: Loading states
+- **SkeletonLoader**: Content loading placeholders
 
-Complete expense tracking system:
+## 🔐 Authentication
 
-- Add/edit/delete expenses
-- Category assignment
-- Date and amount tracking
-- Receipt image upload
-- Bulk operations
+The application includes authentication UI components but operates in a simplified mode. Users can navigate through the interface without full backend integration.
 
-### Income Tracking
+## 🎯 Usage
 
-Multiple income source management:
+This simplified version is perfect for:
 
-- Regular salary tracking
-- Freelance income
-- Investment returns
-- Other income sources
-- Income categorization
+- **UI/UX Development**: Building and testing component designs
+- **Design System**: Establishing consistent design patterns
+- **Prototyping**: Quick mockups and wireframes
+- **Component Library**: Reusable components for other projects
 
-### Analytics & Reports
+## 🚧 Development Notes
 
-Rich financial insights:
+- **No Data Persistence**: This version doesn't save or load real data
+- **Static Content**: Pages show placeholder content
+- **API Ready**: Backend APIs are available but not integrated
+- **Component Focus**: Emphasis on UI components and user experience
 
-- Monthly/yearly comparisons
-- Category spending analysis
-- Trend visualization
-- Budget vs actual tracking
-- Export functionality
+## 📝 License
 
-### User Management
-
-Secure user system:
-
-- Registration and login
-- Profile management
-- Settings customization
-- Theme preferences
-- Data privacy controls
-
-## 🚀 Available Scripts
-
-```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm typecheck    # Run TypeScript type checking
-pnpm clean        # Clean build artifacts
-```
-
-## 🔗 API Integration
-
-This project integrates with the unified backend API for:
-
-- User authentication and management
-- Expense CRUD operations
-- Income tracking
-- Category management
-- Analytics data
-- Report generation
-
-## 🎯 Core Features
-
-### Expense Tracking
-
-- **Quick Add**: Fast expense entry with smart defaults
-- **Categories**: Customizable expense categories
-- **Groups**: Organize expenses into logical groups
-- **Tags**: Add custom tags for better organization
-- **Recurring**: Set up recurring expenses
-
-### Income Management
-
-- **Multiple Sources**: Track various income streams
-- **Regular Income**: Salary and regular payments
-- **Variable Income**: Freelance and project-based income
-- **Investment Income**: Dividends and returns
-
-### Analytics & Insights
-
-- **Visual Charts**: Donut charts, bar graphs, line charts
-- **Trend Analysis**: Spending patterns over time
-- **Category Breakdown**: See where money goes
-- **Budget Tracking**: Compare actual vs planned spending
-- **Savings Goals**: Track progress toward financial goals
-
-### User Experience
-
-- **Responsive Design**: Works on all devices
-- **Dark/Light Theme**: Comfortable viewing options
-- **Fast Performance**: Optimized for speed
-- **Offline Support**: Basic functionality without internet
-- **Data Export**: Export data in various formats
-
-## 🚀 Deployment
-
-### Build for Production
-
-```bash
-pnpm build
-```
-
-The build output will be in the `build/` directory, ready for deployment.
-
-### Recommended Hosting
-
-- Vercel
-- Netlify
-- AWS S3 + CloudFront
-
-### Environment Setup
-
-For production deployment:
-
-- Configure production API endpoints
-- Set up proper authentication
-- Enable analytics tracking
-- Configure data backup
-
-## 📊 Data Management
-
-### Data Structure
-
-- **Expenses**: Amount, category, date, description, tags
-- **Income**: Amount, source, date, description
-- **Categories**: Name, color, icon, budget limits
-- **Users**: Profile, preferences, settings
-
-### Data Security
-
-- **Encryption**: Sensitive data encryption
-- **Backup**: Regular data backups
-- **Privacy**: User data protection
-- **Compliance**: GDPR and privacy compliance
-
-## 🤝 Contributing
-
-1. Follow the monorepo development workflow
-2. Ensure all tests pass
-3. Follow the established code style
-4. Update documentation as needed
-5. Test data integrity and security
-
-## 📄 License
-
-This project is proprietary to Dradic Technologies.
-
----
-
-**Built with ❤️ by Dradic Technologies**
+This project is part of Dradic Technologies and follows the same licensing terms.

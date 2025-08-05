@@ -18,7 +18,6 @@ export default function SimpleCard({
   value,
   currency = "CLP",
   previousValue = null,
-  inCarrousel = false,
 }: SimpleCardProps) {
   const isIncrease = value > (previousValue ?? 0);
   const percentageChange =
@@ -28,20 +27,16 @@ export default function SimpleCard({
 
   return (
     <>
-      <div
-        className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-6 w-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-          inCarrousel ? "text-center" : "text-left"
-        }`}
-      >
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-6 w-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-center">
         <h2 className="text-lg sm:text-xl md:text-2xl mb-2">{title}</h2>
         {description && (
           <p className="text-sm sm:text-base text-gray-400 dark:text-gray-600 mb-4">
             {description}
           </p>
         )}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 w-full">
+        <div className="flex flex-col items-center justify-center md:flex-row gap-2 sm:gap-4 w-full">
           <p
-            className={`text-xl sm:text-2xl text-center ${
+            className={`text-lg sm:text-xl md:text-2xl w-full ${
               value >= 0 ? "" : "text-red-500"
             }`}
           >
@@ -49,7 +44,7 @@ export default function SimpleCard({
           </p>
           {percentageChange && (
             <p
-              className={`text-sm text-center w-full ${
+              className={`text-sm w-full ${
                 isIncrease
                   ? "text-primary-500 dark:text-primary-400"
                   : "text-red-400 dark:text-red-400"
