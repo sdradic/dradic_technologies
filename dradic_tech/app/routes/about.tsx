@@ -1,6 +1,6 @@
 import ContactForm from "~/components/ContactForm";
 
-const dusanImage = "/dusan.webp";
+const dusanImage = "~/assets/dusan.webp";
 export default function About() {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4">

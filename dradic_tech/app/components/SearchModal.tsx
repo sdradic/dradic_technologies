@@ -138,7 +138,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                           <img
                             src={
                               post.metadata?.image ||
-                              "/blog_post_placeholder.webp"
+                              "~/assets/blog_post_placeholder.webp"
                             }
                             alt={post.metadata.title}
                             className="object-cover w-32 h-24 rounded-md"
