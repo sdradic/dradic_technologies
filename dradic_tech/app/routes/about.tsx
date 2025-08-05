@@ -9,7 +9,7 @@ export default function About() {
       <div className="flex flex-col justify-center items-center md:flex-row md:justify-evenly my-8 text-center px-8 gap-8">
         <div className="flex flex-col items-center md:items-start gap-4">
           <img
-            src="/dusan.webp"
+            src="/assets/dusan.webp"
             alt="Dradic"
             className="size-32 rounded-full"
           />

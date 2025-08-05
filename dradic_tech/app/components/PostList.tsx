@@ -57,7 +57,9 @@ export function PostsList({
           >
             <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-500 rounded-lg">
               <img
-                src={post.metadata?.image || "/blog_post_placeholder.webp"}
+                src={
+                  post.metadata?.image || "/assets/blog_post_placeholder.webp"
+                }
                 alt={post.metadata.title}
                 className="object-cover w-32 h-24 rounded-md"
               />

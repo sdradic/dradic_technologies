@@ -9,7 +9,7 @@ export default function Apps() {
         <AppCard
           title="Expense Tracker"
           description="A simple expense tracker app built with React and TypeScript."
-          image={"/TallyUp.webp"}
+          image={"/assets/TallyUp.webp"}
           link="https://expense-tracker-kappa-livid.vercel.app/"
         />
       </div>
@@ -20,7 +20,7 @@ export default function Apps() {
 const AppCard = ({
   title,
   description,
-  image = "/blog_post_placeholder.webp",
+  image = "/assets/blog_post_placeholder.webp",
   link,
 }: {
   title: string;
