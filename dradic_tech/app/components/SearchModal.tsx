@@ -3,7 +3,6 @@ import { XIcon } from "./Icons";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 import { fetchBlogPosts } from "~/modules/api";
 import { SearchBar } from "./SearchBar";
-import { placeholderImage } from "~/modules/store";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -137,7 +136,10 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                           onClick={onClose}
                         >
                           <img
-                            src={post.metadata?.image || placeholderImage}
+                            src={
+                              post.metadata?.image ||
+                              "/blog_post_placeholder.webp"
+                            }
                             alt={post.metadata.title}
                             className="object-cover w-32 h-24 rounded-md"
                           />

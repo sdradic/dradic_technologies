@@ -1,5 +1,3 @@
-import { placeholderImage } from "~/modules/store";
-
 export default function Apps() {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4 text-center pt-4 pb-8">
@@ -22,7 +20,7 @@ export default function Apps() {
 const AppCard = ({
   title,
   description,
-  image = placeholderImage,
+  image = "/blog_post_placeholder.webp",
   link,
 }: {
   title: string;

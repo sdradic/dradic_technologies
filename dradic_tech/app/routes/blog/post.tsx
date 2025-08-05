@@ -6,7 +6,6 @@ import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
 import NotFound from "../404";
 import Loader from "~/components/Loader";
-import { placeholderImage } from "~/modules/store";
 import { localState } from "~/modules/utils";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
@@ -158,7 +157,7 @@ export default function Post({ params }: Route.ComponentProps) {
         src={
           renderedPost.metadata.image
             ? renderedPost.metadata.image
-            : placeholderImage
+            : "/blog_post_placeholder.webp"
         }
         alt={renderedPost.metadata.image}
         className="h-48 md:h-96  rounded-xl object-cover my-4"
