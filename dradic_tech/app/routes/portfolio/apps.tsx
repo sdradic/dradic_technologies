@@ -11,7 +11,7 @@ export default function Apps() {
         <AppCard
           title="Expense Tracker"
           description="A simple expense tracker app built with React and TypeScript."
-          image={"/TallyUp.png"}
+          image={"/TallyUp.webp"}
           link="https://expense-tracker-kappa-livid.vercel.app/"
         />
       </div>

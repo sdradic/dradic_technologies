@@ -10,7 +10,7 @@ export default function Loader({
   textSize?: string;
 }) {
   return (
-    <div className="flex flex-col justify-center items-center p-4 gap-4">
+    <div className="flex flex-col justify-center items-center p-4 gap-4 animate-fade-in">
       <div
         className={`animate-spin rounded-full h-${loaderSize[0]} w-${loaderSize[1]} border-b-2 ${loaderColor}`}
       ></div>

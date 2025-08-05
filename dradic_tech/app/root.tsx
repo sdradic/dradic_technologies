@@ -13,7 +13,7 @@ import "./app.css";
 import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -23,23 +23,14 @@ export function HydrateFallback() {
 
   return (
     <ThemeProvider>
-      {isAdminRoute ? (
-        <AuthProvider>
-          <div>
-            <Navbar />
-            <div className="flex flex-col items-center justify-center min-h-screen">
-              <Loader />
-            </div>
-          </div>
-        </AuthProvider>
-      ) : (
+      <AuthProvider isAdminRoute={isAdminRoute}>
         <div>
           <Navbar />
           <div className="flex flex-col items-center justify-center min-h-screen">
             <Loader />
           </div>
         </div>
-      )}
+      </AuthProvider>
     </ThemeProvider>
   );
 }
@@ -100,12 +91,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function AppContent() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Small delay to ensure smooth transition
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div>
       <Navbar />
-      <Suspense fallback={<Loader />}>
-        <Outlet />
-      </Suspense>
+      <div
+        className={`transition-opacity duration-300 ease-in-out ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <Suspense fallback={<Loader />}>
+          <Outlet />
+        </Suspense>
+      </div>
       <Footer />
     </div>
   );

@@ -1,7 +1,6 @@
 import ContactForm from "~/components/ContactForm";
 
-const dusanImage =
-  "https://aorsaqycwhnsrutvqtdx.supabase.co/storage/v1/object/sign/dradic-public-assets/blog-images/dusan.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81N2MyMzZkNi0xZDEyLTQ3OTYtOTljNi0yM2MyNjhjYmQ2MmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkcmFkaWMtcHVibGljLWFzc2V0cy9ibG9nLWltYWdlcy9kdXNhbi5qcGVnIiwiaWF0IjoxNzUyNDk5Mzg4LCJleHAiOjE3ODQwMzUzODh9.e9rxea7Za7UlX6QRCIIl8VARFPu-qDWEAEhUVbC9mQI";
+const dusanImage = "/dusan.webp";
 export default function About() {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4">

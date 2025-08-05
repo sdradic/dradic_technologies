@@ -56,6 +56,12 @@ let state: LocalStateData | null = null;
 
 // Load state from localStorage
 function loadFromStorage(): void {
+  // Don't try to access localStorage during SSR
+  if (typeof window === "undefined") {
+    state = { ...DEFAULT_STATE };
+    return;
+  }
+
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -72,19 +78,21 @@ function loadFromStorage(): void {
       state = { ...DEFAULT_STATE };
     }
   } catch (error) {
-    console.error("Error loading local state:", error);
     state = { ...DEFAULT_STATE };
   }
 }
 
 // Save state to localStorage
 function saveToStorage(): void {
+  // Don't try to access localStorage during SSR
+  if (typeof window === "undefined") return;
+
   try {
     if (state) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
   } catch (error) {
-    console.error("Error saving local state:", error);
+    // Silent fail for localStorage errors
   }
 }
 
@@ -93,6 +101,10 @@ loadFromStorage();
 
 // Theme management
 export function getTheme(): string {
+  // During SSR, return the default theme
+  if (typeof window === "undefined") {
+    return DEFAULT_STATE.theme;
+  }
   return state?.theme || DEFAULT_STATE.theme;
 }
 

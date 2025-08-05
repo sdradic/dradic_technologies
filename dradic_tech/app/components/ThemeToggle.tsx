@@ -3,12 +3,26 @@ import { MoonIcon, SunIcon } from "./Icons";
 import { useTheme } from "~/contexts/ThemeContext";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   }, [theme]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-between w-14 h-6 p-1 rounded-full border border-gray-500 dark:border-gray-400">
+        <div className="flex justify-center items-center w-1/2 h-full rounded-full">
+          <SunIcon className="w-3 h-3 fill-yellow-400 stroke-yellow-500" />
+        </div>
+        <div className="flex justify-center items-center w-1/2 h-full rounded-full">
+          <MoonIcon className="w-3 h-3 fill-gray-400 stroke-gray-500" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -26,16 +40,16 @@ export function ThemeToggle() {
     >
       <div
         className={`
-        flex justify-center items-center w-1/2 h-full rounded-full
-        ${theme === "light" ? "bg-yellow-50" : ""}
+        flex justify-center items-center w-1/2 h-full rounded-full transition-colors duration-200
+        ${theme === "light" ? "bg-yellow-50" : "bg-transparent"}
       `}
       >
         <SunIcon className="w-3 h-3 fill-yellow-400 stroke-yellow-500" />
       </div>
       <div
         className={`
-        flex justify-center items-center w-1/2 h-full rounded-full
-        ${theme === "dark" ? "bg-[#18196F]" : ""}
+        flex justify-center items-center w-1/2 h-full rounded-full transition-colors duration-200
+        ${theme === "dark" ? "bg-[#18196F]" : "bg-transparent"}
       `}
       >
         <MoonIcon className="w-3 h-3 fill-gray-400 stroke-gray-500" />

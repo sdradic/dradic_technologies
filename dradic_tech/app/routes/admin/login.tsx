@@ -24,7 +24,7 @@ export default function AdminLogin() {
   // Show loading while checking authentication
   if (isCheckingAuth || isAuthLoading) {
     return (
-      <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
+      <div className="flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
         <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
           <div className="flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
@@ -38,22 +38,15 @@ export default function AdminLogin() {
   }
 
   const handleLogin = async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      await login(email, password);
-      navigate("/admin");
-    } catch {
-      console.error(
-        "Failed to sign in. Please check your credentials and try again.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    await login(email, password);
+    navigate("/admin");
+    setIsLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-50 dark:bg-dark-600 sm:px-2 px-8 py-16">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
+    <div className="flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
+      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg border shadow border-gray-200 dark:border-dark-200">
         <FormHeader />
         <FormComponent handleLogin={handleLogin} isLoading={isLoading} />
       </div>
