@@ -5,12 +5,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models import (
-    DashboardCard,
-    DashboardData,
-    DashboardDonutData,
-    DashboardDonutGraph,
     DashboardTable,
-    DashboardTableRow,
+    DashboardTableRowWithRecurring,
     Income,
     IncomeCreate,
     IncomeResponse,
@@ -344,14 +340,16 @@ async def delete_income(income_id: str, current_user: dict = current_user_depend
         ) from e
 
 
-@incomes_router.get("/dashboard/monthly/{year}/{month}", response_model=DashboardData)
-async def get_monthly_dashboard(
+@incomes_router.get(
+    "/dashboard/monthly/{year}/{month}/table", response_model=DashboardTable
+)
+async def get_monthly_income_table(
     year: int,
     month: int,
     currency: str = "CLP",
     current_user: dict = current_user_dependency,
 ):
-    """Get unified monthly income dashboard data"""
+    """Get only the income table data for the monthly dashboard"""
     try:
         # Validate month
         if month < 1 or month > 12:
@@ -370,7 +368,8 @@ async def get_monthly_dashboard(
                 i.date,
                 i.description,
                 ins.name as source_name,
-                ins.category as source_category
+                ins.category as source_category,
+                ins.is_recurring as source_is_recurring
             FROM dradic_tech.incomes i
             JOIN dradic_tech.income_sources ins ON i.source_id = ins.id
             JOIN dradic_tech.users u ON ins.user_id = u.id
@@ -390,92 +389,41 @@ async def get_monthly_dashboard(
 
         incomes_data = DatabaseModel.execute_query(incomes_query, params)
 
-        # Calculate total
-        total_income = sum(float(inc["amount"]) for inc in incomes_data)
-
-        # Create dashboard cards
-        cards = [
-            DashboardCard(
-                title="Total Income",
-                description="Total income for the month",
-                value=total_income,
-                currency=currency,
-            ),
-            DashboardCard(
-                title="Income Sources",
-                description="Number of income sources used",
-                value=len(set(inc["source_name"] for inc in incomes_data)),
-                currency="",  # Not a currency value
-            ),
-            DashboardCard(
-                title="Income Count",
-                description="Number of income records",
-                value=len(incomes_data),
-                currency="",  # Not a currency value
-            ),
-        ]
-
-        # Create donut graph data (group incomes by source category)
-        category_totals: dict[str, float] = {}
-        for income in incomes_data:
-            category = income["source_category"] or "Uncategorized"
-            amount = float(income["amount"])
-            category_totals[category] = category_totals.get(category, 0) + amount
-
-        # Sort categories by amount and take only top 4
-        sorted_categories = sorted(
-            category_totals.items(), key=lambda x: x[1], reverse=True
-        )[:4]
-
-        donut_data = [
-            DashboardDonutData(label=cat, value=amount)
-            for cat, amount in sorted_categories
-            if amount > 0
-        ]
-
-        donut_graph = DashboardDonutGraph(
-            title="Income by source category",
-            description="Top 4 income source categories",
-            data=donut_data,
-        )
-
         # Create table data
         table_rows = []
         for income in incomes_data:
             table_rows.append(
-                DashboardTableRow(
+                DashboardTableRowWithRecurring(
                     id=str(income["id"]),
                     name=income["source_name"],
                     category=income["source_category"] or "Uncategorized",
                     amount=f"{currency} {abs(float(income['amount'])):,.0f}",
-                    date=income["date"].strftime("%m/%d/%Y"),
+                    date=income["date"].strftime("%d/%m/%Y"),
                     description=income["description"] or income["source_name"],
+                    recurring=income["source_is_recurring"],
                 )
             )
 
         table = DashboardTable(
             title=f"{datetime(year, month, 1).strftime('%B')}",
             description="Click on an income to edit it.",
-            columns=["Source", "Category", "Amount", "Date", "Description"],
+            columns=[
+                "Source",
+                "Category",
+                "Amount",
+                "Date",
+                "Description",
+                "Recurring",
+            ],
             data=table_rows,
         )
 
-        return DashboardData(
-            year=year,
-            month=month,
-            currency=currency,
-            cards=cards,
-            donut_graph=donut_graph,
-            table=table,
-            total_expenses=0.0,  # Not applicable for income dashboard
-            total_income=total_income,
-            total_savings=total_income,  # All income is savings in this context
-        )
+        return table
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to fetch income dashboard data: {str(e)}")
+        logger.error(f"Failed to fetch income table data: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to fetch income dashboard data: {str(e)}"
+            status_code=500, detail=f"Failed to fetch income table data: {str(e)}"
         ) from e

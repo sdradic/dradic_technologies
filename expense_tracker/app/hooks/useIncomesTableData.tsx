@@ -1,17 +1,27 @@
 import { use, useRef } from "react";
 import SimpleTable from "~/components/SimpleTable";
 import { useAuth } from "~/contexts/AuthContext";
-import { formatDate, incomeSourcesApi } from "~/modules/apis";
+import { dashboardApi } from "~/modules/apis";
 import { PlusIconOutline } from "~/components/Icons";
-import type { IncomeSource, IncomeSourceResponse } from "~/modules/types";
+import type {
+  DashboardTableRowWithRecurring,
+  Income,
+  DashboardTable,
+} from "~/modules/types";
+import { months } from "~/modules/store";
 
 // Manual cache to ensure stability
-export const incomeSourcesCache = new Map<
-  string,
-  Promise<IncomeSourceResponse>
->();
+export const incomeSourcesCache = new Map<string, Promise<DashboardTable>>();
 
-function useIncomesTableData({ reloadTrigger }: { reloadTrigger: number }) {
+function useIncomesTableData({
+  reloadTrigger,
+  year,
+  month,
+}: {
+  reloadTrigger: number;
+  year: number;
+  month: number;
+}) {
   const { user } = useAuth();
   const userId = user?.id;
   const lastReloadTrigger = useRef(0);
@@ -28,11 +38,13 @@ function useIncomesTableData({ reloadTrigger }: { reloadTrigger: number }) {
   // Get or create the promise
   if (!incomeSourcesCache.has(cacheKey)) {
     const promise = userId
-      ? incomeSourcesApi.getAll({ user_id: userId })
+      ? dashboardApi.getMonthlyIncomeDashboard(year, month, "CLP", userId)
       : Promise.resolve({
-          sources: [],
-          total_count: 0,
-        } as IncomeSourceResponse);
+          title: "",
+          description: "",
+          columns: [],
+          data: [],
+        } as DashboardTable);
     incomeSourcesCache.set(cacheKey, promise);
   }
 
@@ -42,25 +54,47 @@ function useIncomesTableData({ reloadTrigger }: { reloadTrigger: number }) {
 export function IncomesTableData({
   setIsModalOpen,
   reloadTrigger,
+  setSelectedIncome,
+  year,
+  month,
 }: {
   setIsModalOpen: (isOpen: boolean) => void;
   reloadTrigger: number;
+  setSelectedIncome: (income: Income | null) => void;
+  year: number;
+  month: number;
 }) {
   const tableData = useIncomesTableData({
     reloadTrigger,
+    year,
+    month,
   });
+
   return (
     <SimpleTable
-      title={new Date().toLocaleDateString("en-US", { month: "long" })}
+      title={`${months[month - 1]} ${year}`}
       description="Click on an income to edit or delete."
-      columns={["Source", "Category", "Recurring", "Created At", "Updated At"]}
-      data={tableData.sources?.map((income: IncomeSource) => ({
+      columns={[
+        "Source",
+        "Category",
+        "Amount",
+        "Date",
+        "Description",
+        "Recurring",
+      ]}
+      data={tableData.data.map((income) => ({
         id: income.id,
         source: income.name,
-        category: income.category || "",
-        recurring: income.is_recurring ? "Yes" : "No",
-        created_at: formatDate(income.created_at),
-        updated_at: formatDate(income.updated_at),
+        category: income.category,
+        amount: income.amount,
+        date: income.date,
+        description: income.description,
+        recurring:
+          "recurring" in income
+            ? (income as DashboardTableRowWithRecurring).recurring
+              ? "Yes"
+              : "No"
+            : "N/A",
       }))}
       hasButton={true}
       buttonProps={{
@@ -71,7 +105,12 @@ export function IncomesTableData({
       }}
       tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
       tableClassName="w-full p-6"
-      onRowClick={() => {}}
+      onRowClick={(row) => {
+        // For now, pass null to indicate we're adding a new income
+        // In the future, you might want to fetch the actual income data
+        setSelectedIncome(null);
+        setIsModalOpen(true);
+      }}
     />
   );
 }

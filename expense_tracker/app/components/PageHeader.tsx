@@ -15,7 +15,9 @@ export default function PageHeader({
         <h1 className="text-center md:text-start text-3xl dark:text-white">
           {title}
         </h1>
-        <p className="text-gray-400 dark:text-gray-600 text-left">{subtitle}</p>
+        <p className="text-gray-400 dark:text-gray-600 text-center md:text-left">
+          {subtitle}
+        </p>
       </div>
       <div className="flex items-center gap-2 ">
         {children && <div className="flex items-center gap-2">{children}</div>}

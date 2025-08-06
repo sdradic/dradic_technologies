@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
@@ -218,11 +218,15 @@ class DashboardTableRow(BaseModel):
     description: str
 
 
+class DashboardTableRowWithRecurring(DashboardTableRow):
+    recurring: bool
+
+
 class DashboardTable(BaseModel):
     title: str
     description: str
     columns: List[str]
-    data: List[DashboardTableRow]
+    data: List[Union[DashboardTableRow, DashboardTableRowWithRecurring]]
 
 
 class DashboardData(BaseModel):

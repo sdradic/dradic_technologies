@@ -11,6 +11,9 @@ import { CreateEditModal } from "~/components/CreateEditModal";
 import { CardCarrousel } from "~/components/CardCarrousel";
 import { Chart } from "chart.js/auto";
 import useExpensesData from "~/hooks/useExpensesData";
+import { months } from "~/modules/store";
+import { Dropdown } from "~/components/Dropdown";
+import EmptyState from "~/components/EmptyState";
 
 // Separate component that can suspend
 function ExpensesContent({
@@ -49,7 +52,6 @@ function ExpensesContent({
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        console.log("Render chart");
         chartInstanceRef.current = new Chart(ctx, {
           type: "doughnut",
           data: {
@@ -109,58 +111,70 @@ function ExpensesContent({
 
   return (
     <div className="p-4">
-      {/* Cards */}
-      <CardCarrousel
-        cards={dashboardData?.cards.map((card: DashboardCard) => ({
-          title: card.title,
-          description: card.description,
-          value: card.value,
-          currency: card.currency as "CLP" | "USD" | "EUR",
-          previous_value: card.previous_value,
-        }))}
-      />
-      {/* Donut Graph */}
-      {dashboardData?.donut_graph &&
-        dashboardData.donut_graph.data.length > 0 && (
-          <div className="my-6 w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-              {dashboardData.donut_graph.title}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {dashboardData.donut_graph.description}
-            </p>
-            <div
-              className="w-full max-w-md mx-auto"
-              style={{ height: "300px" }}
-            >
-              <canvas ref={chartRef} className="w-full h-full"></canvas>
-            </div>
-          </div>
-        )}
-      {/* Table */}
-      <SimpleTable
-        title={dashboardData.table.title}
-        description={dashboardData.table.description}
-        columns={dashboardData.table.columns}
-        data={dashboardData.table.data.map((row: DashboardTableRow) => ({
-          id: row.id,
-          name: row.name,
-          category: row.category,
-          amount: row.amount,
-          date: formatDate(row.date),
-          description: row.description,
-        }))}
-        hasButton={true}
-        buttonProps={{
-          buttonText: "Add expense",
-          buttonIcon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
-          buttonClassName: "btn-primary",
-          onClick: () => setIsModalOpen(true),
-        }}
-        tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
-        tableClassName="w-full p-6"
-        onRowClick={() => {}}
-      />
+      {dashboardData.table.data.length > 0 ? (
+        <>
+          {/* Cards */}
+          <CardCarrousel
+            cards={dashboardData?.cards.map((card: DashboardCard) => ({
+              title: card.title,
+              description: card.description,
+              value: card.value,
+              currency: card.currency as "CLP" | "USD" | "EUR",
+              previous_value: card.previous_value,
+            }))}
+          />
+          {/* Donut Graph */}
+          {dashboardData?.donut_graph &&
+            dashboardData.donut_graph.data.length > 0 && (
+              <div className="my-6 w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                  {dashboardData.donut_graph.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {dashboardData.donut_graph.description}
+                </p>
+                <div
+                  className="w-full max-w-md mx-auto"
+                  style={{ height: "300px" }}
+                >
+                  <canvas ref={chartRef} className="w-full h-full"></canvas>
+                </div>
+              </div>
+            )}
+          {/* Table */}
+          <SimpleTable
+            title={dashboardData.table.title}
+            description={dashboardData.table.description}
+            columns={dashboardData.table.columns}
+            data={dashboardData.table.data.map((row: DashboardTableRow) => ({
+              id: row.id,
+              name: row.name,
+              category: row.category,
+              amount: row.amount,
+              date: formatDate(row.date),
+              description: row.description,
+            }))}
+            hasButton={true}
+            buttonProps={{
+              buttonText: "Add expense",
+              buttonIcon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
+              buttonClassName: "btn-primary",
+              onClick: () => setIsModalOpen(true),
+            }}
+            tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
+            tableClassName="w-full p-6"
+            onRowClick={() => {}}
+          />
+        </>
+      ) : (
+        <EmptyState
+          button={{
+            text: "Add expense",
+            icon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
+            onClick: () => setIsModalOpen(true),
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -170,7 +184,7 @@ export default function Expenses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth());
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [currency, setCurrency] = useState("CLP");
 
   const handleReload = () => setReloadTrigger((prev) => prev + 1);
@@ -190,17 +204,30 @@ export default function Expenses() {
       />
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls>
-          <HeaderButton
-            onButtonClick={handleReload}
-            isLoading={false}
-            disabled={false}
-            loadingText="Reloading..."
-            buttonText="Reload Data"
-            className="btn-secondary flex items-center gap-2 min-w-32"
-            buttonIcon={
-              <ReloadIcon className="size-5 stroke-2 stroke-primary-400 dark:stroke-white" />
-            }
-          />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-2 sm:mt-0">
+            <Dropdown
+              options={months.map((month) => ({
+                value: month,
+                label: month,
+              }))}
+              value={months[month - 1]}
+              onChange={(month) => {
+                setMonth(months.indexOf(month) + 1);
+                setReloadTrigger((prev) => prev + 1);
+              }}
+            />
+            <HeaderButton
+              onButtonClick={handleReload}
+              isLoading={false}
+              disabled={false}
+              loadingText="Reloading..."
+              buttonText="Reload Data"
+              className="btn-secondary dark:bg-gray-800 dark:text-white bg-white dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 min-w-32"
+              buttonIcon={
+                <ReloadIcon className="size-5 stroke-2 stroke-primary-400 dark:stroke-white" />
+              }
+            />
+          </div>
         </HeaderControls>
         <div className="separator my-4" />
         <div className="flex flex-col gap-4 p-4">

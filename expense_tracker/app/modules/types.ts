@@ -200,7 +200,7 @@ export interface DashboardTable {
   title: string;
   description: string;
   columns: string[];
-  data: DashboardTableRow[];
+  data: DashboardTableRow[] | DashboardTableRowWithRecurring[];
 }
 
 export interface DashboardData {
@@ -217,4 +217,8 @@ export interface DashboardData {
 
 export interface DashboardDataWithExpenses extends DashboardData {
   expenses: ExpenseWithDetails[];
+}
+
+export interface DashboardTableRowWithRecurring extends DashboardTableRow {
+  recurring: boolean;
 }

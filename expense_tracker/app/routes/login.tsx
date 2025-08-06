@@ -2,41 +2,39 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { TallyUpLogo } from "~/components/Icons";
 
-import { useState, useEffect } from "react";
+import { useState, useActionState } from "react";
 import { ErrorXIcon, EyeIcon, EyeSlashIcon } from "~/components/Icons";
 import Loader from "~/components/Loader";
 import { ThemeToggle } from "~/components/ThemeToggle";
 
 export default function Login() {
-  const { login, handleGuestLogin, isLoading, isAuthenticated } = useAuth();
+  const { login, handleGuestLogin, isLoading } = useAuth();
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [isGuestLoading, setIsGuestLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect if already authenticated (but not while loading)
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      navigate("/", { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      await login(email, password);
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to sign in. Please check your credentials and try again.",
-      );
-    }
-  };
+  // React 19 useActionState expects (state, formData) => newState
+  const [state, submitAction] = useActionState(
+    async (prevState: { error?: string } | null, formData: FormData) => {
+      const email = formData.get("email");
+      const password = formData.get("password");
+      if (!email || !password) {
+        return { error: "Email and password are required" };
+      }
+      try {
+        await login(email as string, password as string);
+        navigate("/", { replace: true });
+        return null;
+      } catch (err: unknown) {
+        console.error(err);
+        return {
+          error:
+            "Failed to sign in. Please check your credentials and try again.",
+        };
+      }
+    },
+    null,
+  );
 
   const handleGuest = () => {
     try {
@@ -44,9 +42,8 @@ export default function Login() {
       handleGuestLogin(true);
       navigate("/", { replace: true });
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Failed to log in as guest",
-      );
+      console.error(err);
+      return { error: "Failed to log in as guest" };
     } finally {
       setIsGuestLoading(false);
     }
@@ -68,19 +65,19 @@ export default function Login() {
             </h3>
           </div>
         </div>
-        {error && (
+        {state?.error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <ErrorXIcon className="h-5 w-5 text-red-400" />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700">{state.error}</p>
               </div>
             </div>
           </div>
         )}
-        <form className="mt-6 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-6 space-y-6" action={submitAction}>
           <div className="-space-y-px flex flex-col gap-6">
             <div>
               <label htmlFor="email" className="">
@@ -91,8 +88,6 @@ export default function Login() {
                 name="email"
                 type="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
                 placeholder="Email address"
                 autoComplete="username"
@@ -108,9 +103,7 @@ export default function Login() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
+                  className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-gray-700"
                   placeholder="Password"
                   autoComplete="current-password"
                 />
@@ -155,7 +148,7 @@ export default function Login() {
             isGuestLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={isGuestLoading}
-          onClick={handleGuest}
+          onClick={() => {}}
         >
           {isGuestLoading ? (
             <Loader loaderSize={[4, 4]} />

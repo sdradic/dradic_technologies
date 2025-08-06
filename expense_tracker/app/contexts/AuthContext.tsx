@@ -45,6 +45,17 @@ const mapSupabaseUser = async (
   return user;
 };
 
+// Create a basic user object from Supabase user (for immediate login)
+const createBasicUser = (supabaseUser: SupabaseUser): User => ({
+  id: supabaseUser.id,
+  name:
+    supabaseUser.user_metadata?.full_name ||
+    supabaseUser.email?.split("@")[0] ||
+    "User",
+  email: supabaseUser.email || "",
+  isLoading: true, // Flag to indicate profile is still loading
+});
+
 export function useAuthStore() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -53,6 +64,23 @@ export function useAuthStore() {
   const [authError, setAuthError] = useState<string | null>(null);
   const isInitialized = useRef(false);
   const currentUserRef = useRef<User | null>(null);
+
+  // Load full user profile in background
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const fullUser = await mapSupabaseUser(supabaseUser);
+      if (fullUser) {
+        setUser({ ...fullUser, isLoading: false });
+        currentUserRef.current = { ...fullUser, isLoading: false };
+      }
+    } catch (error) {
+      console.error("Failed to load user profile:", error);
+      // Keep the basic user data even if profile loading fails
+      const basicUser = createBasicUser(supabaseUser);
+      setUser({ ...basicUser, isLoading: false });
+      currentUserRef.current = { ...basicUser, isLoading: false };
+    }
+  };
 
   // Check for existing session and listen for auth state changes
   useEffect(() => {
@@ -81,11 +109,15 @@ export function useAuthStore() {
         }
 
         if (session?.user) {
-          const appUser = await mapSupabaseUser(session.user);
-          setUser(appUser);
-          currentUserRef.current = appUser;
+          // Immediately set basic user data for instant login
+          const basicUser = createBasicUser(session.user);
+          setUser(basicUser);
+          currentUserRef.current = basicUser;
           setIsAuthenticated(true);
           setIsGuest(false);
+
+          // Load full profile in background
+          loadUserProfile(session.user);
         } else {
           setUser(null);
           currentUserRef.current = null;
@@ -124,11 +156,15 @@ export function useAuthStore() {
             userCache.delete(currentUserRef.current.id);
           }
 
-          const appUser = await mapSupabaseUser(session.user);
-          setUser(appUser);
-          currentUserRef.current = appUser;
+          // Immediately set basic user data
+          const basicUser = createBasicUser(session.user);
+          setUser(basicUser);
+          currentUserRef.current = basicUser;
           setIsAuthenticated(true);
           setIsGuest(false);
+
+          // Load full profile in background
+          loadUserProfile(session.user);
         } else {
           // Clear cache when user logs out
           if (currentUserRef.current) {
@@ -164,14 +200,18 @@ export function useAuthStore() {
         throw error;
       }
 
-      // Immediately update auth state after successful login
+      // Immediately update auth state with basic user data
       if (data.user) {
-        const appUser = await mapSupabaseUser(data.user);
-        setUser(appUser);
-        currentUserRef.current = appUser;
+        const basicUser = createBasicUser(data.user);
+        setUser(basicUser);
+        currentUserRef.current = basicUser;
         setIsAuthenticated(true);
         setIsGuest(false);
-        return appUser;
+
+        // Load full profile in background
+        loadUserProfile(data.user);
+
+        return basicUser;
       }
 
       return null;
@@ -194,6 +234,7 @@ export function useAuthStore() {
       name: "Mock User",
       email: "mock-user@example.com",
       groups: [],
+      isLoading: false,
     };
     setIsLoading(true);
     try {
@@ -246,7 +287,7 @@ export function useAuthStore() {
       isGuest,
       authError,
     }),
-    [isAuthenticated, user, isLoading, isGuest, authError],
+    [isAuthenticated, user, isLoading, login, isGuest, authError],
   );
 
   return contextValue;
@@ -256,6 +297,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  isLoading?: boolean; // Flag to indicate if profile is still loading
   groups?: Array<{
     group_id: string;
     group_name: string;

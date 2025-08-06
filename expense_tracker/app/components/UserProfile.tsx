@@ -18,9 +18,14 @@ export function UserProfile({ isCollapsed }: { isCollapsed: boolean }) {
             isCollapsed ? "opacity-0" : "opacity-100"
           }`}
         >
-          <p className="text-sm  text-gray-800 dark:text-white">{user.name}</p>
+          <p className="text-sm  text-gray-800 dark:text-white">
+            {user.name}
+            {user.isLoading && (
+              <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+            )}
+          </p>
           <p className="text-xs text-gray-400 dark:text-gray-400">
-            {user.email}
+            {user.isLoading ? "Loading profile..." : user.email}
           </p>
         </div>
       </div>
