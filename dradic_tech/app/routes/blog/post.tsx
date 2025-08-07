@@ -1,5 +1,5 @@
 import { useLocation } from "react-router";
-import { fetchPostContent } from "~/modules/api";
+import { fetchPostContent } from "~/modules/apis";
 import type { Route } from "./+types/post";
 import { renderMarkdownToHtml } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
@@ -97,7 +97,7 @@ export default function Post({ params }: Route.ComponentProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4">
+      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4 min-h-screen justify-center items-center">
         <Loader message="Loading post..." />
       </div>
     );

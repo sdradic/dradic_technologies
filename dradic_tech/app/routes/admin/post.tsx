@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router";
-import { fetchPostContent } from "~/modules/api";
+import { fetchPostContent } from "~/modules/apis";
 import { useEffect, useState, useRef } from "react";
 import Loader from "~/components/Loader";
 import PostEditor from "~/components/PostEditor";

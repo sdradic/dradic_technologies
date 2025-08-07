@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "./Icons";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
-import { fetchBlogPosts } from "~/modules/api";
+import { fetchBlogPosts } from "~/modules/apis";
 import { SearchBar } from "./SearchBar";
 
 interface SearchModalProps {

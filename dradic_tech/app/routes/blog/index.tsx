@@ -1,6 +1,9 @@
 import type { Route } from "./+types/index";
 import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList } from "~/components/PostList";
+import { useState, useCallback } from "react";
+import { RefreshIcon } from "~/components/Icons";
+import { localState } from "~/modules/utils";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -10,11 +13,19 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = useCallback(() => {
+    // Clear cache to force fresh data
+    localState.clearBlogData();
+    setRefreshKey((prev) => prev + 1);
+  }, []);
+
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4">
       {/* Hero Section */}
       <div className="flex flex-col mt-4 justify-center items-center text-center mx-4 pt-4 pb-8">
-        <h1 className="text-4xl md:text-6xl font-semibold">
+        <h1 className="text-5xl md:text-6xl font-semibold">
           Weekly <span className="text-primary-500">embedded</span> +{" "}
           <span className="text-primary-500">programing</span> tech insights and
           tutorials
@@ -33,11 +44,21 @@ export default function Home() {
       </div>
       {/* Recent Posts */}
       <div className="flex flex-col mt-6 justify-center text-left mx-4">
-        <h2 className="font-semibold text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Latest content
-        </h2>
-        <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700">
-          <PostsList />
+        <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+          <h2 className="font-semibold text-gray-600 dark:text-gray-400">
+            Latest content
+          </h2>
+          <button
+            onClick={handleRefresh}
+            className="btn-secondary flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400"
+            title="Refresh posts"
+          >
+            <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400" />
+            Refresh
+          </button>
+        </div>
+        <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
+          <PostsList key={refreshKey} onRefresh={handleRefresh} />
         </ul>
       </div>
     </div>

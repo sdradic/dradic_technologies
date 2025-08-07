@@ -1,7 +1,7 @@
 export default function Apps() {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4 text-center pt-4 pb-8">
-      <h1 className="text-4xl md:text-6xl font-semibold">Apps</h1>
+      <h1 className="text-5xl md:text-6xl font-semibold">Apps</h1>
       <p className="text-xl text-gray-500 dark:text-gray-400 mt-4">
         Here are some of the apps I have worked on.
       </p>
@@ -30,7 +30,7 @@ const AppCard = ({
 }) => {
   return (
     <div
-      className={`flex flex-col gap-2 border bg-gray-50 dark:bg-dark-400 border-gray-200 dark:border-gray-800 rounded-lg p-4 w-full hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors ${
+      className={`flex flex-col gap-2 bg-gray-50 dark:bg-dark-400 rounded-lg p-4 w-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors ${
         link ? "cursor-pointer" : "cursor-not-allowed"
       }`}
       onClick={() => {

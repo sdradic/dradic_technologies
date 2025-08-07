@@ -14,7 +14,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="flex flex-col items-center justify-center w-full h-full mt-16 dark:bg-dark-400 bg-gray-100 max-w-6xl mx-auto sm:rounded-xl">
+      <footer className="flex flex-col items-center justify-center w-full h-full mt-16 dark:bg-dark-400 bg-gray-100 max-w-6xl mx-auto sm:rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col items-center justify-center ">
           <div className="flex flex-row items-center justify-center">
             <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-400" />
@@ -36,7 +36,6 @@ export default function Footer() {
                 onChange={() => {}}
                 buttonText="Subscribe"
               />
-              <div className="md:hidden flex separator mt-4"></div>
             </div>
           )}
           <div className="flex flex-row items-center justify-center gap-2 w-full max-w-6xl mx-auto my-2">

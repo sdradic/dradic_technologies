@@ -13,7 +13,7 @@ import "./app.css";
 import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -103,17 +103,15 @@ function AppContent() {
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div
-        className={`transition-opacity duration-300 ease-in-out ${
+      <main
+        className={`flex-1 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >
-        <Suspense fallback={<Loader />}>
-          <Outlet />
-        </Suspense>
-      </div>
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );

@@ -8,7 +8,7 @@ export default function ContactForm() {
     setIsLoading(true);
   };
   return (
-    <div className="flex flex-col gap-4 w-full min-w-80 p-6 bg-gray-50 dark:bg-dark-400 rounded-xl">
+    <div className="flex flex-col gap-4 w-full min-w-80 p-6 bg-gray-50 dark:bg-dark-400 rounded-xl border border-gray-200 dark:border-gray-700">
       <h1 className="text-2xl font-bold text-center text-gray-700 dark:text-gray-300">
         Contact Me
       </h1>
@@ -16,7 +16,7 @@ export default function ContactForm() {
         <div className="flex flex-col gap-2">
           <label
             htmlFor="name"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Name
           </label>
@@ -32,7 +32,7 @@ export default function ContactForm() {
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Email
           </label>
@@ -48,7 +48,7 @@ export default function ContactForm() {
         <div className="flex flex-col gap-2">
           <label
             htmlFor="message"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Message
           </label>

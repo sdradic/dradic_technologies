@@ -11,7 +11,7 @@ import {
 import type { BlogPost, BlogPostWithSeparatedContent } from "~/modules/types";
 import { v7 as uuidv7 } from "uuid";
 import { useAuth } from "~/contexts/AuthContext";
-import { createPost, updatePost, deletePost } from "~/modules/api";
+import { createPost, updatePost, deletePost } from "~/modules/apis";
 import {
   type BlogFormData,
   createBlogPostFromForm,
@@ -273,9 +273,9 @@ export default function PostEditor({
                       setIsMobileMenuOpen(false);
                     }}
                     disabled={isSaving}
-                    className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-gray-100 hover:text-primary-500 dark:hover:bg-gray-400 dark:hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-gray-700 dark:hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <SaveIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+                    <SaveIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-600 dark:group-hover:stroke-primary-600" />
                     {isSaving ? "Saving..." : "Save"}
                   </button>
                   {!isNewPost && (
@@ -285,9 +285,9 @@ export default function PostEditor({
                         handleDelete();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-red-100 dark:hover:bg-red-400 text-red-600 dark:text-red-200"
+                      className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-red-100 dark:hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-red-600 dark:hover:text-red-200"
                     >
-                      <TrashIcon className="size-4 stroke-2 stroke-red-500 dark:stroke-red-200 group-hover:stroke-red-500 dark:group-hover:stroke-red-200" />
+                      <TrashIcon className="size-4 stroke-2 stroke-red-600 dark:stroke-red-400 group-hover:stroke-red-600 dark:group-hover:stroke-red-200" />
                       Delete
                     </button>
                   )}

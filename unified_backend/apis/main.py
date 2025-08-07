@@ -48,7 +48,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
@@ -182,6 +182,13 @@ async def favicon():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
+
+
+# Ping endpoint for pre-warming
+@app.head("/ping")
+async def ping():
+    """Simple ping endpoint for pre-warming the backend"""
+    return {"message": "pong", "timestamp": datetime.now(timezone.utc)}
 
 
 # Include routers

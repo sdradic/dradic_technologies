@@ -32,7 +32,7 @@ nav {
 }
 
 .separator {
-  @apply w-full h-0.5 bg-gray-200 dark:bg-dark-300;
+  @apply w-full h-0.5 bg-gray-200 dark:bg-gray-700;
 }
 
 /* Smooth fade-in animation */

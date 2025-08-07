@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import { fetchBlogPosts } from "~/modules/api";
+import { fetchBlogPosts } from "~/modules/apis";
+import { localState } from "~/modules/utils";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
 interface PostListProps {
   isAdmin?: boolean;
   searchQuery?: string;
+  onRefresh?: () => void;
 }
 
 export function PostsList({
@@ -18,14 +20,32 @@ export function PostsList({
   >([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const loadPosts = async () => {
+    const posts = await fetchBlogPosts();
+    setPosts(posts);
+    setFilteredPosts(posts);
+    setIsLoading(false);
+  };
+
+  // Initial load
   useEffect(() => {
-    const loadPosts = async () => {
-      const posts = await fetchBlogPosts();
-      setPosts(posts);
-      setFilteredPosts(posts);
-      setIsLoading(false);
-    };
     loadPosts();
+  }, []);
+
+  // Background refresh after 5 minutes
+  useEffect(() => {
+    const interval = setInterval(
+      () => {
+        // Only refresh if cache is expired
+        if (!localState.isCacheValid()) {
+          console.debug("Background refresh triggered - cache expired");
+          loadPosts();
+        }
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
+
+    return () => clearInterval(interval);
   }, []);
 
   // Handle search filtering

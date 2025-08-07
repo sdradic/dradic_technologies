@@ -101,10 +101,29 @@ export async function fetchBlogPosts(): Promise<
   BlogPostWithSeparatedContent[]
 > {
   try {
-    // Clear cache to force fresh data (temporary fix for migration)
-    localState.clearBlogData();
+    // Check cache first
+    if (localState.isCacheValid()) {
+      const cachedPosts = localState.getCachedBlogPosts();
+      if (cachedPosts.length > 0) {
+        console.debug("Using cached blog posts");
+        // Convert cached posts to the expected format
+        return cachedPosts.map((post) => ({
+          metadata: {
+            slug: post.slug,
+            title: post.title,
+            created_at: post.created_at,
+            updated_at: post.updated_at,
+            image: post.image,
+            category: post.category,
+            author: post.author,
+          },
+          content: post.content,
+        }));
+      }
+    }
 
-    // Fetch from API
+    // Fetch from API if cache is invalid or empty
+    console.debug("Fetching fresh blog posts from API");
     const response: {
       posts: BlogPostWithSeparatedContent[];
       total_count: number;
@@ -128,6 +147,25 @@ export async function fetchBlogPosts(): Promise<
     return posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
+
+    // Return cached data if available (even if expired)
+    if (localState.hasCachedPosts()) {
+      console.debug("Falling back to cached posts due to API error");
+      const cachedPosts = localState.getCachedBlogPosts();
+      return cachedPosts.map((post) => ({
+        metadata: {
+          slug: post.slug,
+          title: post.title,
+          created_at: post.created_at,
+          updated_at: post.updated_at,
+          image: post.image,
+          category: post.category,
+          author: post.author,
+        },
+        content: post.content,
+      }));
+    }
+
     return [];
   }
 }
@@ -136,8 +174,9 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   try {
     // Check cache first
     if (localState.isCacheValid()) {
-      const cachedPosts = localState.getBlogPosts();
+      const cachedPosts = localState.getCachedBlogPosts();
       if (cachedPosts.length > 0) {
+        console.debug("Using cached posts metadata");
         // Extract metadata from cached posts
         return cachedPosts.map(
           ({
@@ -161,7 +200,8 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
       }
     }
 
-    // Fetch from API
+    // Fetch from API if cache is invalid or empty
+    console.debug("Fetching fresh posts metadata from API");
     const metadata: BlogPostMetadata[] = await apiRequest(
       "/api/blog/posts-metadata",
     );
@@ -170,9 +210,10 @@ export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   } catch (error) {
     console.error("Error loading blog posts metadata:", error);
 
-    // Return cached data if available
-    const cachedPosts = localState.getBlogPosts();
-    if (cachedPosts.length > 0) {
+    // Return cached data if available (even if expired)
+    if (localState.hasCachedPosts()) {
+      console.debug("Falling back to cached posts metadata due to API error");
+      const cachedPosts = localState.getCachedBlogPosts();
       return cachedPosts.map(
         ({ slug, title, created_at, updated_at, image, category, author }) => ({
           slug,
@@ -270,5 +311,18 @@ export async function createPost(post: BlogPost): Promise<BlogPost> {
   } catch (error) {
     console.error("Error creating post:", error);
     throw error;
+  }
+}
+
+export async function pingBackend(): Promise<void> {
+  try {
+    const url = `${API_BASE_URL}/ping`;
+    await fetch(url, {
+      method: "HEAD", // Use HEAD to avoid downloading response body
+    });
+    console.debug("Backend ping successful");
+  } catch (error) {
+    // Silently fail - this is just a pre-warming trick
+    console.debug("Backend ping failed:", error);
   }
 }

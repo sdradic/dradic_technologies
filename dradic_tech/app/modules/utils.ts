@@ -130,6 +130,18 @@ export function getBlogPosts(): BlogPost[] {
   return [];
 }
 
+// Get cached posts without clearing them (for cache-first approach)
+export function getCachedBlogPosts(): BlogPost[] {
+  if (!state) return [];
+  return state.blogPosts;
+}
+
+// Check if we have any cached posts (regardless of TTL)
+export function hasCachedPosts(): boolean {
+  if (!state) return false;
+  return state.blogPosts.length > 0;
+}
+
 export function setBlogPosts(posts: BlogPost[]): void {
   if (state) {
     state.blogPosts = posts;
@@ -208,6 +220,8 @@ export const localState = {
   setTheme,
   getBlogPosts,
   setBlogPosts,
+  getCachedBlogPosts,
+  hasCachedPosts,
   getPost,
   getPostContent,
   setPost,
