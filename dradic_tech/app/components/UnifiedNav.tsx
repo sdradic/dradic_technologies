@@ -81,11 +81,11 @@ const DropdownButton = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 min-w-48">
+        <div className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-md p-2 shadow-lg z-50 min-w-48 space-y-1">
           {item.children?.map((child) => (
             <button
               key={child.label}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-100 dark:hover:bg-primary-900 cursor-pointer ${
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-100 dark:hover:bg-primary-900 rounded-sm cursor-pointer ${
                 selectedPath === child.path
                   ? "bg-primary-100 dark:bg-primary-900 text-primary-500"
                   : "text-gray-800 dark:text-gray-200"
@@ -126,7 +126,7 @@ const SidebarItem = ({
   return (
     <div>
       <button
-        className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-100 dark:hover:bg-primary-900 flex items-center justify-between cursor-pointer ${
+        className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-100 dark:hover:bg-primary-900 flex items-center justify-between cursor-pointer rounded-sm space-x-1 ${
           selectedPath === item.path
             ? "bg-primary-100 dark:bg-primary-900 text-primary-500"
             : "text-gray-800 dark:text-gray-200"
@@ -136,7 +136,7 @@ const SidebarItem = ({
         <span>{item.label}</span>
         {hasChildren && (
           <ChevronDownIcon
-            className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white ${
+            className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white rounded-sm ${
               isExpanded ? "rotate-180" : ""
             }`}
           />
@@ -144,7 +144,7 @@ const SidebarItem = ({
       </button>
 
       {hasChildren && isExpanded && (
-        <div className="bg-gray-50 dark:bg-dark-600">
+        <div className="rounded-sm p-2 space-y-1">
           {item.children?.map((child) => (
             <SidebarItem
               key={child.label}

@@ -18,9 +18,11 @@ export default function Projects() {
   );
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 text-center">
-      <h1 className="text-5xl md:text-6xl font-semibold">Projects</h1>
-      <p className="text-xl text-gray-500 dark:text-gray-400 mt-4">
+    <div className="w-full">
+      <h1 className="text-4xl sm:text-6xl font-semibold text-center">
+        Projects
+      </h1>
+      <p className="text-2xl text-gray-500 dark:text-gray-400 mt-4 text-center">
         These are research projects I have worked on.
       </p>
       <SearchBar

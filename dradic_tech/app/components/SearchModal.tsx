@@ -86,16 +86,16 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+      <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-2">
         <div className="bg-white dark:bg-dark-400 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between py-4 px-2 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Search Posts
             </h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg transition-colors cursor-pointer"
+              className="rounded-lg transition-colors cursor-pointer"
             >
               <XIcon className="size-6 stroke-gray-500 dark:stroke-gray-400 hover:stroke-primary-500 dark:hover:stroke-primary-500" />
             </button>
@@ -111,7 +111,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
           {/* Results */}
           <div className="overflow-y-auto max-h-[60vh]">
             {isLoading ? (
-              <div className="p-4">
+              <div className="">
                 <div className="animate-pulse space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex gap-4">
@@ -125,7 +125,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                 </div>
               </div>
             ) : (
-              <div className="p-4">
+              <div className="px-2 py-4">
                 {filteredPosts.length > 0 ? (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredPosts.map((post) => (

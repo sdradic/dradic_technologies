@@ -75,7 +75,7 @@ export function PostsList({
             key={post.metadata.slug}
             to={`${baseUrl}/${post.metadata.slug}`}
           >
-            <li className="flex flex-row gap-4 px-2 py-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-500 rounded-lg">
+            <li className="flex flex-row gap-4 p-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-300 rounded-xl">
               <img
                 src={
                   post.metadata?.image || "/assets/blog_post_placeholder.webp"
@@ -116,7 +116,7 @@ export function PostsSkeleton() {
   return (
     <>
       {[1, 2, 3].map((i) => (
-        <li key={i} className="flex flex-row gap-4 w-full py-4">
+        <li key={i} className="flex flex-row gap-4 w-full py-4 px-2 rounded-xl">
           <div className="w-32 h-24 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
           <div className="flex flex-col gap-2 items-start justify-center">
             <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>

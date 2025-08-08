@@ -106,7 +106,7 @@ function AppContent() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main
-        className={`flex-1 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
+        className={`flex-1 w-full max-w-4xl sm:max-w-6xl mx-auto px-2 sm:px-2 flex transition-opacity duration-300 ease-in-out ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >

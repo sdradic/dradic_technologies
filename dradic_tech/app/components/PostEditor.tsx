@@ -211,7 +211,7 @@ export default function PostEditor({
   }
 
   return (
-    <div className="flex flex-col w-full max-w-6xl mx-auto px-4 pt-4">
+    <div className="w-full ">
       {error && (
         <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg">
           {error}
@@ -305,7 +305,7 @@ export default function PostEditor({
       <BlogPostForm formData={formData} onFormDataChange={setFormData} />
 
       {/* Editor */}
-      <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto border border-gray-300 dark:border-gray-600">
+      <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-gray-300 dark:border-gray-600">
         <MDXEditorComponent
           selectedPost={selectedPost}
           selectedPostContent={postContent}

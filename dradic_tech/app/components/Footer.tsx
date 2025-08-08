@@ -14,7 +14,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="flex flex-col items-center justify-center w-full h-full mt-16 dark:bg-dark-400 bg-gray-100 max-w-6xl mx-auto sm:rounded-xl border border-gray-200 dark:border-gray-700">
+      <footer className="flex flex-col items-center justify-center w-full h-full mt-16 dark:bg-dark-400 bg-gray-100 max-w-6xl mx-auto sm:rounded-xl border-t border-gray-200 dark:border-gray-700">
         <div className="flex flex-col items-center justify-center ">
           <div className="flex flex-row items-center justify-center">
             <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500 dark:fill-dark-400" />
@@ -26,7 +26,7 @@ export default function Footer() {
           </div>
 
           {isBlog && (
-            <div className="flex flex-col items-center justify-center w-full py-4 px-8">
+            <div className="flex flex-col items-center justify-center w-full py-4 px-2">
               <span className="text-md text-gray-500 dark:text-gray-400">
                 Subscribe to our newsletter
               </span>

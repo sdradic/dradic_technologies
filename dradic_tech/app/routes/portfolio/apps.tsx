@@ -1,11 +1,11 @@
 export default function Apps() {
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4 text-center pt-4 pb-8">
-      <h1 className="text-5xl md:text-6xl font-semibold">Apps</h1>
-      <p className="text-xl text-gray-500 dark:text-gray-400 mt-4">
+    <div className="text-center w-full">
+      <h1 className="text-4xl sm:text-6xl font-semibold">Apps</h1>
+      <p className="text-2xl text-gray-500 dark:text-gray-400 mt-4">
         Here are some of the apps I have worked on.
       </p>
-      <div className="max-w-6xl mx-auto mt-12">
+      <div className="mt-12 max-w-2xl mx-auto">
         <AppCard
           title="Expense Tracker"
           description="A simple expense tracker app built with React and TypeScript."

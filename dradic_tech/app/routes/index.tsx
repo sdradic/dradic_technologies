@@ -22,11 +22,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full max-w-4xl sm:max-w-6xl mx-auto px-4">
+    <>
       {/* Hero Section */}
-      <div className="flex flex-col md:flex-row justify-center items-center text-center mx-4">
+      <div className="flex flex-col md:flex-row justify-center items-center text-center">
         <div className="flex flex-col justify-center items-center">
-          <h1 className="text-5xl md:text-6xl font-semibold mb-8">
+          <h1 className="text-4xl md:text-6xl font-semibold mb-8">
             Hi! I&apos;m <span className="text-primary-500">Dusan Radic</span>,
             a software engineer and DevOps specialist.
           </h1>
@@ -45,6 +45,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

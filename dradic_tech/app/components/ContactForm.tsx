@@ -8,7 +8,7 @@ export default function ContactForm() {
     setIsLoading(true);
   };
   return (
-    <div className="flex flex-col gap-4 w-full min-w-80 p-6 bg-gray-50 dark:bg-dark-400 rounded-xl border border-gray-200 dark:border-gray-700">
+    <div className="flex flex-col gap-4 w-full bg-gray-50 dark:bg-dark-400 rounded-xl border border-gray-200 dark:border-gray-700 px-2 py-4 max-w-96">
       <h1 className="text-2xl font-bold text-center text-gray-700 dark:text-gray-300">
         Contact Me
       </h1>
@@ -16,7 +16,7 @@ export default function ContactForm() {
         <div className="flex flex-col gap-2">
           <label
             htmlFor="name"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
+            className="font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Name
           </label>
@@ -25,14 +25,14 @@ export default function ContactForm() {
             id="name"
             name="name"
             placeholder="Enter your name"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-full bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
             required
           />
         </div>
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
+            className="font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Email
           </label>
@@ -41,14 +41,14 @@ export default function ContactForm() {
             id="email"
             name="email"
             placeholder="Enter your email"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-full bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
             required
           />
         </div>
         <div className="flex flex-col gap-2">
           <label
             htmlFor="message"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
+            className="font-medium text-gray-700 dark:text-gray-300 text-left ml-4"
           >
             Message
           </label>
@@ -57,7 +57,7 @@ export default function ContactForm() {
             name="message"
             placeholder="Enter your message"
             rows={4}
-            className="resize-none w-full border border-gray-300 dark:border-gray-700 rounded-2xl bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="resize-none w-full border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-dark-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
             required
           />
         </div>

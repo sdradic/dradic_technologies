@@ -89,8 +89,8 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
   // Show loading state while checking authentication
   if (isAuthLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader />
+      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4 min-h-screen justify-center items-center">
+        <Loader message="Authenticating..." />
       </div>
     );
   }
@@ -102,8 +102,8 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader />
+      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4 min-h-screen justify-center items-center">
+        <Loader message="Loading post..." />
       </div>
     );
   }

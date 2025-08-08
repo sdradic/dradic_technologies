@@ -2,11 +2,11 @@ import ContactForm from "~/components/ContactForm";
 
 export default function About() {
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 mt-4">
-      <h1 className="text-4xl md:text-6xl font-semibold text-center pt-4 pb-8">
+    <div>
+      <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-4 pb-8">
         About Me
       </h1>
-      <div className="flex flex-col justify-center items-center md:flex-row md:justify-evenly my-8 text-center px-8 gap-8">
+      <div className="flex flex-col justify-center items-center md:flex-row md:justify-evenly my-8 text-center gap-8">
         <div className="flex flex-col items-center md:items-start gap-4">
           <img
             src="/assets/dusan.webp"
@@ -22,9 +22,7 @@ export default function About() {
             modern software solutions.
           </p>
         </div>
-        <div className="flex mt-8 md:mt-0">
-          <ContactForm />
-        </div>
+        <ContactForm />
       </div>
     </div>
   );
