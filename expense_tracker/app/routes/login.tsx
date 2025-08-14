@@ -50,8 +50,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 sm:px-2 px-8 max-h-screen">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 sm:px-2 px-4 my-auto min-h-screen py-8 sm:py-0">
+      <div className="max-w-md w-full space-y-8 p-4 bg-white dark:bg-gray-800 rounded-md shadow">
         <div>
           <div className="flex flex-row items-center justify-center gap-2 mt-4 mb-2">
             <TallyUpLogo className="w-18 h-18 stroke-primary-400 fill-primary-400 dark:stroke-primary-600 dark:fill-primary-600 cursor-pointer" />

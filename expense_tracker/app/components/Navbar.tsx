@@ -38,7 +38,7 @@ export function Navbar() {
       {/* Mobile Menu using Sidebar */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 backdrop-blur-sm bg-opacity-50 "
+          className="fixed inset-0 z-50 bg-black/50"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Sidebar />

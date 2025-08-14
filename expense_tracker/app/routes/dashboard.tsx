@@ -11,7 +11,7 @@ export function meta(_args: Route.MetaArgs) {
 export default function Dashboard() {
   return (
     <div className="p-4 rounded-xl">
-      <div className="border border-gray-200 dark:border-gray-800 rounded-2xl p-4">
+      <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls></HeaderControls>
         <div className="separator my-4" />
         {/* Dashboard content will go here */}
