@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.security import HTTPBearer
@@ -18,6 +18,7 @@ from routers.expense_tracker import (
     users,
 )
 from utils.auth import get_credentials_from_token
+from utils.supabase_service import SupabaseService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +64,7 @@ EXCLUDED_PATHS = {
     "/docs",
     "/redoc",
     "/openapi.json",
+    "/api/files",
 }
 
 # Paths that allow optional authentication (like public blog posts)
@@ -189,6 +191,76 @@ async def health_check():
 async def ping():
     """Simple ping endpoint for pre-warming the backend"""
     return {"message": "pong", "timestamp": datetime.now(timezone.utc)}
+
+
+# Generic file download endpoint
+@app.get("/api/files")
+async def download_file(
+    filename: str = Query(..., description="Filename to search for"),
+):
+    """Download a file directly from the dradic-technologies bucket"""
+    try:
+        supabase_service = SupabaseService()
+        supabase_service.initialize()
+
+        # List all files in the dradic-technologies bucket
+        if supabase_service._s3_client:
+            # Use S3 API
+            response = supabase_service._s3_client.list_objects_v2(
+                Bucket="dradic-technologies"
+            )
+
+            if "Contents" not in response:
+                raise HTTPException(status_code=404, detail="No files found in bucket")
+
+            # Find files that match the filename pattern
+            matching_files = []
+            for obj in response["Contents"]:
+                if filename.lower() in obj["Key"].lower():
+                    matching_files.append(
+                        {
+                            "key": obj["Key"],
+                            "size": obj["Size"],
+                            "last_modified": obj["LastModified"].isoformat(),
+                        }
+                    )
+
+            if not matching_files:
+                raise HTTPException(
+                    status_code=404, detail=f"No files found matching '{filename}'"
+                )
+
+            # Get the first matching file
+            selected_file = matching_files[0]
+
+            # Download the file content from S3
+            file_obj = supabase_service._s3_client.get_object(
+                Bucket="dradic-technologies", Key=selected_file["key"]
+            )
+
+            file_content = file_obj["Body"].read()
+            file_name = selected_file["key"].split("/")[-1]
+
+            # Log the download for debugging
+            logger.info(
+                f"Downloading file: {selected_file['key']}, size: {len(file_content)} bytes"
+            )
+
+            # Return the file directly
+            return Response(
+                content=file_content,
+                media_type="application/octet-stream",
+                headers={
+                    "Content-Disposition": f"attachment; filename={file_name}",
+                    "Content-Length": str(len(file_content)),
+                },
+            )
+
+    except Exception as e:
+        logger.error(f"Failed to download file from bucket: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to download file: {str(e)}"
+        ) from e
 
 
 # Include routers

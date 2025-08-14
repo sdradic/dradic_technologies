@@ -74,7 +74,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 backdrop-blur-lg z-40"
+        className="fixed inset-0 z-40 bg-black/50"
         onClick={onClose}
         onKeyDown={(e) => {
           if (e.key === "Escape") {
@@ -112,7 +112,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
           <div className="overflow-y-auto max-h-[60vh]">
             {isLoading ? (
               <div className="">
-                <div className="animate-pulse space-y-4">
+                <div className="animate-pulse space-y-4 px-2 py-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex gap-4">
                       <div className="w-32 h-24 bg-gray-200 dark:bg-gray-700 rounded-md"></div>

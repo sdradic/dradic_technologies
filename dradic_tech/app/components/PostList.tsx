@@ -38,7 +38,6 @@ export function PostsList({
       () => {
         // Only refresh if cache is expired
         if (!localState.isCacheValid()) {
-          console.debug("Background refresh triggered - cache expired");
           loadPosts();
         }
       },
@@ -81,7 +80,7 @@ export function PostsList({
                   post.metadata?.image || "/assets/blog_post_placeholder.webp"
                 }
                 alt={post.metadata.title}
-                className="object-cover w-32 h-24 rounded-md"
+                className="object-cover w-32 h-24 rounded-2xl"
               />
               <div className="flex flex-col gap-2 items-start justify-center">
                 <h3 className="text-sm font-semibold dark:text-gray-200">

@@ -4,6 +4,8 @@ import { PostsList } from "~/components/PostList";
 import { useState, useCallback } from "react";
 import { RefreshIcon } from "~/components/Icons";
 import { localState } from "~/modules/utils";
+import { featuredPost } from "~/modules/store";
+import { Link } from "react-router";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -12,9 +14,8 @@ export function meta(_args: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export default function Blog() {
   const [refreshKey, setRefreshKey] = useState(0);
-
   const handleRefresh = useCallback(() => {
     // Clear cache to force fresh data
     localState.clearBlogData();
@@ -42,6 +43,23 @@ export default function Home() {
           buttonText="Subscribe"
         />
       </div>
+
+      <div className="flex flex-col justify-center items-center text-center pt-4 pb-8 gap-4">
+        <h1 className="text-2xl font-semibold">Featured Post</h1>
+        <Link
+          to={`/blog/${featuredPost.slug}`}
+          className="flex flex-col sm:flex-row gap-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 justify-center items-center sm:items-start"
+        >
+          <img
+            src={featuredPost.image}
+            alt="Featured Post"
+            className="w-full sm:w-3/4 h-full object-cover rounded-2xl"
+          />
+          <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4 w-full sm:w-1/4 text-left">
+            {featuredPost.sample_content}
+          </p>
+        </Link>
+      </div>
       {/* Recent Posts */}
       <div className="flex flex-col mt-6 justify-center text-left">
         <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
@@ -50,10 +68,10 @@ export default function Home() {
           </h2>
           <button
             onClick={handleRefresh}
-            className="btn-secondary flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400"
+            className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400 group hover:text-primary-500 dark:hover:text-primary-400"
             title="Refresh posts"
           >
-            <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400" />
+            <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
             Refresh
           </button>
         </div>

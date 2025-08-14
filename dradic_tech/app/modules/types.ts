@@ -6,6 +6,7 @@ export interface BlogPostMetadata {
   image?: string;
   author?: string;
   category?: string;
+  sample_content?: string;
 }
 
 export interface BlogPost extends BlogPostMetadata {

@@ -24,7 +24,7 @@ export default function AdminLogin() {
   // Show loading while checking authentication
   if (isCheckingAuth || isAuthLoading) {
     return (
-      <div className="flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
+      <div className="w-full flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
         <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg shadow">
           <div className="flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
@@ -45,7 +45,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
+    <div className="w-full flex items-center justify-center bg-white dark:bg-dark-500 sm:px-2 px-8 py-16">
       <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-dark-400 rounded-lg border shadow border-gray-200 dark:border-dark-200">
         <FormHeader />
         <FormComponent handleLogin={handleLogin} isLoading={isLoading} />

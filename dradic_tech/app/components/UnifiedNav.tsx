@@ -126,25 +126,52 @@ const SidebarItem = ({
   return (
     <div>
       <button
-        className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-100 dark:hover:bg-primary-900 flex items-center justify-between cursor-pointer rounded-sm space-x-1 ${
-          selectedPath === item.path
-            ? "bg-primary-100 dark:bg-primary-900 text-primary-500"
-            : "text-gray-800 dark:text-gray-200"
-        } ${level > 0 ? "pl-8" : ""}`}
+        className={`w-full text-left px-4 py-2 text-sm flex hover:bg-gray-50 dark:hover:bg-dark-400 items-center cursor-pointer rounded-sm space-x-4 group ${level > 0 ? "pl-8" : ""} ${
+          selectedPath === item.path ? "bg-gray-50 dark:bg-dark-400" : ""
+        }`}
         onClick={handleClick}
       >
-        <span>{item.label}</span>
-        {hasChildren && (
-          <ChevronDownIcon
-            className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white rounded-sm ${
-              isExpanded ? "rotate-180" : ""
-            }`}
-          />
+        {/* Vertical line indicator */}
+        {level > 0 ? (
+          // For children: always show, full height, gray by default, primary on hover or selected
+          <span
+            className={`
+              w-1 h-6 rounded-sm transition-colors
+              ${
+                selectedPath === item.path
+                  ? "bg-primary-500 dark:bg-primary-600"
+                  : "bg-gray-200 dark:bg-gray-700 group-hover:bg-primary-500 dark:group-hover:bg-primary-600"
+              }
+            `}
+          ></span>
+        ) : // For top-level: only show when selected
+        selectedPath === item.path ? (
+          <span className="bg-primary-500 dark:bg-primary-600 rounded-sm w-1 h-6"></span>
+        ) : (
+          <span className="w-1 h-6 rounded-sm"></span>
         )}
+        <div className="flex items-center justify-between w-full">
+          <span
+            className={`text-gray-800 dark:text-gray-200 ${
+              selectedPath === item.path
+                ? "text-primary-500 dark:text-primary-500"
+                : ""
+            }`}
+          >
+            {item.label}
+          </span>
+          {hasChildren && (
+            <ChevronDownIcon
+              className={`w-4 h-4 transition-transform stroke-2 stroke-gray-500 dark:stroke-white rounded-sm ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+            />
+          )}
+        </div>
       </button>
 
       {hasChildren && isExpanded && (
-        <div className="rounded-sm p-2 space-y-1">
+        <div className="rounded-sm space-y-1">
           {item.children?.map((child) => (
             <SidebarItem
               key={child.label}
@@ -231,7 +258,7 @@ export const UnifiedNav = ({
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-lg z-10 md:hidden"
+          className="fixed inset-0 z-10 md:hidden bg-black/50"
           onClick={onToggleSidebar}
           onKeyDown={(e) => {
             if (e.key === "Escape") {

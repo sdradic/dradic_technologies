@@ -61,11 +61,7 @@ export default function ContactForm() {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-primary-500 dark:bg-primary-600 text-white font-medium rounded-full hover:bg-primary-600 dark:hover:bg-primary-700 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-primary-500 dark:border-primary-600"
-          disabled={isLoading}
-        >
+        <button type="submit" className="btn-primary" disabled={isLoading}>
           Send Message
         </button>
       </form>

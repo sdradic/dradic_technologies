@@ -71,11 +71,6 @@ export default function Navbar() {
               <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
             </div>
           )}
-          {isBlog && (
-            <button className="sm:flex hidden bg-primary-500 dark:bg-primary-600 text-white cursor-pointer gap-2 px-4 py-2 text-sm rounded-full hover:bg-primary-600 dark:hover:bg-primary-500">
-              Subscribe
-            </button>
-          )}
         </div>
       </nav>
 

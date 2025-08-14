@@ -326,3 +326,49 @@ export async function pingBackend(): Promise<void> {
     console.debug("Backend ping failed:", error);
   }
 }
+
+export async function downloadFileFromBackend(filename: string): Promise<void> {
+  try {
+    // Download file directly from backend
+    const response = await fetch(
+      `${API_BASE_URL}/api/files?filename=${encodeURIComponent(filename)}`,
+      {
+        method: "GET",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    // Get the filename from the Content-Disposition header
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let downloadFilename = filename;
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename=(.+)/);
+      if (filenameMatch) {
+        downloadFilename = filenameMatch[1].replace(/"/g, "");
+      }
+    }
+
+    // Create blob from response and download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary link element to trigger download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = downloadFilename;
+
+    // Append to DOM, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the URL object
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    throw error;
+  }
+}
