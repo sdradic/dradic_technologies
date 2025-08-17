@@ -1,6 +1,6 @@
 import { HeaderControls } from "~/components/HeaderControls";
 
-export default function About() {
+export default function Contact() {
   return (
     <div className="p-4 rounded-xl">
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">

@@ -1,9 +1,8 @@
 import { Link, useLocation } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserProfile } from "./UserProfile";
 import {
   TallyUpLogo,
-  AboutIcon,
   SettingsIcon,
   ExpensesIcon,
   ChevronDownIcon,
@@ -12,6 +11,9 @@ import {
   LogoutIcon,
   IncomesIcon,
   DashboardIconOutline,
+  ContactIcon,
+  GroupsIcon,
+  GeneralSettingsIcon,
 } from "./Icons";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -53,11 +55,27 @@ const navOptions: NavItem[] = [
     icon: (
       <SettingsIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />
     ),
+    children: [
+      {
+        path: "/settings",
+        label: "General",
+        icon: (
+          <GeneralSettingsIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />
+        ),
+      },
+      {
+        path: "/groups",
+        label: "Groups",
+        icon: (
+          <GroupsIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />
+        ),
+      },
+    ],
   },
   {
-    path: "/about",
-    label: "About",
-    icon: <AboutIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />,
+    path: "/contact",
+    label: "Contact",
+    icon: <ContactIcon className="w-6 h-6 stroke-gray-600 dark:stroke-white" />,
   },
   {
     path: "/logout",
@@ -79,6 +97,32 @@ function useSidebarState() {
       location.pathname === path || location.pathname.startsWith(path + "/")
     );
   };
+
+  // Check if any children of a parent item are active
+  const hasActiveChildren = (item: NavItem): boolean => {
+    if (!item.children) return false;
+    return item.children.some((child) => isActive(child.path));
+  };
+
+  // Automatically expand parent items when their children are active
+  const getAutoExpandedItems = (): string[] => {
+    const autoExpanded: string[] = [];
+
+    // Check navOptions (SUPPORT section) for items with active children
+    navOptions.forEach((item) => {
+      if (item.children && hasActiveChildren(item)) {
+        autoExpanded.push(item.path);
+      }
+    });
+
+    return autoExpanded;
+  };
+
+  // Initialize expandedItems with auto-expanded items
+  useEffect(() => {
+    const autoExpanded = getAutoExpandedItems();
+    setExpandedItems(autoExpanded);
+  }, [location.pathname]);
 
   const toggleExpand = (path: string) => {
     setExpandedItems((prev) =>
@@ -148,8 +192,9 @@ function NavLink({
   isExpanded,
   onToggleExpand,
 }: NavLinkProps) {
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     if (hasChildren) {
+      e.stopPropagation();
       onToggleExpand(item.path);
     }
   };
@@ -176,20 +221,45 @@ function NavLink({
     </div>
   );
 
+  // If item has children, render as button to prevent navigation
+  if (hasChildren) {
+    return (
+      <button
+        onClick={handleClick}
+        className={`flex items-center transition-colors px-4 w-full cursor-pointer ${
+          isActive
+            ? "bg-primary-100 dark:bg-gray-700 border border-primary-200 dark:border-gray-800 text-gray-600 dark:text-white"
+            : "hover:bg-primary-100 dark:hover:bg-gray-800"
+        } py-2 rounded-xl relative`}
+      >
+        {isCollapsed ? (
+          <div className="group relative flex items-center w-full">
+            {NavLinkContent}
+            <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-0 whitespace-nowrap rounded bg-gray-800 text-white text-sm px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-100">
+              {item.label}
+            </span>
+          </div>
+        ) : (
+          NavLinkContent
+        )}
+      </button>
+    );
+  }
+
+  // If no children, render as Link for navigation
   return (
     <Link
       to={item.path}
-      onClick={handleClick}
       className={`flex items-center transition-colors px-4 ${
         isActive
-          ? "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-white"
+          ? "bg-primary-100 dark:bg-gray-700 border border-primary-200 dark:border-gray-800 text-gray-600 dark:text-white"
           : "hover:bg-primary-100 dark:hover:bg-gray-800"
       } py-2 rounded-xl relative`}
     >
       {isCollapsed ? (
         <div className="group relative flex items-center w-full">
           {NavLinkContent}
-          <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded bg-gray-800 text-white text-sm px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-100">
+          <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-0 whitespace-nowrap rounded bg-gray-800 text-white text-sm px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-100">
             {item.label}
           </span>
         </div>
@@ -238,8 +308,8 @@ function NavItemComponent({
                   to={child.path}
                   className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
                     isActive(child.path)
-                      ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "bg-primary-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                      : "hover:bg-primary-100 dark:hover:bg-gray-800"
                   }`}
                 >
                   <span className={`text-xl ${isCollapsed ? "" : "mr-3"}`}>
@@ -311,11 +381,13 @@ export function Sidebar() {
   const { isCollapsed, expandedItems, isActive, toggleExpand, toggleCollapse } =
     useSidebarState();
 
+  const isMobile = window.innerWidth < 768;
+
   return (
     <nav
       className={`h-full bg-primary-50 dark:bg-gray-900 dark:border-r-2 dark:border-gray-800 transition-all duration-300 ${
         isCollapsed ? "w-24" : "w-64"
-      }`}
+      } ${isMobile ? "overflow-y-auto" : ""}`}
     >
       <div className="p-4 h-full flex flex-col">
         <SidebarHeader
@@ -343,8 +415,8 @@ export function Sidebar() {
             items={navOptions}
             isCollapsed={isCollapsed}
             isActive={isActive}
-            expandedItems={[]}
-            onToggleExpand={() => {}}
+            expandedItems={expandedItems}
+            onToggleExpand={toggleExpand}
           />
           <div className="flex flex-col justify-end items-center h-full pt-4">
             <ThemeToggle />

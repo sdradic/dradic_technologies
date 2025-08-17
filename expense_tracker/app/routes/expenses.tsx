@@ -110,7 +110,7 @@ function ExpensesContent({
   );
 
   return (
-    <div className="p-4">
+    <>
       {dashboardData.table.data.length > 0 ? (
         <>
           {/* Cards */}
@@ -175,7 +175,7 @@ function ExpensesContent({
           }}
         />
       )}
-    </div>
+    </>
   );
 }
 

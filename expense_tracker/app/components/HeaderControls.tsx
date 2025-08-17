@@ -8,9 +8,9 @@ interface PageHeaderData {
 }
 
 const PageHeaderMapping = {
-  about: {
-    title: "About",
-    subtitle: "About TallyUp",
+  contact: {
+    title: "Contact",
+    subtitle: "Contact Us",
   },
   dashboard: {
     title: "Dashboard",
@@ -23,6 +23,10 @@ const PageHeaderMapping = {
   incomes: {
     title: "Incomes",
     subtitle: "Manage your incomes",
+  },
+  groups: {
+    title: "Group Settings",
+    subtitle: "Manage your group settings",
   },
   settings: {
     title: "Settings",

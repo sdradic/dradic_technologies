@@ -6,6 +6,7 @@ export default function Settings() {
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls />
         <div className="separator my-4" />
+        {/* Settings */}
       </div>
     </div>
   );

@@ -97,7 +97,7 @@ export const CardCarrousel = ({
       {/* Cards Container */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none"
       >
         {cards.map((card, index) => (
           <div

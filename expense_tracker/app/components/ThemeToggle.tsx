@@ -12,7 +12,18 @@ export function ThemeToggle() {
 
   return (
     <div
-      onClick={toggleTheme}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleTheme();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.stopPropagation();
+          toggleTheme();
+        }
+      }}
+      tabIndex={0}
+      role="button"
       className="flex items-center justify-between w-14 h-6 p-1 rounded-full cursor-pointer border border-gray-400 dark:border-gray-400"
     >
       <div

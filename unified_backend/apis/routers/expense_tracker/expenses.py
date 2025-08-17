@@ -455,8 +455,8 @@ async def get_monthly_dashboard(
                 currency=currency,
             ),
             DashboardCard(
-                title="Total Savings",
-                description="Total savings for the month",
+                title="Remaining",
+                description="Remaining amount for the month",
                 value=total_savings,
                 currency=currency,
             ),
