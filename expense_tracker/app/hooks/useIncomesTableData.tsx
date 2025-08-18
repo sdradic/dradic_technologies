@@ -88,20 +88,22 @@ export function IncomesTableData({
         "Description",
         "Recurring",
       ]}
-      data={dashboardData.table.data.map((income) => ({
-        id: income.id,
-        source: income.name,
-        category: income.category,
-        amount: income.amount,
-        date: income.date,
-        description: income.description,
-        recurring:
-          "recurring" in income
-            ? (income as DashboardTableRowWithRecurring).recurring
-              ? "Yes"
-              : "No"
-            : "N/A",
-      }))}
+      data={
+        dashboardData?.table?.data?.map((income) => ({
+          id: income.id,
+          source: income.name,
+          category: income.category,
+          amount: income.amount,
+          date: income.date,
+          description: income.description,
+          recurring:
+            "recurring" in income
+              ? (income as DashboardTableRowWithRecurring).recurring
+                ? "Yes"
+                : "No"
+              : "N/A",
+        })) || []
+      }
       hasButton={true}
       buttonProps={{
         buttonText: "Add income",
@@ -116,7 +118,7 @@ export function IncomesTableData({
       tableClassName="w-full p-6"
       onRowClick={(row) => {
         // Find the full income object from the incomes array
-        const fullIncome = dashboardData.incomes.find(
+        const fullIncome = dashboardData?.incomes?.find(
           (income) => income.id === row.id,
         );
         if (fullIncome) {
