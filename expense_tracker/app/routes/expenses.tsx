@@ -150,7 +150,7 @@ function ExpensesContent({
             )}
           {/* Table */}
           <SimpleTable
-            title={dashboardData.table.title}
+            title={`${dashboardData.table.title} ${year}`}
             description={dashboardData.table.description}
             columns={dashboardData.table.columns}
             data={dashboardData.table.data.map((row: DashboardTableRow) => ({
@@ -216,14 +216,14 @@ export default function Expenses() {
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [itemsReloadTrigger, setItemsReloadTrigger] = useState(0);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [year] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [currency, setCurrency] = useState("CLP");
+  const [currency] = useState("CLP");
 
   const handleReload = () => setReloadTrigger((prev) => prev + 1);
 
   // Use the hook to get expense items
-  const { items: expenseItems, isLoading: isLoadingItems } = useExpenseItems({
+  const { items: expenseItems } = useExpenseItems({
     reloadTrigger: itemsReloadTrigger,
   });
 
@@ -256,6 +256,25 @@ export default function Expenses() {
     }
   };
 
+  const handleDelete = async (id: string, mode: string) => {
+    try {
+      if (mode === "expense-item") {
+        // Delete expense item
+        await expenseItemsApi.delete(id);
+        // Trigger reload to refresh the expense items
+        setItemsReloadTrigger((prev) => prev + 1);
+      } else if (mode === "expense") {
+        // Delete expense
+        await expensesApi.delete(id);
+        // Trigger reload to refresh the data
+        setReloadTrigger((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      // TODO: Add proper error handling/toast notification
+    }
+  };
+
   return (
     <div className="p-4 rounded-xl">
       <CreateEditModal
@@ -263,6 +282,7 @@ export default function Expenses() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         onSave={handleSave}
+        onDelete={handleDelete}
         userId={user?.id}
         editData={selectedExpense || undefined}
         expenseItems={expenseItems}

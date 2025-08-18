@@ -17,11 +17,13 @@ export default function SimpleForm({
   description,
   fields,
   action,
+  onCancel,
 }: {
   title: string;
   description: string;
   fields: SimpleFormField[];
   action: (data: any) => Promise<void>;
+  onCancel: () => void;
 }) {
   const [state, submitAction] = useActionState(
     async (prevState: { error?: string } | null, formData: FormData) => {
@@ -39,7 +41,14 @@ export default function SimpleForm({
   const renderField = (field: SimpleFormField) => {
     switch (field.type) {
       case "number":
-        return <input type="number" id={field.id} />;
+        return (
+          <input
+            className="w-full"
+            type="number"
+            id={field.id}
+            onChange={(e) => field.additionalProps?.onChange(e.target.value)}
+          />
+        );
       case "dropdown":
         return (
           <Dropdown
@@ -55,17 +64,31 @@ export default function SimpleForm({
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col p-4 w-full">
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-gray-500">{description}</p>
-        <form action={submitAction}>
+        <form
+          className="flex flex-col justify-center items-center gap-4 mt-4"
+          action={submitAction}
+        >
           {fields.map((field) => (
-            <div key={field.id}>
+            <div className="w-full " key={field.id}>
               <label htmlFor={field.id}>{field.label}</label>
               {renderField(field)}
             </div>
           ))}
-          <button type="submit">Submit</button>
+          <div className="flex gap-4 w-full justify-end">
+            <button
+              className="btn-secondary max-w-24"
+              type="button"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+            <button className="btn-primary max-w-24" type="submit">
+              Submit
+            </button>
+          </div>
         </form>
       </div>
     </>

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { SimpleModal } from "./SimpleModal";
 import { Dropdown } from "./Dropdown";
 import { DatePicker } from "./DatePicker";
+import { TrashIcon } from "./Icons";
+import Loader from "./Loader";
 import { expenseItemsApi, incomeSourcesApi } from "~/modules/apis";
 import type {
   Income,
@@ -25,7 +27,8 @@ interface CreateEditModalProps {
   editData?: Income | IncomeSource | Expense | ExpenseItem;
   onSave: (
     data: IncomeCreate | IncomeSourceCreate | ExpenseCreate | ExpenseItemCreate,
-  ) => void;
+  ) => Promise<void>;
+  onDelete?: (id: string, mode: ModalMode) => Promise<void>;
   incomeSources?: IncomeSourceWithUser[];
   expenseItems?: ExpenseItemWithUser[];
   userId?: string;
@@ -61,10 +64,12 @@ export const CreateEditModal = ({
   mode,
   editData,
   onSave,
+  onDelete,
   incomeSources = [],
   expenseItems = [],
   userId = "",
 }: CreateEditModalProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Source/Item fields
     name: "",
@@ -219,6 +224,7 @@ export const CreateEditModal = ({
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    setIsLoading(true);
     try {
       let saveData: any;
       const isEditMode = !!editData;
@@ -310,11 +316,13 @@ export const CreateEditModal = ({
         saveData.editId = editData.id;
       }
 
-      onSave(saveData);
+      await onSave(saveData);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving:", error);
       // TODO: Add proper error handling
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -527,7 +535,7 @@ export const CreateEditModal = ({
       <div className="space-y-4">
         {/* Group Expense Toggle (only for expenses) */}
         {mode === "expense" && (
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3  mt-4">
             <label className="flex items-center cursor-pointer">
               <div className="relative">
                 <input
@@ -554,11 +562,11 @@ export const CreateEditModal = ({
                     } translate-y-0.5`}
                   />
                 </div>
-              </div>
-              <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Group expense
-              </span>
+              </div>{" "}
             </label>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Group expense
+            </span>
           </div>
         )}
 
@@ -715,32 +723,70 @@ export const CreateEditModal = ({
       className="w-full max-w-md"
     >
       <div className="p-6">
-        <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
-          {getModalTitle()}
-        </h2>
+        {isLoading ? (
+          <Loader
+            message="Processing..."
+            loaderSize={[8, 8]}
+            textSize="text-lg"
+          />
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {getModalTitle()}
+              </h2>
+              {editData && onDelete && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this item?",
+                      )
+                    ) {
+                      setIsLoading(true);
+                      try {
+                        await onDelete(editData.id, mode);
+                        setIsModalOpen(false);
+                      } catch (error) {
+                        console.error("Error deleting:", error);
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }
+                  }}
+                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors cursor-pointer"
+                  title="Delete"
+                >
+                  <TrashIcon className="w-5 h-5 stroke-2 stroke-red-500" />
+                </button>
+              )}
+            </div>
 
-        <div className="space-y-6">
-          {renderSourceSection()}
-          {renderAmountSection()}
-        </div>
+            <div className="space-y-6">
+              {renderSourceSection()}
+              {renderAmountSection()}
+            </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 mt-8">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="btn-secondary max-w-24"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="btn-primary max-w-24"
-          >
-            Save
-          </button>
-        </div>
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 mt-8">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="btn-secondary max-w-24"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="btn-primary max-w-24"
+              >
+                Save
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </SimpleModal>
   );

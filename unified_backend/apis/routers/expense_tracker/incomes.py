@@ -310,8 +310,10 @@ async def delete_income(income_id: str, current_user: dict = current_user_depend
             )
 
         # Delete the income record
-        delete_query = "DELETE FROM dradic_tech.incomes WHERE id = :income_id"
-        DatabaseModel.execute_query(delete_query, {"income_id": income_id})
+        deleted = DatabaseModel.delete_record("incomes", income_id)
+
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Income not found")
 
         return {"message": "Income deleted successfully"}
     except HTTPException:

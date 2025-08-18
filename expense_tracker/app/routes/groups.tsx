@@ -113,6 +113,11 @@ export default function GroupSettings() {
     },
   ];
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setFormData({ name: "", description: "" });
+  };
+
   return (
     <div className="p-4 rounded-xl">
       <SimpleModal
@@ -125,6 +130,7 @@ export default function GroupSettings() {
           description="Create a new group to manage shared expenses"
           fields={fields}
           action={handleCreateGroup}
+          onCancel={handleCancel}
         />
       </SimpleModal>
 

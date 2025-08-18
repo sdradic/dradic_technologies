@@ -43,14 +43,7 @@ export default function Incomes() {
       } else if (data.mode === "income") {
         if (data.isEdit && data.editId) {
           // Update income
-          console.log(
-            "Updating income with ID:",
-            data.editId,
-            "and data:",
-            data,
-          );
-          const result = await incomesApi.update(data.editId, data);
-          console.log("Update result:", result);
+          await incomesApi.update(data.editId, data);
         } else {
           // Create income
           await incomesApi.create(data);
@@ -64,6 +57,25 @@ export default function Incomes() {
     }
   };
 
+  const handleDelete = async (id: string, mode: string) => {
+    try {
+      if (mode === "income-source") {
+        // Delete income source
+        await incomeSourcesApi.delete(id);
+        // Trigger reload to refresh the income sources
+        setSourcesReloadTrigger((prev) => prev + 1);
+      } else if (mode === "income") {
+        // Delete income
+        await incomesApi.delete(id);
+        // Trigger reload to refresh the data
+        setReloadTrigger((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      // TODO: Add proper error handling/toast notification
+    }
+  };
+
   return (
     <div className="p-4 rounded-xl">
       <CreateEditModal
@@ -71,6 +83,7 @@ export default function Incomes() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         onSave={handleSave}
+        onDelete={handleDelete}
         userId={user?.id}
         editData={selectedIncome || undefined}
         incomeSources={incomeSources}
