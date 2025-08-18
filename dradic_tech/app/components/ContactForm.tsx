@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Dropdown } from "./Dropdown";
-import { Logo } from "./Logo";
 import { DradicTechLogo } from "./Icons";
 export default function ContactForm() {
   const [isLoading, setIsLoading] = useState(false);
