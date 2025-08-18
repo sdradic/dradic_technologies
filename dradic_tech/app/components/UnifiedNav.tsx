@@ -222,7 +222,7 @@ export const UnifiedNav = ({
         <button className="cursor-pointer" onClick={onToggleSidebar}>
           <MenuIcon
             isSidebarOpen={isSidebarOpen}
-            className="w-8 h-8 stroke-1 stroke-gray-500 dark:stroke-white"
+            className="size-7 stroke-1 stroke-gray-500 dark:stroke-white"
           />
         </button>
       </div>

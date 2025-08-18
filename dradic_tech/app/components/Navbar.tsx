@@ -22,6 +22,10 @@ export default function Navbar() {
       path: "/blog",
     },
     {
+      label: "Contact",
+      path: "/contact",
+    },
+    {
       label: "Portfolio",
       path: "/portfolio",
       children: [
@@ -68,7 +72,7 @@ export default function Navbar() {
               role="button"
               aria-label="Open search modal"
             >
-              <SearchIcon className="w-6 h-6 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
+              <SearchIcon className="size-5 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
             </div>
           )}
         </div>
