@@ -17,28 +17,44 @@ export default function Incomes() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [selectedIncome, setSelectedIncome] = useState<Income | null>(null);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [year] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [sourcesReloadTrigger, setSourcesReloadTrigger] = useState(0);
 
   const handleReload = () => setReloadTrigger((prev) => prev + 1);
 
   // Use the hook to get income sources
-  const { sources: incomeSources, isLoading: isLoadingSources } =
-    useIncomeSources({
-      reloadTrigger: sourcesReloadTrigger,
-    });
+  const { sources: incomeSources } = useIncomeSources({
+    reloadTrigger: sourcesReloadTrigger,
+  });
 
   const handleSave = async (data: any) => {
     try {
       if (data.mode === "income-source") {
-        // Create income source
-        await incomeSourcesApi.create(data);
+        if (data.isEdit && data.editId) {
+          // Update income source
+          await incomeSourcesApi.update(data.editId, data);
+        } else {
+          // Create income source
+          await incomeSourcesApi.create(data);
+        }
         // Trigger reload to refresh the income sources
         setSourcesReloadTrigger((prev) => prev + 1);
       } else if (data.mode === "income") {
-        // Create income
-        await incomesApi.create(data);
+        if (data.isEdit && data.editId) {
+          // Update income
+          console.log(
+            "Updating income with ID:",
+            data.editId,
+            "and data:",
+            data,
+          );
+          const result = await incomesApi.update(data.editId, data);
+          console.log("Update result:", result);
+        } else {
+          // Create income
+          await incomesApi.create(data);
+        }
         // Trigger reload to refresh the data
         setReloadTrigger((prev) => prev + 1);
       }

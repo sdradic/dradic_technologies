@@ -221,6 +221,7 @@ export const CreateEditModal = ({
 
     try {
       let saveData: any;
+      const isEditMode = !!editData;
 
       switch (mode) {
         case "income-source":
@@ -302,8 +303,13 @@ export const CreateEditModal = ({
           break;
       }
 
-      // Add mode to the data so the parent knows what was saved
+      // Add mode and edit info to the data so the parent knows what was saved
       saveData.mode = mode;
+      saveData.isEdit = isEditMode;
+      if (isEditMode && editData) {
+        saveData.editId = editData.id;
+      }
+
       onSave(saveData);
       setIsModalOpen(false);
     } catch (error) {

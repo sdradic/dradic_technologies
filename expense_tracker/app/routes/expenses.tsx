@@ -3,7 +3,11 @@ import { HeaderButton } from "~/components/HeaderButton";
 import { PlusIconOutline, ReloadIcon } from "~/components/Icons";
 import { useRef, useState, Suspense, useCallback } from "react";
 import { useAuth } from "~/contexts/AuthContext";
-import type { DashboardTableRow, DashboardCard } from "~/modules/types";
+import type {
+  DashboardTableRow,
+  DashboardCard,
+  Expense,
+} from "~/modules/types";
 import { formatDate, expenseItemsApi, expensesApi } from "~/modules/apis";
 import Loader from "~/components/Loader";
 import SimpleTable from "~/components/SimpleTable";
@@ -23,12 +27,14 @@ function ExpensesContent({
   month,
   currency,
   setIsModalOpen,
+  setSelectedExpense,
 }: {
   reloadTrigger: number;
   year: number;
   month: number;
   currency: string;
   setIsModalOpen: (isOpen: boolean) => void;
+  setSelectedExpense: (expense: Expense | null) => void;
 }) {
   const dashboardData = useExpensesData({
     reloadTrigger,
@@ -160,11 +166,32 @@ function ExpensesContent({
               buttonText: "Add expense",
               buttonIcon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
               buttonClassName: "btn-primary",
-              onClick: () => setIsModalOpen(true),
+              onClick: () => {
+                setSelectedExpense(null);
+                setIsModalOpen(true);
+              },
             }}
             tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
             tableClassName="w-full p-6"
-            onRowClick={() => {}}
+            onRowClick={(row) => {
+              // Find the full expense object from the expenses array
+              const fullExpense = dashboardData.expenses.find(
+                (expense) => expense.id === row.id,
+              );
+              if (fullExpense) {
+                // Use the full expense object with all required fields
+                const expenseToEdit: Expense = {
+                  id: fullExpense.id,
+                  item_id: fullExpense.item_id,
+                  date: fullExpense.date,
+                  amount: fullExpense.amount,
+                  currency: fullExpense.currency,
+                  created_at: fullExpense.created_at,
+                };
+                setSelectedExpense(expenseToEdit);
+              }
+              setIsModalOpen(true);
+            }}
           />
         </>
       ) : (
@@ -172,7 +199,10 @@ function ExpensesContent({
           button={{
             text: "Add expense",
             icon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
-            onClick: () => setIsModalOpen(true),
+            onClick: () => {
+              setSelectedExpense(null);
+              setIsModalOpen(true);
+            },
           }}
         />
       )}
@@ -185,6 +215,7 @@ export default function Expenses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [itemsReloadTrigger, setItemsReloadTrigger] = useState(0);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [currency, setCurrency] = useState("CLP");
@@ -199,13 +230,23 @@ export default function Expenses() {
   const handleSave = async (data: any) => {
     try {
       if (data.mode === "expense-item") {
-        // Create expense item first
-        await expenseItemsApi.create(data);
+        if (data.isEdit && data.editId) {
+          // Update expense item
+          await expenseItemsApi.update(data.editId, data);
+        } else {
+          // Create expense item
+          await expenseItemsApi.create(data);
+        }
         // Trigger reload to refresh the expense items
         setItemsReloadTrigger((prev) => prev + 1);
       } else if (data.mode === "expense") {
-        // Create expense
-        await expensesApi.create(data);
+        if (data.isEdit && data.editId) {
+          // Update expense
+          await expensesApi.update(data.editId, data);
+        } else {
+          // Create expense
+          await expensesApi.create(data);
+        }
         // Trigger reload to refresh the data
         setReloadTrigger((prev) => prev + 1);
       }
@@ -223,6 +264,7 @@ export default function Expenses() {
         setIsModalOpen={setIsModalOpen}
         onSave={handleSave}
         userId={user?.id}
+        editData={selectedExpense || undefined}
         expenseItems={expenseItems}
       />
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
@@ -261,6 +303,7 @@ export default function Expenses() {
               month={month}
               currency={currency}
               setIsModalOpen={setIsModalOpen}
+              setSelectedExpense={setSelectedExpense}
             />
           </Suspense>
         </div>

@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from models import (
     DashboardTable,
     DashboardTableRowWithRecurring,
+    DashboardTableWithIncomes,
     Income,
     IncomeCreate,
     IncomeResponse,
@@ -268,32 +269,14 @@ async def update_income(
                 status_code=403, detail="Cannot use another user's income source"
             )
 
-        # Update the income record
-        update_query = """
-            UPDATE dradic_tech.incomes
-            SET source_id = :source_id, amount = :amount, currency = :currency,
-                date = :date, description = :description, updated_at = NOW()
-            WHERE id = :income_id
-            RETURNING id, source_id, amount, currency, date, description, created_at, updated_at
-        """
-        result = DatabaseModel.execute_query(
-            update_query,
-            {
-                "income_id": income_id,
-                "source_id": income.source_id,
-                "amount": income.amount,
-                "currency": income.currency,
-                "date": income.date,
-                "description": income.description,
-            },
-        )
+        # Update the income record using the same pattern as expenses
+        income_data = income.dict(exclude_unset=True)
+        updated_income = DatabaseModel.update_record("incomes", income_id, income_data)
 
-        if not result:
-            raise HTTPException(
-                status_code=500, detail="Failed to update income record"
-            )
+        if not updated_income:
+            raise HTTPException(status_code=404, detail="Income not found")
 
-        return Income(**result[0])
+        return Income(**updated_income)
     except HTTPException:
         raise
     except Exception as e:
@@ -341,7 +324,7 @@ async def delete_income(income_id: str, current_user: dict = current_user_depend
 
 
 @incomes_router.get(
-    "/dashboard/monthly/{year}/{month}/table", response_model=DashboardTable
+    "/dashboard/monthly/{year}/{month}/table", response_model=DashboardTableWithIncomes
 )
 async def get_monthly_income_table(
     year: int,
@@ -349,7 +332,7 @@ async def get_monthly_income_table(
     currency: str = "CLP",
     current_user: dict = current_user_dependency,
 ):
-    """Get only the income table data for the monthly dashboard"""
+    """Get income table data with full income objects for edit modal functionality"""
     try:
         # Validate month
         if month < 1 or month > 12:
@@ -363,16 +346,23 @@ async def get_monthly_income_table(
         incomes_query = """
             SELECT
                 i.id,
+                i.source_id,
                 i.amount,
                 i.currency,
                 i.date,
                 i.description,
+                i.created_at,
+                i.updated_at,
                 ins.name as source_name,
                 ins.category as source_category,
-                ins.is_recurring as source_is_recurring
+                ins.is_recurring as source_is_recurring,
+                u.name as user_name,
+                u.email as user_email,
+                g.name as group_name
             FROM dradic_tech.incomes i
             JOIN dradic_tech.income_sources ins ON i.source_id = ins.id
             JOIN dradic_tech.users u ON ins.user_id = u.id
+            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE EXTRACT(YEAR FROM i.date) = :year
             AND EXTRACT(MONTH FROM i.date) = :month
             AND i.currency = :currency
@@ -418,7 +408,10 @@ async def get_monthly_income_table(
             data=table_rows,
         )
 
-        return table
+        # Create full income objects for edit modal
+        incomes = [IncomeWithDetails(**income) for income in incomes_data]
+
+        return DashboardTableWithIncomes(table=table, incomes=incomes)
 
     except HTTPException:
         raise

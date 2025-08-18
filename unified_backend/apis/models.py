@@ -247,6 +247,13 @@ class DashboardDataWithExpenses(DashboardData):
     expenses: List[ExpenseWithDetails]
 
 
+class DashboardTableWithIncomes(BaseModel):
+    """Dashboard table data that includes actual income objects for edit modal functionality"""
+
+    table: DashboardTable
+    incomes: List[IncomeWithDetails]
+
+
 # Response Models for API
 class IncomeSourceResponse(BaseModel):
     sources: List[IncomeSourceWithUser]

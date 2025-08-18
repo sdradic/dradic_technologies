@@ -222,3 +222,8 @@ export interface DashboardDataWithExpenses extends DashboardData {
 export interface DashboardTableRowWithRecurring extends DashboardTableRow {
   recurring: boolean;
 }
+
+export interface DashboardTableWithIncomes {
+  table: DashboardTable;
+  incomes: IncomeWithDetails[];
+}
