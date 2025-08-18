@@ -4,13 +4,14 @@ import { PlusIconOutline, ReloadIcon } from "~/components/Icons";
 import { useRef, useState, Suspense, useCallback } from "react";
 import { useAuth } from "~/contexts/AuthContext";
 import type { DashboardTableRow, DashboardCard } from "~/modules/types";
-import { formatDate } from "~/modules/apis";
+import { formatDate, expenseItemsApi, expensesApi } from "~/modules/apis";
 import Loader from "~/components/Loader";
 import SimpleTable from "~/components/SimpleTable";
 import { CreateEditModal } from "~/components/CreateEditModal";
 import { CardCarrousel } from "~/components/CardCarrousel";
 import { Chart } from "chart.js/auto";
 import useExpensesData from "~/hooks/useExpensesData";
+import useExpenseItems from "~/hooks/useExpenseItems";
 import { months } from "~/modules/store";
 import { Dropdown } from "~/components/Dropdown";
 import EmptyState from "~/components/EmptyState";
@@ -183,14 +184,35 @@ export default function Expenses() {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
+  const [itemsReloadTrigger, setItemsReloadTrigger] = useState(0);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [currency, setCurrency] = useState("CLP");
 
   const handleReload = () => setReloadTrigger((prev) => prev + 1);
 
-  const handleSave = (data: any) => {
-    console.log(data);
+  // Use the hook to get expense items
+  const { items: expenseItems, isLoading: isLoadingItems } = useExpenseItems({
+    reloadTrigger: itemsReloadTrigger,
+  });
+
+  const handleSave = async (data: any) => {
+    try {
+      if (data.mode === "expense-item") {
+        // Create expense item first
+        await expenseItemsApi.create(data);
+        // Trigger reload to refresh the expense items
+        setItemsReloadTrigger((prev) => prev + 1);
+      } else if (data.mode === "expense") {
+        // Create expense
+        await expensesApi.create(data);
+        // Trigger reload to refresh the data
+        setReloadTrigger((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error saving:", error);
+      // TODO: Add proper error handling/toast notification
+    }
   };
 
   return (
@@ -201,6 +223,7 @@ export default function Expenses() {
         setIsModalOpen={setIsModalOpen}
         onSave={handleSave}
         userId={user?.id}
+        expenseItems={expenseItems}
       />
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls>

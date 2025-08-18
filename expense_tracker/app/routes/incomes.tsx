@@ -4,27 +4,61 @@ import { ReloadIcon } from "~/components/Icons";
 import { Suspense, useState } from "react";
 import Loader from "~/components/Loader";
 import { IncomesTableData } from "~/hooks/useIncomesTableData";
-import IncomeModal from "~/components/IncomeModal";
+import { CreateEditModal } from "~/components/CreateEditModal";
 import type { Income } from "~/modules/types";
 import { months } from "~/modules/store";
 import { Dropdown } from "~/components/Dropdown";
+import { incomeSourcesApi, incomesApi } from "~/modules/apis";
+import useIncomeSources from "~/hooks/useIncomeSources";
+import { useAuth } from "~/contexts/AuthContext";
 
 export default function Incomes() {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [selectedIncome, setSelectedIncome] = useState<Income | null>(null);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [sourcesReloadTrigger, setSourcesReloadTrigger] = useState(0);
 
   const handleReload = () => setReloadTrigger((prev) => prev + 1);
 
+  // Use the hook to get income sources
+  const { sources: incomeSources, isLoading: isLoadingSources } =
+    useIncomeSources({
+      reloadTrigger: sourcesReloadTrigger,
+    });
+
+  const handleSave = async (data: any) => {
+    try {
+      if (data.mode === "income-source") {
+        // Create income source
+        await incomeSourcesApi.create(data);
+        // Trigger reload to refresh the income sources
+        setSourcesReloadTrigger((prev) => prev + 1);
+      } else if (data.mode === "income") {
+        // Create income
+        await incomesApi.create(data);
+        // Trigger reload to refresh the data
+        setReloadTrigger((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error saving:", error);
+      // TODO: Add proper error handling/toast notification
+    }
+  };
+
   return (
     <div className="p-4 rounded-xl">
-      {/* <IncomeModal
+      <CreateEditModal
+        mode="income"
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        selectedIncome={selectedIncome}
-      /> */}
+        onSave={handleSave}
+        userId={user?.id}
+        editData={selectedIncome || undefined}
+        incomeSources={incomeSources}
+      />
 
       <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
         <HeaderControls>

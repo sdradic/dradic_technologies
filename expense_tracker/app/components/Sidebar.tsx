@@ -289,13 +289,21 @@ function NavItemComponent({
   const isExpanded = expandedItems.includes(item.path);
   const active = isActive(item.path);
 
+  // Check if any children are active to keep parent background selected
+  const hasActiveChildren = (item: NavItem): boolean => {
+    if (!item.children) return false;
+    return item.children.some((child) => isActive(child.path));
+  };
+
+  const isParentActive = active || hasActiveChildren(item);
+
   return (
     <li key={item.path}>
       <div>
         <NavLink
           item={item}
           isCollapsed={isCollapsed}
-          isActive={active}
+          isActive={isParentActive}
           hasChildren={hasChildren}
           isExpanded={isExpanded}
           onToggleExpand={onToggleExpand}
