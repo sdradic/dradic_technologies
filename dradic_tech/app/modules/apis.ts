@@ -314,19 +314,6 @@ export async function createPost(post: BlogPost): Promise<BlogPost> {
   }
 }
 
-export async function pingBackend(): Promise<void> {
-  try {
-    const url = `${API_BASE_URL}/ping`;
-    await fetch(url, {
-      method: "HEAD", // Use HEAD to avoid downloading response body
-    });
-    console.debug("Backend ping successful");
-  } catch (error) {
-    // Silently fail - this is just a pre-warming trick
-    console.debug("Backend ping failed:", error);
-  }
-}
-
 export async function downloadFileFromBackend(filename: string): Promise<void> {
   try {
     // Download file directly from backend

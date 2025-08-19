@@ -1,7 +1,5 @@
 import type { Route } from "./+types/index";
 import { ChipSVG } from "~/components/Icons";
-import { useEffect } from "react";
-import { pingBackend } from "~/modules/apis";
 import { Link } from "react-router";
 
 export function meta(_args: Route.MetaArgs) {
@@ -11,17 +9,7 @@ export function meta(_args: Route.MetaArgs) {
   ];
 }
 
-let pinged = false;
-
 export default function Home() {
-  // Background ping on homepage load
-  useEffect(() => {
-    if (!pinged) {
-      pingBackend();
-      pinged = true;
-    }
-  }, []);
-
   return (
     <>
       {/* Hero Section with Background Video */}

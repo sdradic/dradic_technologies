@@ -3,26 +3,12 @@ import { MoonIcon, SunIcon } from "./Icons";
 import { useTheme } from "~/contexts/ThemeContext";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme, mounted } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   }, [theme]);
-
-  // Don't render until mounted to prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-between w-14 h-7 p-1 rounded-full border border-gray-500 dark:border-gray-400">
-        <div className="flex justify-center items-center w-1/2 h-full rounded-full">
-          <SunIcon className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
-        </div>
-        <div className="flex justify-center items-center w-1/2 h-full rounded-full">
-          <MoonIcon className="w-3 h-3 fill-gray-400 stroke-gray-400" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
