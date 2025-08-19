@@ -1,6 +1,6 @@
 export default function EmptyState({
-  title = "Such empty...",
-  description = "You don't have any expenses yet.",
+  title = "",
+  description = "",
   icon = null,
   button = {
     text: "Button",
@@ -20,10 +20,12 @@ export default function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center h-full">
       {icon && <div className="text-gray-600 dark:text-gray-400">{icon}</div>}
-      <h1 className="text-xl">{title}</h1>
-      <p className="text-gray-600 dark:text-gray-400 text-center">
-        {description}
-      </p>
+      {title && <h1 className="text-xl">{title}</h1>}
+      {description && (
+        <p className="text-gray-600 dark:text-gray-400 text-center">
+          {description}
+        </p>
+      )}
       {button && (
         <button className="btn-primary mt-4" onClick={button.onClick}>
           {button.icon}

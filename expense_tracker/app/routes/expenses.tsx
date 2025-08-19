@@ -196,6 +196,8 @@ function ExpensesContent({
         </>
       ) : (
         <EmptyState
+          title="No expenses yet"
+          description="You don't have any expenses yet."
           button={{
             text: "Add expense",
             icon: <PlusIconOutline className="w-6 h-6 stroke-white" />,

@@ -40,7 +40,7 @@ function IncomesContent({
 
   return (
     <>
-      {table.data.length > 0 ? (
+      {!isLoading && table.data.length > 0 ? (
         <SimpleTable
           title={`${months[month - 1]} ${year}`}
           description="Click on an income to edit or delete."
@@ -97,6 +97,8 @@ function IncomesContent({
         />
       ) : (
         <EmptyState
+          title="No incomes yet"
+          description="You don't have any incomes yet."
           button={{
             text: "Add income",
             icon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
