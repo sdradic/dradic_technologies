@@ -23,7 +23,7 @@ export function useIncomesTableData({
   const userId = user?.id;
   const lastReloadTrigger = useRef(0);
   const hasInitialized = useRef(false);
-  const [data, setData] = useState<DashboardTableWithIncomes>({
+  const defaultData: DashboardTableWithIncomes = {
     table: {
       title: "",
       description: "",
@@ -31,7 +31,9 @@ export function useIncomesTableData({
       data: [],
     },
     incomes: [],
-  });
+  };
+
+  const [data, setData] = useState<DashboardTableWithIncomes>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
 
   // Create a stable cache key including all parameters
@@ -89,8 +91,20 @@ export function useIncomesTableData({
           month,
           "CLP",
         );
-        incomeDashboardCache.set(cacheKey, response);
-        setData(response);
+
+        // Ensure response has the required structure
+        const safeResponse: DashboardTableWithIncomes = {
+          table: response?.table || {
+            title: "",
+            description: "",
+            columns: [],
+            data: [],
+          },
+          incomes: response?.incomes || [],
+        };
+
+        incomeDashboardCache.set(cacheKey, safeResponse);
+        setData(safeResponse);
       } catch (error) {
         console.error("Error loading income dashboard:", error);
         setData({
@@ -111,5 +125,9 @@ export function useIncomesTableData({
     loadData();
   }, [userId, year, month, reloadTrigger, cacheKey]);
 
-  return { ...data, isLoading };
+  return {
+    table: data.table,
+    incomes: data.incomes,
+    isLoading,
+  };
 }
