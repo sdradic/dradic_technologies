@@ -57,7 +57,7 @@ function useExpenseItems({ reloadTrigger }: { reloadTrigger: number }) {
       try {
         setIsLoading(true);
         loadingStates.set(cacheKey, true);
-        const response = await expenseItemsApi.getAll({ user_id: userId });
+        const response = await expenseItemsApi.getAll();
         expenseItemsCache.set(cacheKey, response);
         setData(response);
       } catch (error) {

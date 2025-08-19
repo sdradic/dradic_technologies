@@ -10,6 +10,7 @@ import SimpleForm from "~/components/SimpleForm";
 import SimpleTable from "~/components/SimpleTable";
 import useGroups from "~/hooks/useGroups";
 import Loader from "~/components/Loader";
+import { useAuth } from "~/contexts/AuthContext";
 
 // Separate component for groups content
 function GroupsContent({
@@ -69,6 +70,7 @@ function GroupsContent({
 export default function GroupSettings() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reloadTrigger, setReloadTrigger] = useState(0);
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({ name: "", description: "" });
 

@@ -57,7 +57,7 @@ function useIncomeSources({ reloadTrigger }: { reloadTrigger: number }) {
       try {
         setIsLoading(true);
         loadingStates.set(cacheKey, true);
-        const response = await incomeSourcesApi.getAll({ user_id: userId });
+        const response = await incomeSourcesApi.getAll();
         incomeSourcesCache.set(cacheKey, response);
         setData(response);
       } catch (error) {

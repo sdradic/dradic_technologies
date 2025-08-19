@@ -100,7 +100,7 @@ async function apiRequest<T>(
   }
 }
 
-// Groups API
+// Groups API - Backend gets user from authentication
 export const groupsApi = {
   // Create a new group
   create: (data: GroupCreate): Promise<Group> =>
@@ -109,8 +109,8 @@ export const groupsApi = {
       body: JSON.stringify(data),
     }),
 
-  // Get all groups
-  getAll: (): Promise<Group[]> => apiRequest(`/api/expense-tracker/groups/`),
+  // Get all groups for the authenticated user
+  getAll: (): Promise<Group[]> => apiRequest("/api/expense-tracker/groups/"),
 
   // Get a specific group
   getById: (id: string): Promise<Group> =>
@@ -180,10 +180,9 @@ export const expenseItemsApi = {
       body: JSON.stringify(data),
     }),
 
-  // Get expense items with filters
+  // Get expense items with filters - backend filters by authenticated user
   getAll: (
     params: {
-      user_id?: string;
       category?: string;
       is_fixed?: boolean;
       limit?: number;
@@ -231,13 +230,9 @@ export const expenseItemsApi = {
       `/api/expense-tracker/expense-items/${id}/expenses?limit=${limit}&offset=${offset}`,
     ),
 
-  // Get all categories
-  getCategories: (userId?: string): Promise<string[]> => {
-    const params = userId ? `?user_id=${userId}` : "";
-    return apiRequest(
-      `/api/expense-tracker/expense-items/categories/${params}`,
-    );
-  },
+  // Get all categories for the authenticated user
+  getCategories: (): Promise<string[]> =>
+    apiRequest("/api/expense-tracker/expense-items/categories/"),
 };
 
 // Expenses API
@@ -249,10 +244,9 @@ export const expensesApi = {
       body: JSON.stringify(data),
     }),
 
-  // Get expenses with filters
+  // Get expenses with filters - backend filters by authenticated user
   getAll: (
     params: {
-      user_id?: string;
       item_id?: string;
       category?: string;
       currency?: string;
@@ -291,11 +285,9 @@ export const expensesApi = {
       method: "DELETE",
     }),
 
-  // Get all currencies
-  getCurrencies: (userId?: string): Promise<string[]> => {
-    const params = userId ? `?user_id=${userId}` : "";
-    return apiRequest(`/api/expense-tracker/expenses/currencies/${params}`);
-  },
+  // Get all currencies for the authenticated user
+  getCurrencies: (): Promise<string[]> =>
+    apiRequest("/api/expense-tracker/expenses/currencies/"),
 };
 
 // Income Sources API
@@ -307,10 +299,9 @@ export const incomeSourcesApi = {
       body: JSON.stringify(data),
     }),
 
-  // Get all income sources (optionally filter by user)
+  // Get all income sources for the authenticated user
   getAll: (
     params: {
-      user_id?: string;
       category?: string;
       limit?: number;
       offset?: number;
@@ -360,9 +351,9 @@ export const incomeSourcesApi = {
       `/api/expense-tracker/income-sources/${sourceId}/incomes?limit=${limit}&offset=${offset}`,
     ),
 
-  // Get all unique categories
+  // Get all unique categories for the authenticated user
   getCategories: (): Promise<string[]> =>
-    apiRequest(`/api/expense-tracker/income-sources/categories/`),
+    apiRequest("/api/expense-tracker/income-sources/categories/"),
 };
 
 // Incomes API
@@ -374,10 +365,9 @@ export const incomesApi = {
       body: JSON.stringify(data),
     }),
 
-  // Get incomes with filters
+  // Get incomes with filters - backend filters by authenticated user
   getAll: (
     params: {
-      user_id?: string;
       source_id?: string;
       category?: string;
       currency?: string;
@@ -424,27 +414,25 @@ export const incomesApi = {
 
 // Dashboard API
 export const dashboardApi = {
-  // Get unified monthly dashboard data
+  // Get unified monthly dashboard data for authenticated user
   getMonthlyDashboard: (
     year: number,
     month: number,
     currency = "CLP",
-    user_id: string,
   ): Promise<DashboardData> => {
-    const params = new URLSearchParams({ currency, user_id });
+    const params = new URLSearchParams({ currency });
     return apiRequest(
       `/api/expense-tracker/expenses/dashboard/monthly/${year}/${month}?${params.toString()}`,
     );
   },
 
-  // Get unified monthly income dashboard data
+  // Get unified monthly income dashboard data for authenticated user
   getMonthlyIncomeDashboard: (
     year: number,
     month: number,
     currency = "CLP",
-    user_id: string,
   ): Promise<DashboardTableWithIncomes> => {
-    const params = new URLSearchParams({ currency, user_id });
+    const params = new URLSearchParams({ currency });
     return apiRequest(
       `/api/expense-tracker/incomes/dashboard/monthly/${year}/${month}/table?${params}`,
     );
@@ -496,6 +484,7 @@ const api = {
   expenses: expensesApi,
   incomeSources: incomeSourcesApi,
   incomes: incomesApi,
+  dashboard: dashboardApi,
   health: healthApi,
 };
 

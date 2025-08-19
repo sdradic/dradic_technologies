@@ -1,8 +1,7 @@
 import { HeaderControls } from "~/components/HeaderControls";
 import { HeaderButton } from "~/components/HeaderButton";
 import { ReloadIcon } from "~/components/Icons";
-import { Suspense, useState } from "react";
-import Loader from "~/components/Loader";
+import { useState } from "react";
 import { IncomesTableData } from "~/hooks/useIncomesTableData";
 import { CreateEditModal } from "~/components/CreateEditModal";
 import type { Income } from "~/modules/types";
@@ -119,15 +118,13 @@ export default function Incomes() {
         <div className="separator my-4" />
         <div className="flex flex-col gap-4">
           <div className="p-4">
-            <Suspense fallback={<Loader message="Loading incomes..." />}>
-              <IncomesTableData
-                setIsModalOpen={setIsModalOpen}
-                reloadTrigger={reloadTrigger}
-                setSelectedIncome={setSelectedIncome}
-                year={year}
-                month={month}
-              />
-            </Suspense>
+            <IncomesTableData
+              setIsModalOpen={setIsModalOpen}
+              reloadTrigger={reloadTrigger}
+              setSelectedIncome={setSelectedIncome}
+              year={year}
+              month={month}
+            />
           </div>
         </div>
       </div>
