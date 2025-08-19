@@ -454,7 +454,29 @@ export const formatCurrency = (amount: number, currency: string): string => {
 };
 
 export const formatDate = (date: string | Date): string => {
-  const d = typeof date === "string" ? new Date(date) : date;
+  let d: Date;
+
+  if (typeof date === "string") {
+    // Handle different date formats
+    if (date.includes("T") || date.includes("Z")) {
+      // ISO datetime string - parse as is
+      d = new Date(date);
+    } else if (date.includes("/")) {
+      // DD/MM/YYYY format
+      const [day, month, year] = date.split("/");
+      d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else if (date.includes("-") && date.split("-").length === 3) {
+      // YYYY-MM-DD format - parse as local date to avoid timezone issues
+      const [year, month, day] = date.split("-");
+      d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else {
+      // Fallback to regular parsing
+      d = new Date(date);
+    }
+  } else {
+    d = date;
+  }
+
   return d.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",

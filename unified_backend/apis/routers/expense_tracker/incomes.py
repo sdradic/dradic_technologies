@@ -390,7 +390,7 @@ async def get_monthly_income_table(
                     name=income["source_name"],
                     category=income["source_category"] or "Uncategorized",
                     amount=f"{currency} {abs(float(income['amount'])):,.0f}",
-                    date=income["date"].strftime("%d/%m/%Y"),
+                    date=income["date"].strftime("%Y-%m-%d"),
                     description=income["description"] or income["source_name"],
                     recurring=income["source_is_recurring"],
                 )

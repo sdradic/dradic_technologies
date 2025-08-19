@@ -1,16 +1,115 @@
 import { HeaderControls } from "~/components/HeaderControls";
 import { HeaderButton } from "~/components/HeaderButton";
-import { ReloadIcon } from "~/components/Icons";
+import { ReloadIcon, PlusIconOutline } from "~/components/Icons";
 import { useState, Suspense } from "react";
-import { IncomesTableData } from "~/hooks/useIncomesTableData";
 import { CreateEditModal } from "~/components/CreateEditModal";
 import type { Income } from "~/modules/types";
 import { months } from "~/modules/store";
 import { Dropdown } from "~/components/Dropdown";
-import { incomeSourcesApi, incomesApi } from "~/modules/apis";
+import { incomeSourcesApi, incomesApi, formatDate } from "~/modules/apis";
 import useIncomeSources from "~/hooks/useIncomeSources";
 import { useAuth } from "~/contexts/AuthContext";
 import Loader from "~/components/Loader";
+import SimpleTable from "~/components/SimpleTable";
+import { useIncomesTableData } from "~/hooks/useIncomesTableData";
+import EmptyState from "~/components/EmptyState";
+
+// Separate component that can suspend
+function IncomesContent({
+  reloadTrigger,
+  year,
+  month,
+  setIsModalOpen,
+  setSelectedIncome,
+}: {
+  reloadTrigger: number;
+  year: number;
+  month: number;
+  setIsModalOpen: (isOpen: boolean) => void;
+  setSelectedIncome: (income: Income | null) => void;
+}) {
+  const { table, incomes, isLoading } = useIncomesTableData({
+    reloadTrigger,
+    year,
+    month,
+  });
+
+  if (isLoading) {
+    return <Loader message="Loading incomes..." />;
+  }
+
+  return (
+    <>
+      {table.data.length > 0 ? (
+        <SimpleTable
+          title={`${months[month - 1]} ${year}`}
+          description="Click on an income to edit or delete."
+          columns={[
+            "Source",
+            "Category",
+            "Amount",
+            "Date",
+            "Description",
+            "Recurring",
+          ]}
+          data={table.data.map((row: any) => ({
+            id: row.id,
+            source: row.name,
+            category: row.category,
+            amount: row.amount,
+            date: formatDate(row.date),
+            description: row.description,
+            recurring: "recurring" in row && row.recurring ? "Yes" : "No",
+          }))}
+          hasButton={true}
+          buttonProps={{
+            buttonText: "Add income",
+            buttonIcon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
+            buttonClassName: "btn-primary",
+            onClick: () => {
+              setSelectedIncome(null);
+              setIsModalOpen(true);
+            },
+          }}
+          tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
+          tableClassName="w-full p-6"
+          onRowClick={(row: any) => {
+            // Find the full income object from the incomes array
+            const fullIncome = incomes.find(
+              (income: Income) => income.id === row.id,
+            );
+            if (fullIncome) {
+              // Use the full income object with all required fields
+              const incomeToEdit: Income = {
+                id: fullIncome.id,
+                source_id: fullIncome.source_id,
+                amount: fullIncome.amount,
+                currency: fullIncome.currency,
+                date: fullIncome.date,
+                description: fullIncome.description || "",
+                created_at: fullIncome.created_at,
+                updated_at: fullIncome.updated_at,
+              };
+              setSelectedIncome(incomeToEdit);
+            }
+            setIsModalOpen(true);
+          }}
+        />
+      ) : (
+        <EmptyState
+          button={{
+            text: "Add income",
+            icon: <PlusIconOutline className="w-6 h-6 stroke-white" />,
+            onClick: () => {
+              setSelectedIncome(null);
+              setIsModalOpen(true);
+            },
+          }}
+        />
+      )}
+    </>
+  );
+}
 
 export default function Incomes() {
   const { user } = useAuth();
@@ -117,18 +216,16 @@ export default function Incomes() {
           </div>
         </HeaderControls>
         <div className="separator my-4" />
-        <div className="flex flex-col gap-4">
-          <div className="p-4">
-            <Suspense fallback={<Loader message="Loading incomes..." />}>
-              <IncomesTableData
-                setIsModalOpen={setIsModalOpen}
-                reloadTrigger={reloadTrigger}
-                setSelectedIncome={setSelectedIncome}
-                year={year}
-                month={month}
-              />
-            </Suspense>
-          </div>
+        <div className="flex flex-col gap-4 p-4">
+          <Suspense fallback={<Loader message="Loading incomes..." />}>
+            <IncomesContent
+              reloadTrigger={reloadTrigger}
+              year={year}
+              month={month}
+              setIsModalOpen={setIsModalOpen}
+              setSelectedIncome={setSelectedIncome}
+            />
+          </Suspense>
         </div>
       </div>
     </div>
