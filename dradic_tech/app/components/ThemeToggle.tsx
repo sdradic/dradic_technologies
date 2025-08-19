@@ -41,7 +41,7 @@ export function ThemeToggle() {
       `}
       >
         <MoonIcon
-          className={`w-3 h-3 ${theme === "dark" ? "fill-gray-400 stroke-gray-400" : "fill-gray-400 stroke-gray-400"}`}
+          className={`w-3 h-3 ${theme === "dark" ? "fill-indigo-200 stroke-indigo-200" : "fill-gray-400 stroke-gray-400"}`}
         />
       </div>
     </div>
