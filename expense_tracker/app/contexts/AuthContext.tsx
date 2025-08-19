@@ -5,6 +5,7 @@ import {
   useState,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import type { ReactNode } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -45,15 +46,16 @@ const mapSupabaseUser = async (
   return user;
 };
 
-// Create a basic user object from Supabase user (for immediate login)
-const createBasicUser = (supabaseUser: SupabaseUser): User => ({
+// Create a user object from Supabase user (session already contains name/email)
+const createUserFromSession = (supabaseUser: SupabaseUser): User => ({
   id: supabaseUser.id,
   name:
     supabaseUser.user_metadata?.full_name ||
+    supabaseUser.user_metadata?.name ||
     supabaseUser.email?.split("@")[0] ||
     "User",
   email: supabaseUser.email || "",
-  isLoading: true, // Flag to indicate profile is still loading
+  isLoading: false, // No need to load if we have session data
 });
 
 export function useAuthStore() {
@@ -65,20 +67,26 @@ export function useAuthStore() {
   const isInitialized = useRef(false);
   const currentUserRef = useRef<User | null>(null);
 
-  // Load full user profile in background
+  // Load user profile - use session data first, API as fallback for additional data
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    // Always start with session data (already cached by Supabase)
+    const sessionUser = createUserFromSession(supabaseUser);
+    setUser(sessionUser);
+    currentUserRef.current = sessionUser;
+
+    // Only fetch from API if we need additional data (like groups)
+    // For basic name/email, session data is sufficient
     try {
-      const fullUser = await mapSupabaseUser(supabaseUser);
-      if (fullUser) {
-        setUser({ ...fullUser, isLoading: false });
-        currentUserRef.current = { ...fullUser, isLoading: false };
+      const apiUser = await mapSupabaseUser(supabaseUser);
+      if (apiUser && apiUser.groups) {
+        // Update with groups data from API
+        const enrichedUser = { ...sessionUser, groups: apiUser.groups };
+        setUser(enrichedUser);
+        currentUserRef.current = enrichedUser;
       }
     } catch (error) {
-      console.error("Failed to load user profile:", error);
-      // Keep the basic user data even if profile loading fails
-      const basicUser = createBasicUser(supabaseUser);
-      setUser({ ...basicUser, isLoading: false });
-      currentUserRef.current = { ...basicUser, isLoading: false };
+      console.warn("Failed to load additional user data:", error);
+      // Continue with session data - no problem
     }
   };
 
@@ -109,14 +117,10 @@ export function useAuthStore() {
         }
 
         if (session?.user) {
-          // Immediately set basic user data for instant login
-          const basicUser = createBasicUser(session.user);
-          setUser(basicUser);
-          currentUserRef.current = basicUser;
           setIsAuthenticated(true);
           setIsGuest(false);
 
-          // Load full profile in background
+          // Load user profile (starts with session data, then enriches from API)
           loadUserProfile(session.user);
         } else {
           setUser(null);
@@ -156,14 +160,10 @@ export function useAuthStore() {
             userCache.delete(currentUserRef.current.id);
           }
 
-          // Immediately set basic user data
-          const basicUser = createBasicUser(session.user);
-          setUser(basicUser);
-          currentUserRef.current = basicUser;
           setIsAuthenticated(true);
           setIsGuest(false);
 
-          // Load full profile in background
+          // Load user profile (starts with session data, then enriches from API)
           loadUserProfile(session.user);
         } else {
           // Clear cache when user logs out
@@ -186,7 +186,7 @@ export function useAuthStore() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
       setIsLoading(true);
       setAuthError(null);
@@ -200,18 +200,15 @@ export function useAuthStore() {
         throw error;
       }
 
-      // Immediately update auth state with basic user data
+      // Immediately update auth state
       if (data.user) {
-        const basicUser = createBasicUser(data.user);
-        setUser(basicUser);
-        currentUserRef.current = basicUser;
         setIsAuthenticated(true);
         setIsGuest(false);
 
-        // Load full profile in background
+        // Load user profile (starts with session data, then enriches from API)
         loadUserProfile(data.user);
 
-        return basicUser;
+        return createUserFromSession(data.user);
       }
 
       return null;
@@ -226,7 +223,7 @@ export function useAuthStore() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const handleGuestLogin = (isLoggingIn: boolean) => {
     const mockUser = {
