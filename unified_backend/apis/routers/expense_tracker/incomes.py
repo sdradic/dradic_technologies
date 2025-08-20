@@ -91,11 +91,10 @@ async def get_incomes(
                 isc.name as source_name, isc.category as source_category,
                 isc.is_recurring as source_is_recurring,
                 u.name as user_name, u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.incomes i
             JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
             JOIN dradic_tech.users u ON isc.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE isc.user_id = :user_id
         """
         params = {"user_id": user_id}
@@ -195,11 +194,10 @@ async def get_income(income_id: str, current_user: dict = current_user_dependenc
                 isc.name as source_name, isc.category as source_category,
                 isc.is_recurring as source_is_recurring,
                 u.name as user_name, u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.incomes i
             JOIN dradic_tech.income_sources isc ON i.source_id = isc.id
             JOIN dradic_tech.users u ON isc.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE i.id = :income_id
         """
         incomes = DatabaseModel.execute_query(query, {"income_id": income_id})
@@ -360,11 +358,11 @@ async def get_monthly_income_table(
                 ins.is_recurring as source_is_recurring,
                 u.name as user_name,
                 u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.incomes i
             JOIN dradic_tech.income_sources ins ON i.source_id = ins.id
             JOIN dradic_tech.users u ON ins.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
+            LEFT JOIN dradic_tech.user_groups ug ON u.id = ug.user_id
             WHERE EXTRACT(YEAR FROM i.date) = :year
             AND EXTRACT(MONTH FROM i.date) = :month
             AND i.currency = :currency

@@ -91,11 +91,10 @@ async def get_expenses(
                 e.id, e.item_id, e.date, e.amount, e.currency, e.created_at,
                 ei.name as item_name, ei.category as item_category, ei.is_fixed as item_is_fixed,
                 u.name as user_name, u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.expenses e
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             JOIN dradic_tech.users u ON ei.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE u.id = :user_id
         """
         params = {"user_id": user_id}
@@ -197,11 +196,10 @@ async def get_expense(expense_id: UUID, current_user: dict = current_user_depend
                 e.id, e.item_id, e.date, e.amount, e.currency, e.created_at,
                 ei.name as item_name, ei.category as item_category, ei.is_fixed as item_is_fixed,
                 u.name as user_name, u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.expenses e
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             JOIN dradic_tech.users u ON ei.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE e.id = :expense_id
         """
         expenses = DatabaseModel.execute_query(query, {"expense_id": expense_id})
@@ -394,11 +392,10 @@ async def get_monthly_dashboard(
                 ei.is_fixed as item_is_fixed,
                 u.name as user_name,
                 u.email as user_email,
-                g.name as group_name
+                NULL as group_name
             FROM dradic_tech.expenses e
             JOIN dradic_tech.expense_items ei ON e.item_id = ei.id
             JOIN dradic_tech.users u ON ei.user_id = u.id
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE EXTRACT(YEAR FROM e.date) = :year
             AND EXTRACT(MONTH FROM e.date) = :month
             AND e.currency = :currency
