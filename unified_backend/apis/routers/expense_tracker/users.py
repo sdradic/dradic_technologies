@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from models import User, UserCreate, UserWithGroup
+from models import User, UserCreate, UserGroupMembership, UserWithGroups
 from utils.auth import get_current_user
 from utils.db import DatabaseModel
 
@@ -37,19 +37,7 @@ async def create_user(user: UserCreate, current_user: dict = current_user_depend
         if existing_user and existing_user[0]["count"] > 0:
             raise HTTPException(status_code=400, detail="User already exists")
 
-        # Validate group exists if group_id is provided
-        if user.group_id:
-            group_check_query = """
-                SELECT COUNT(*) as count
-                FROM dradic_tech.groups
-                WHERE id = :group_id
-            """
-            group_exists = DatabaseModel.execute_query(
-                group_check_query, {"group_id": user.group_id}
-            )
-
-            if not group_exists or group_exists[0]["count"] == 0:
-                raise HTTPException(status_code=400, detail="Group not found")
+        # Note: Groups are now managed separately through user_groups table
 
         user_data = user.dict()
         new_user = DatabaseModel.insert_record("users", user_data)
@@ -63,30 +51,56 @@ async def create_user(user: UserCreate, current_user: dict = current_user_depend
         ) from e
 
 
-@users_router.get("/", response_model=List[UserWithGroup])
+@users_router.get("/", response_model=List[UserWithGroups])
 async def get_users(
     group_id: Optional[UUID] = None, current_user: dict = current_user_dependency
 ):
     """Get all users, optionally filtered by group"""
     try:
         # Build the query with optional group filter
-        query = """
-            SELECT
-                u.id, u.name, u.email, u.group_id, u.created_at,
-                g.name as group_name, g.description as group_description
-            FROM dradic_tech.users u
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
-        """
-        params = {}
-
         if group_id:
-            query += " WHERE u.group_id = :group_id"
-            params["group_id"] = group_id
+            # Get users in a specific group
+            query = """
+                SELECT DISTINCT
+                    u.id, u.name, u.email, u.role, u.created_at
+                FROM dradic_tech.users u
+                JOIN dradic_tech.user_groups ug ON u.id = ug.user_id
+                WHERE ug.group_id = :group_id
+                ORDER BY u.name
+            """
+            params = {"group_id": group_id}
+            users = DatabaseModel.execute_query(query, params)
+        else:
+            # Get all users
+            query = """
+                SELECT
+                    u.id, u.name, u.email, u.role, u.created_at
+                FROM dradic_tech.users u
+                ORDER BY u.name
+            """
+            users = DatabaseModel.execute_query(query, {})
 
-        query += " ORDER BY u.name"
+        # For each user, get their groups
+        result = []
+        for user in users:
+            groups_query = """
+                SELECT g.id, g.name, g.description, g.created_at
+                FROM dradic_tech.groups g
+                JOIN dradic_tech.user_groups ug ON g.id = ug.group_id
+                WHERE ug.user_id = :user_id
+                ORDER BY g.name
+            """
+            groups = DatabaseModel.execute_query(groups_query, {"user_id": user["id"]})
 
-        users = DatabaseModel.execute_query(query, params)
-        return [UserWithGroup(**user) for user in users]
+            # Convert groups to Group objects
+            from models import Group
+
+            user_groups = [Group(**group) for group in groups]
+
+            user_data = {**user, "groups": user_groups}
+            result.append(UserWithGroups(**user_data))
+
+        return result
     except Exception as e:
         logger.error(f"Failed to fetch users: {str(e)}")
         raise HTTPException(
@@ -94,24 +108,41 @@ async def get_users(
         ) from e
 
 
-@users_router.get("/{user_id}", response_model=UserWithGroup)
+@users_router.get("/{user_id}", response_model=UserWithGroups)
 async def get_user(user_id: str, current_user: dict = current_user_dependency):
     """Get a specific user by ID"""
     try:
-        query = """
+        # Get user data
+        user_query = """
             SELECT
-                u.id, u.name, u.email, u.group_id, u.created_at,
-                g.name as group_name, g.description as group_description
+                u.id, u.name, u.email, u.role, u.created_at
             FROM dradic_tech.users u
-            LEFT JOIN dradic_tech.groups g ON u.group_id = g.id
             WHERE u.id = :user_id
         """
-        users = DatabaseModel.execute_query(query, {"user_id": user_id})
+        users = DatabaseModel.execute_query(user_query, {"user_id": user_id})
 
         if not users:
             raise HTTPException(status_code=404, detail="User not found")
 
-        return UserWithGroup(**users[0])
+        user = users[0]
+
+        # Get user's groups
+        groups_query = """
+            SELECT g.id, g.name, g.description, g.created_at
+            FROM dradic_tech.groups g
+            JOIN dradic_tech.user_groups ug ON g.id = ug.group_id
+            WHERE ug.user_id = :user_id
+            ORDER BY g.name
+        """
+        groups = DatabaseModel.execute_query(groups_query, {"user_id": user_id})
+
+        # Convert groups to Group objects
+        from models import Group
+
+        user_groups = [Group(**group) for group in groups]
+
+        user_data = {**user, "groups": user_groups}
+        return UserWithGroups(**user_data)
     except HTTPException:
         raise
     except Exception as e:
@@ -135,19 +166,7 @@ async def update_user(
         if user.id != current_user.get("uid"):
             raise HTTPException(status_code=403, detail="Cannot change user ID")
 
-        # Validate group exists if group_id is being changed
-        if user.group_id:
-            group_check_query = """
-                SELECT COUNT(*) as count
-                FROM dradic_tech.groups
-                WHERE id = :group_id
-            """
-            group_exists = DatabaseModel.execute_query(
-                group_check_query, {"group_id": user.group_id}
-            )
-
-            if not group_exists or group_exists[0]["count"] == 0:
-                raise HTTPException(status_code=400, detail="Group not found")
+        # Note: Groups are now managed separately through user_groups table
 
         user_data = user.dict(exclude_unset=True)
         updated_user = DatabaseModel.update_record("users", user_id, user_data)
@@ -217,6 +236,142 @@ async def delete_user(user_id: str, current_user: dict = current_user_dependency
         logger.error(f"Failed to delete user: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to delete user: {str(e)}"
+        ) from e
+
+
+@users_router.post("/{user_id}/groups/{group_id}")
+async def add_user_to_group(
+    user_id: str, group_id: UUID, current_user: dict = current_user_dependency
+):
+    """Add a user to a group"""
+    try:
+        # Check if user exists
+        user_check_query = """
+            SELECT COUNT(*) as count
+            FROM dradic_tech.users
+            WHERE id = :user_id
+        """
+        user_exists = DatabaseModel.execute_query(
+            user_check_query, {"user_id": user_id}
+        )
+
+        if not user_exists or user_exists[0]["count"] == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Check if group exists
+        group_check_query = """
+            SELECT COUNT(*) as count
+            FROM dradic_tech.groups
+            WHERE id = :group_id
+        """
+        group_exists = DatabaseModel.execute_query(
+            group_check_query, {"group_id": group_id}
+        )
+
+        if not group_exists or group_exists[0]["count"] == 0:
+            raise HTTPException(status_code=404, detail="Group not found")
+
+        # Check if user is already in the group
+        existing_membership_query = """
+            SELECT COUNT(*) as count
+            FROM dradic_tech.user_groups
+            WHERE user_id = :user_id AND group_id = :group_id
+        """
+        existing_membership = DatabaseModel.execute_query(
+            existing_membership_query, {"user_id": user_id, "group_id": group_id}
+        )
+
+        if existing_membership and existing_membership[0]["count"] > 0:
+            raise HTTPException(status_code=400, detail="User is already in this group")
+
+        # Add user to group
+        insert_query = """
+            INSERT INTO dradic_tech.user_groups (user_id, group_id)
+            VALUES (:user_id, :group_id)
+        """
+        DatabaseModel.execute_query(
+            insert_query, {"user_id": user_id, "group_id": group_id}
+        )
+
+        return {"message": f"User {user_id} added to group {group_id} successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to add user to group: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to add user to group: {str(e)}"
+        ) from e
+
+
+@users_router.delete("/{user_id}/groups/{group_id}")
+async def remove_user_from_group(
+    user_id: str, group_id: UUID, current_user: dict = current_user_dependency
+):
+    """Remove a user from a group"""
+    try:
+        # Check if user is in the group
+        membership_query = """
+            SELECT COUNT(*) as count
+            FROM dradic_tech.user_groups
+            WHERE user_id = :user_id AND group_id = :group_id
+        """
+        membership = DatabaseModel.execute_query(
+            membership_query, {"user_id": user_id, "group_id": group_id}
+        )
+
+        if not membership or membership[0]["count"] == 0:
+            raise HTTPException(status_code=404, detail="User is not in this group")
+
+        # Remove user from group
+        delete_query = """
+            DELETE FROM dradic_tech.user_groups
+            WHERE user_id = :user_id AND group_id = :group_id
+        """
+        DatabaseModel.execute_query(
+            delete_query, {"user_id": user_id, "group_id": group_id}
+        )
+
+        return {"message": f"User {user_id} removed from group {group_id} successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to remove user from group: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to remove user from group: {str(e)}"
+        ) from e
+
+
+@users_router.get("/{user_id}/groups")
+async def get_user_groups(user_id: str, current_user: dict = current_user_dependency):
+    """Get all groups for a user"""
+    try:
+        # Ensure user can only access their own groups
+        if user_id != current_user.get("uid"):
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's groups"
+            )
+
+        query = """
+            SELECT
+                ug.user_id, ug.group_id,
+                g.name as group_name, g.description as group_description
+            FROM dradic_tech.user_groups ug
+            JOIN dradic_tech.groups g ON ug.group_id = g.id
+            WHERE ug.user_id = :user_id
+            ORDER BY g.name
+        """
+
+        groups = DatabaseModel.execute_query(query, {"user_id": user_id})
+        return [UserGroupMembership(**group) for group in groups]
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to fetch user groups: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch user groups: {str(e)}"
         ) from e
 
 

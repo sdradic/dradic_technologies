@@ -7,6 +7,9 @@ CREATE SCHEMA IF NOT EXISTS dradic_tech;
 -- Create currency enum type
 CREATE TYPE dradic_tech.currency AS ENUM ('USD', 'CLP', 'EUR');
 
+-- Create user role enum type
+CREATE TYPE dradic_tech.user_role AS ENUM ('admin', 'user');
+
 -- Create groups table
 CREATE TABLE dradic_tech.groups (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -20,8 +23,15 @@ CREATE TABLE dradic_tech.users (
     id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL,
     email VARCHAR NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    group_id UUID REFERENCES dradic_tech.groups(id)
+    role dradic_tech.user_role NOT NULL DEFAULT 'user',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create user_groups junction table for many-to-many relationship
+CREATE TABLE dradic_tech.user_groups (
+    user_id VARCHAR NOT NULL REFERENCES dradic_tech.users(id) ON DELETE CASCADE,
+    group_id UUID NOT NULL REFERENCES dradic_tech.groups(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, group_id)
 );
 
 -- Create expense_items table
@@ -68,6 +78,8 @@ CREATE TABLE dradic_tech.incomes (
 
 -- Create indexes for better performance
 CREATE UNIQUE INDEX ix_dradic_tech_users_email ON dradic_tech.users (email);
+CREATE INDEX ix_dradic_tech_user_groups_user_id ON dradic_tech.user_groups (user_id);
+CREATE INDEX ix_dradic_tech_user_groups_group_id ON dradic_tech.user_groups (group_id);
 CREATE INDEX ix_dradic_tech_expenses_date ON dradic_tech.expenses (date);
 CREATE INDEX ix_dradic_tech_expense_items_user_id ON dradic_tech.expense_items (user_id);
 CREATE INDEX ix_dradic_tech_incomes_date ON dradic_tech.incomes (date);
@@ -76,6 +88,7 @@ CREATE INDEX ix_dradic_tech_income_sources_user_id ON dradic_tech.income_sources
 -- Enable Row Level Security (RLS) for all tables
 ALTER TABLE dradic_tech.groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dradic_tech.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE dradic_tech.user_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dradic_tech.expense_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dradic_tech.expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dradic_tech.income_sources ENABLE ROW LEVEL SECURITY;
@@ -87,7 +100,10 @@ ALTER TABLE dradic_tech.incomes ENABLE ROW LEVEL SECURITY;
 -- Groups policy - users can see groups they belong to
 CREATE POLICY "Users can view groups they belong to" ON dradic_tech.groups
     FOR SELECT USING (
-        id IN (SELECT group_id FROM dradic_tech.users WHERE id = auth.uid()::text)
+        id IN (
+            SELECT group_id FROM dradic_tech.user_groups
+            WHERE user_id = auth.uid()::text
+        )
     );
 
 -- Users policy - authenticated users can manage their own profile
@@ -99,6 +115,19 @@ CREATE POLICY "Users can insert their own data" ON dradic_tech.users
 
 CREATE POLICY "Users can update their own data" ON dradic_tech.users
     FOR UPDATE USING (id = auth.uid()::text);
+
+-- User groups policy - users can view their own group memberships
+CREATE POLICY "Users can view their own group memberships" ON dradic_tech.user_groups
+    FOR SELECT USING (user_id = auth.uid()::text);
+
+-- User groups policy - admins can manage all group memberships
+CREATE POLICY "Admins can manage all group memberships" ON dradic_tech.user_groups
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM dradic_tech.users
+            WHERE id = auth.uid()::text AND role = 'admin'
+        )
+    );
 
 -- Expense items policy - users can manage their own expense items
 CREATE POLICY "Users can manage their own expense items" ON dradic_tech.expense_items
@@ -148,4 +177,4 @@ CREATE TRIGGER update_incomes_updated_at
 GRANT USAGE ON SCHEMA dradic_tech TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA dradic_tech TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA dradic_tech TO authenticated;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA dradic_tech TO authenticated; 
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA dradic_tech TO authenticated;

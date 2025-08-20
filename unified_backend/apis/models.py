@@ -28,7 +28,7 @@ class UserBase(BaseModel):
     id: str
     name: str
     email: EmailStr
-    group_id: Optional[UUID] = None
+    role: str = "user"  # Default to "user" role
 
     class Config:
         from_attributes = True
@@ -42,9 +42,18 @@ class User(UserBase):
     created_at: datetime
 
 
-class UserWithGroup(User):
-    group_name: Optional[str] = None
+class UserWithGroups(User):
+    groups: List[Group] = []
+
+
+class UserGroupMembership(BaseModel):
+    user_id: str
+    group_id: UUID
+    group_name: str
     group_description: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 
 # Expense Item Models
