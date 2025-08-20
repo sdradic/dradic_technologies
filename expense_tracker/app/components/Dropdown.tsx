@@ -39,7 +39,7 @@ export const Dropdown = ({
 
   return (
     <div
-      className={`relative inline-block text-left w-full ${className} ${
+      className={`relative inline-block text-left w-full min-w-36 ${className} ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       ref={dropdownRef}
