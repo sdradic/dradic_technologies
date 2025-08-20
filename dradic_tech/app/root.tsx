@@ -56,30 +56,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('dradic-tech-local-state');
-                  if (theme) {
-                    var parsed = JSON.parse(theme);
-                    if (parsed.theme === 'dark') {
-                      document.documentElement.className = 'dark';
-                    }
-                  } else {
-                    // Check system preference if no saved theme
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                      document.documentElement.className = 'dark';
-                    }
-                  }
-                } catch (e) {
-                  console.error('Error applying theme:', e);
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body>
         {children}

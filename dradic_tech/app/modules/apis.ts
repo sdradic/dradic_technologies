@@ -4,7 +4,6 @@ import type {
   BlogPostMetadata,
   BlogPostWithSeparatedContent,
 } from "./types";
-import { localState } from "./utils";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -84,9 +83,6 @@ export async function fetchPostContent(
   slug: string,
 ): Promise<BlogPostWithSeparatedContent> {
   try {
-    // Clear cache for this post to force fresh data (temporary fix for migration)
-    localState.removePost(slug);
-
     const post: BlogPostWithSeparatedContent = await apiRequest(
       `/api/blog/posts-separated/${slug}`,
     );
@@ -101,132 +97,26 @@ export async function fetchBlogPosts(): Promise<
   BlogPostWithSeparatedContent[]
 > {
   try {
-    // Check cache first
-    if (localState.isCacheValid()) {
-      const cachedPosts = localState.getCachedBlogPosts();
-      if (cachedPosts.length > 0) {
-        console.debug("Using cached blog posts");
-        // Convert cached posts to the expected format
-        return cachedPosts.map((post) => ({
-          metadata: {
-            slug: post.slug,
-            title: post.title,
-            created_at: post.created_at,
-            updated_at: post.updated_at,
-            image: post.image,
-            category: post.category,
-            author: post.author,
-          },
-          content: post.content,
-        }));
-      }
-    }
-
-    // Fetch from API if cache is invalid or empty
-    console.debug("Fetching fresh blog posts from API");
     const response: {
       posts: BlogPostWithSeparatedContent[];
       total_count: number;
     } = await apiRequest("/api/blog/posts-separated");
 
-    const posts = response.posts;
-
-    // Update cache with converted format
-    const convertedPosts = posts.map((post) => ({
-      slug: post.metadata.slug,
-      title: post.metadata.title,
-      created_at: post.metadata.created_at,
-      updated_at: post.metadata.updated_at,
-      image: post.metadata.image,
-      category: post.metadata.category,
-      author: post.metadata.author,
-      content: post.content,
-    }));
-    localState.setBlogPosts(convertedPosts);
-
-    return posts;
+    return response.posts;
   } catch (error) {
     console.error("Error loading blog posts:", error);
-
-    // Return cached data if available (even if expired)
-    if (localState.hasCachedPosts()) {
-      console.debug("Falling back to cached posts due to API error");
-      const cachedPosts = localState.getCachedBlogPosts();
-      return cachedPosts.map((post) => ({
-        metadata: {
-          slug: post.slug,
-          title: post.title,
-          created_at: post.created_at,
-          updated_at: post.updated_at,
-          image: post.image,
-          category: post.category,
-          author: post.author,
-        },
-        content: post.content,
-      }));
-    }
-
     return [];
   }
 }
 
 export async function fetchPostsMetadata(): Promise<BlogPostMetadata[]> {
   try {
-    // Check cache first
-    if (localState.isCacheValid()) {
-      const cachedPosts = localState.getCachedBlogPosts();
-      if (cachedPosts.length > 0) {
-        console.debug("Using cached posts metadata");
-        // Extract metadata from cached posts
-        return cachedPosts.map(
-          ({
-            slug,
-            title,
-            created_at,
-            updated_at,
-            image,
-            category,
-            author,
-          }) => ({
-            slug,
-            title,
-            created_at,
-            updated_at,
-            image,
-            category,
-            author,
-          }),
-        );
-      }
-    }
-
-    // Fetch from API if cache is invalid or empty
-    console.debug("Fetching fresh posts metadata from API");
     const metadata: BlogPostMetadata[] = await apiRequest(
       "/api/blog/posts-metadata",
     );
-
     return metadata;
   } catch (error) {
     console.error("Error loading blog posts metadata:", error);
-
-    // Return cached data if available (even if expired)
-    if (localState.hasCachedPosts()) {
-      console.debug("Falling back to cached posts metadata due to API error");
-      const cachedPosts = localState.getCachedBlogPosts();
-      return cachedPosts.map(
-        ({ slug, title, created_at, updated_at, image, category, author }) => ({
-          slug,
-          title,
-          created_at,
-          updated_at,
-          image,
-          category,
-          author,
-        }),
-      );
-    }
-
     return [];
   }
 }

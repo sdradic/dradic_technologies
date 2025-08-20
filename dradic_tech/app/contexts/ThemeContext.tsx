@@ -1,107 +1,62 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { localState } from "~/modules/utils";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import { saveTheme, getTheme } from "../modules/utils";
 
-type ThemeContextType = {
-  theme: "light" | "dark";
+type Theme = "light" | "dark";
+
+interface ThemeContextType {
+  theme: Theme;
   toggleTheme: () => void;
-  mounted: boolean;
-};
+}
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Safe default theme that works during SSR
-const getDefaultTheme = (): "light" | "dark" => {
-  if (typeof window === "undefined") {
-    return "light"; // Default for SSR
+const getInitialTheme = (): Theme => {
+  // Check if we're in a browser environment
+  if (typeof window !== "undefined") {
+    // Check if user has a theme preference in our unified storage
+    const savedTheme = getTheme();
+    if (savedTheme) return savedTheme as Theme;
+
+    // Check system preference
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    return systemPrefersDark ? "dark" : "light";
   }
 
-  // Check system preference
-  if (
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  ) {
-    return "dark";
-  }
-
+  // Default to light theme during SSR
   return "light";
 };
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<"light" | "dark">(getDefaultTheme());
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === "undefined") return;
-
-    try {
-      // Get theme from utils local state
-      const savedTheme = localState.getTheme() as "light" | "dark";
-      const initialTheme = savedTheme || getDefaultTheme();
-
-      setTheme(initialTheme);
-
-      // Apply theme to document
-      if (initialTheme === "dark") {
-        document.documentElement.className = "dark";
-      } else {
-        document.documentElement.className = "";
-      }
-    } catch (error) {
-      // Fallback to system preference
-      const fallbackTheme = getDefaultTheme();
-      setTheme(fallbackTheme);
-
-      if (fallbackTheme === "dark") {
-        document.documentElement.className = "dark";
-      } else {
-        document.documentElement.className = "";
-      }
-      throw error;
-    } finally {
-      setMounted(true);
-    }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only change theme if no saved preference exists
-      const savedTheme = localState.getTheme();
-      if (!savedTheme) {
-        const newTheme = e.matches ? "dark" : "light";
-        setTheme(newTheme);
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || typeof window === "undefined") return;
-
-    // Apply theme to document and save to local state
-    if (theme === "dark") {
-      document.documentElement.className = "dark";
-    } else {
-      document.documentElement.className = "";
+    if (mounted) {
+      // Only update localStorage and document class after component is mounted
+      saveTheme(theme);
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(theme);
     }
-    localState.setTheme(theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  // Prevent flash of wrong theme by only rendering children after mount
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -109,7 +64,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;

@@ -6,7 +6,6 @@ import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
 import NotFound from "../404";
 import Loader from "~/components/Loader";
-import { localState } from "~/modules/utils";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
 interface LoaderData {
@@ -59,19 +58,6 @@ export default function Post({ params }: Route.ComponentProps) {
         } else {
           // Fetch content from API
           post = await fetchPostContent(params.slug);
-          // Cache the post for future use
-          if (post) {
-            localState.setPost({
-              slug: post.metadata.slug,
-              title: post.metadata.title,
-              created_at: post.metadata.created_at,
-              updated_at: post.metadata.updated_at,
-              image: post.metadata.image,
-              category: post.metadata.category,
-              author: post.metadata.author,
-              content: post.content,
-            });
-          }
         }
 
         if (!post || !post.content) {

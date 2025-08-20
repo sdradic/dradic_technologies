@@ -31,7 +31,7 @@ export default function About() {
           Dusan Radic
         </h2>
         <p className="text-lg text-center md:text-left text-gray-500 dark:text-gray-400">
-          DevOps Lead and Backend Engineer with expertise in AWS cloud-native
+          DevOps Lead and Software Engineer with expertise in AWS cloud-native
           architectures, automation, and CI/CD. Proven success delivering
           scalable serverless systems and developer tooling for distributed
           platforms. Background in Electrical Engineering with a diploma in

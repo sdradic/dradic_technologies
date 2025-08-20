@@ -16,11 +16,8 @@
 
 html,
 body {
-  @apply bg-white dark:bg-dark-500 text-black dark:text-white;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  font-family:
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 /* Prevent theme flash by setting initial background */

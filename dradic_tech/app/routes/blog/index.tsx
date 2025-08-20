@@ -3,9 +3,8 @@ import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList } from "~/components/PostList";
 import { useState, useCallback } from "react";
 import { RefreshIcon } from "~/components/Icons";
-import { localState } from "~/modules/utils";
-import { featuredPost } from "~/modules/store";
 import { Link } from "react-router";
+import { useFeaturedPost } from "~/hooks/useBlogPostsData";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -17,10 +16,10 @@ export function meta(_args: Route.MetaArgs) {
 export default function Blog() {
   const [refreshKey, setRefreshKey] = useState(0);
   const handleRefresh = useCallback(() => {
-    // Clear cache to force fresh data
-    localState.clearBlogData();
     setRefreshKey((prev) => prev + 1);
   }, []);
+
+  const latestPost = useFeaturedPost({ reloadTrigger: refreshKey });
 
   return (
     <div>
@@ -45,18 +44,20 @@ export default function Blog() {
       </div>
 
       <div className="flex flex-col justify-center items-center text-center pt-4 pb-8 gap-4">
-        <h1 className="text-2xl font-semibold">Featured Post</h1>
+        <h1 className="text-2xl font-semibold">Latest Post</h1>
         <Link
-          to={`/blog/${featuredPost.slug}`}
+          to={`/blog/${latestPost?.metadata.slug}`}
           className="flex flex-col sm:flex-row gap-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 justify-center items-center sm:items-start"
         >
           <img
-            src={featuredPost.image}
-            alt="Featured Post"
+            src={
+              latestPost?.metadata.image || "/assets/blog_post_placeholder.webp"
+            }
+            alt="Latest Post"
             className="w-full sm:w-3/4 h-full object-cover rounded-2xl"
           />
           <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4 w-full sm:w-1/4 text-left">
-            {featuredPost.sample_content}
+            {latestPost?.content?.slice(0, 100)}
           </p>
         </Link>
       </div>
@@ -64,7 +65,7 @@ export default function Blog() {
       <div className="flex flex-col mt-6 justify-center text-left">
         <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
           <h2 className="font-semibold text-gray-600 dark:text-gray-400">
-            Latest content
+            Recent content
           </h2>
           <button
             onClick={handleRefresh}
@@ -76,7 +77,7 @@ export default function Blog() {
           </button>
         </div>
         <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
-          <PostsList key={refreshKey} onRefresh={handleRefresh} />
+          <PostsList reloadTrigger={refreshKey} />
         </ul>
       </div>
     </div>

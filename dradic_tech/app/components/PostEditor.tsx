@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
-import { localState } from "~/modules/utils";
 import {
   SaveIcon,
   ChevronLeftIcon,
@@ -134,7 +133,6 @@ export default function PostEditor({
           newSlug,
         );
         await createPost(newPost);
-        localState.setPost(newPost);
         navigate(`/admin/${newSlug}`, { state: { post: newPost } });
       } else {
         // Update existing post
@@ -150,7 +148,6 @@ export default function PostEditor({
           author: formData.author,
         };
         await updatePost(slug!, updatedPost);
-        localState.setPost(updatedPost);
         navigate(`/blog/${slug}`, { state: { post: updatedPost } });
       }
     } catch (error) {
@@ -187,7 +184,6 @@ export default function PostEditor({
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
         await deletePost(slug);
-        localState.removePost(slug);
         navigate("/admin");
       } catch (error) {
         console.error("Failed to delete post:", error);

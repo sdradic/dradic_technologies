@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "./Icons";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
-import { fetchBlogPosts } from "~/modules/apis";
 import { SearchBar } from "./SearchBar";
+import useBlogPostsData from "~/hooks/useBlogPostsData";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -10,30 +10,12 @@ interface SearchModalProps {
 }
 
 export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
-  const [posts, setPosts] = useState<BlogPostWithSeparatedContent[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<
     BlogPostWithSeparatedContent[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const fetchedPosts = await fetchBlogPosts();
-        setPosts(fetchedPosts);
-        setFilteredPosts(fetchedPosts);
-      } catch (error) {
-        console.error("Failed to fetch posts:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (isOpen) {
-      loadPosts();
-    }
-  }, [isOpen]);
+  const posts = useBlogPostsData({ reloadTrigger: 0 });
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -110,7 +92,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
 
           {/* Results */}
           <div className="overflow-y-auto max-h-[60vh]">
-            {isLoading ? (
+            {posts.length === 0 ? (
               <div className="">
                 <div className="animate-pulse space-y-4 px-2 py-4">
                   {[1, 2, 3].map((i) => (

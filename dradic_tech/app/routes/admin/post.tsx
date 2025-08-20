@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import Loader from "~/components/Loader";
 import PostEditor from "~/components/PostEditor";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
-import { localState } from "~/modules/utils";
 import { useAuth } from "~/contexts/AuthContext";
 
 export default function AdminPost({ params }: { params: { slug: string } }) {
@@ -54,21 +53,7 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
             };
           }
         } else {
-          // Fetch content from API
           post = await fetchPostContent(params.slug);
-          // Cache the post for future use
-          if (post) {
-            localState.setPost({
-              slug: post.metadata.slug,
-              title: post.metadata.title,
-              created_at: post.metadata.created_at,
-              updated_at: post.metadata.updated_at,
-              image: post.metadata.image,
-              category: post.metadata.category,
-              author: post.metadata.author,
-              content: post.content,
-            });
-          }
         }
 
         if (!post || !post.content) {

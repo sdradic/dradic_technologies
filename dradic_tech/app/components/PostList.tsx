@@ -1,51 +1,26 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import { fetchBlogPosts } from "~/modules/apis";
-import { localState } from "~/modules/utils";
+import useBlogPostsData from "~/hooks/useBlogPostsData";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
 interface PostListProps {
   isAdmin?: boolean;
   searchQuery?: string;
-  onRefresh?: () => void;
+  reloadTrigger: number;
 }
 
 export function PostsList({
   isAdmin = false,
   searchQuery = "",
+  reloadTrigger,
 }: PostListProps) {
-  const [posts, setPosts] = useState<BlogPostWithSeparatedContent[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<
     BlogPostWithSeparatedContent[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadPosts = async () => {
-    const posts = await fetchBlogPosts();
-    setPosts(posts);
-    setFilteredPosts(posts);
-    setIsLoading(false);
-  };
-
-  // Initial load
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  // Background refresh after 5 minutes
-  useEffect(() => {
-    const interval = setInterval(
-      () => {
-        // Only refresh if cache is expired
-        if (!localState.isCacheValid()) {
-          loadPosts();
-        }
-      },
-      5 * 60 * 1000,
-    ); // 5 minutes
-
-    return () => clearInterval(interval);
-  }, []);
+  // Use the new hook with refresh trigger
+  const posts = useBlogPostsData({ reloadTrigger });
 
   // Handle search filtering
   useEffect(() => {
@@ -54,22 +29,24 @@ export function PostsList({
       setFilteredPosts(posts);
     } else {
       const filtered = posts.filter((post) =>
-        post.metadata.title.toLowerCase().includes(trimmedQuery),
+        post.metadata.title.toLowerCase().includes(searchQuery),
       );
       setFilteredPosts(filtered);
     }
   }, [searchQuery, posts]);
 
-  if (isLoading) {
-    return <PostsSkeleton />;
-  }
+  useEffect(() => {
+    setIsLoading(false);
+  }, [posts]);
 
   const baseUrl = isAdmin ? "/admin" : "/blog";
 
   return (
     <>
-      {filteredPosts && filteredPosts.length > 0 ? (
-        filteredPosts.map((post: BlogPostWithSeparatedContent) => (
+      {isLoading ? (
+        <PostsSkeleton />
+      ) : (
+        filteredPosts.slice(1, 10).map((post: BlogPostWithSeparatedContent) => (
           <NavLink
             key={post.metadata.slug}
             to={`${baseUrl}/${post.metadata.slug}`}
@@ -102,10 +79,6 @@ export function PostsList({
             </li>
           </NavLink>
         ))
-      ) : (
-        <li className="text-center text-gray-500 dark:text-gray-400">
-          No posts found
-        </li>
       )}
     </>
   );

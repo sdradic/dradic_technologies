@@ -1,15 +1,21 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { SearchBar } from "~/components/SearchBar";
 import { PostsList } from "~/components/PostList";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/contexts/AuthContext";
 import Loader from "~/components/Loader";
+import { RefreshIcon } from "~/components/Icons";
 
 export default function AdminHome() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
   const hasNavigated = useRef(false);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -43,12 +49,22 @@ export default function AdminHome() {
         <h1 className="font-semibold text-gray-600 dark:text-gray-400">
           All Posts
         </h1>
-        <button
-          onClick={() => navigate("/admin/new-post")}
-          className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors cursor-pointer"
-        >
-          New Post
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400 group hover:text-primary-500 dark:hover:text-primary-400"
+            title="Refresh posts"
+          >
+            <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+            Refresh
+          </button>
+          <button
+            onClick={() => navigate("/admin/new-post")}
+            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors cursor-pointer"
+          >
+            New Post
+          </button>
+        </div>
       </div>
       <SearchBar
         searchQuery={searchQuery}
@@ -56,7 +72,11 @@ export default function AdminHome() {
         placeholder="Search for a post..."
       />
       <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
-        <PostsList isAdmin={true} searchQuery={searchQuery} />
+        <PostsList
+          isAdmin={true}
+          searchQuery={searchQuery}
+          reloadTrigger={refreshKey}
+        />
       </ul>
     </div>
   );

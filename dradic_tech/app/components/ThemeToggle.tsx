@@ -22,7 +22,7 @@ export function ThemeToggle() {
       tabIndex={0}
       role="button"
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-      className="flex items-center justify-between w-14 h-7 p-1 rounded-full cursor-pointer bg-gray-100 dark:bg-dark-400 border border-gray-200 dark:border-dark-300"
+      className="flex items-center justify-between w-14 h-7 p-1 rounded-full cursor-pointer bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-dark-300"
     >
       <div
         className={`
@@ -31,7 +31,7 @@ export function ThemeToggle() {
       `}
       >
         <SunIcon
-          className={`w-3 h-3 ${theme === "light" ? "fill-yellow-400 stroke-yellow-400" : "fill-gray-400 stroke-gray-400"}`}
+          className={`w-3 h-3 ${theme === "light" ? "fill-yellow-400 stroke-yellow-400" : "fill-gray-400 stroke-gray-300"}`}
         />
       </div>
       <div
@@ -41,7 +41,7 @@ export function ThemeToggle() {
       `}
       >
         <MoonIcon
-          className={`w-3 h-3 ${theme === "dark" ? "fill-indigo-200 stroke-indigo-200" : "fill-gray-400 stroke-gray-400"}`}
+          className={`w-3 h-3 ${theme === "dark" ? "fill-gray-400 stroke-gray-400" : "fill-gray-400 stroke-gray-400"}`}
         />
       </div>
     </div>
