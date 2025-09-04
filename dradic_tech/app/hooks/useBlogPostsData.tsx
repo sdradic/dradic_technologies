@@ -1,6 +1,7 @@
 import { use, useRef } from "react";
 import { fetchBlogPosts } from "~/modules/apis";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
+import { blogStore } from "~/modules/blogStore";
 
 // Manual cache to ensure stability
 export const blogPostsCache = new Map<
@@ -10,6 +11,18 @@ export const blogPostsCache = new Map<
 
 function useBlogPostsData({ reloadTrigger }: { reloadTrigger: number }) {
   const lastReloadTrigger = useRef(0);
+
+  // If reloadTrigger is -1, return empty array without making API call
+  if (reloadTrigger === -1) {
+    return [];
+  }
+
+  // Check if we already have posts in the store first
+  const storePosts = blogStore.getPosts();
+  if (storePosts.length > 0 && reloadTrigger === 0) {
+    // If we have posts in store and this is the initial load, use them
+    return storePosts;
+  }
 
   // Create a stable cache key
   const cacheKey = `blog-posts-${reloadTrigger}`;
@@ -27,6 +40,12 @@ function useBlogPostsData({ reloadTrigger }: { reloadTrigger: number }) {
   }
 
   const posts = use(blogPostsCache.get(cacheKey)!);
+
+  // Store posts in the global store for other components to access
+  if (posts.length > 0) {
+    blogStore.setPosts(posts);
+  }
+
   return posts;
 }
 

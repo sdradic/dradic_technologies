@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { XIcon } from "./Icons";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 import { SearchBar } from "./SearchBar";
-import useBlogPostsData from "~/hooks/useBlogPostsData";
+import { blogStore } from "~/modules/blogStore";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -14,8 +14,29 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     BlogPostWithSeparatedContent[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [posts, setPosts] = useState<BlogPostWithSeparatedContent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const posts = useBlogPostsData({ reloadTrigger: 0 });
+  // Subscribe to blog store updates
+  useEffect(() => {
+    const unsubscribe = blogStore.subscribe(() => {
+      const newPosts = blogStore.getPosts();
+      setPosts(newPosts);
+      setIsLoading(false);
+    });
+
+    // Get initial posts if they're already loaded
+    const initialPosts = blogStore.getPosts();
+
+    if (initialPosts.length > 0) {
+      setPosts(initialPosts);
+      setIsLoading(false);
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -92,19 +113,23 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
 
           {/* Results */}
           <div className="overflow-y-auto max-h-[60vh]">
-            {posts.length === 0 ? (
-              <div className="">
-                <div className="animate-pulse space-y-4 px-2 py-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="w-32 h-24 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                      </div>
+            {isLoading ? (
+              <div className="animate-pulse space-y-4 px-2 py-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="w-32 h-24 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No posts available. Please visit the blog page first.
+                </p>
               </div>
             ) : (
               <div className="px-2 py-4">

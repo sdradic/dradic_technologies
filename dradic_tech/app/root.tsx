@@ -13,7 +13,6 @@ import "./app.css";
 import Navbar from "./components/Navbar";
 import Loader from "./components/Loader";
 import Footer from "./components/Footer";
-import { useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -67,24 +66,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function AppContent() {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    // Small delay to ensure smooth transition
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main
-        className={`flex-1 w-full max-w-4xl sm:max-w-6xl mx-auto px-2 sm:px-2 flex transition-opacity duration-300 ease-in-out ${
-          isLoaded ? "opacity-100" : "opacity-0"
-        }`}
+        className={`flex-1 w-full max-w-4xl sm:max-w-6xl mx-auto px-2 sm:px-2 flex transition-opacity duration-300 ease-in-out`}
       >
         <Outlet />
       </main>

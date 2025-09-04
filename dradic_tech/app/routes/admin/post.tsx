@@ -30,7 +30,6 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
         setIsLoading(true);
         let post: BlogPostWithSeparatedContent | null = null;
 
-        // Use content from navigation state if available and valid
         if (
           postFromState?.content &&
           postFromState.content !== "Error loading content"

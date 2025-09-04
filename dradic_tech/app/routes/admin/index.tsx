@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { SearchBar } from "~/components/SearchBar";
-import { PostsList } from "~/components/PostList";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/contexts/AuthContext";
 import Loader from "~/components/Loader";
 import { RefreshIcon } from "~/components/Icons";
+import { PostsList, PostsSkeleton } from "~/components/PostList";
 
 export default function AdminHome() {
   const navigate = useNavigate();
@@ -72,11 +72,13 @@ export default function AdminHome() {
         placeholder="Search for a post..."
       />
       <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
-        <PostsList
-          isAdmin={true}
-          searchQuery={searchQuery}
-          reloadTrigger={refreshKey}
-        />
+        <Suspense fallback={<PostsSkeleton />}>
+          <PostsList
+            reloadTrigger={refreshKey}
+            isAdmin={true}
+            searchQuery={searchQuery}
+          />
+        </Suspense>
       </ul>
     </div>
   );

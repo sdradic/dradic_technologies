@@ -32,7 +32,6 @@ export default function Post({ params }: Route.ComponentProps) {
         setIsLoading(true);
         let post: BlogPostWithSeparatedContent | null = null;
 
-        // Skip cache for now to ensure fresh data (temporary fix for migration)
         if (
           postFromState?.content &&
           postFromState.content !== "Error loading content"

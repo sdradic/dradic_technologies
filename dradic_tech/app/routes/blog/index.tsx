@@ -1,10 +1,11 @@
 import type { Route } from "./+types/index";
 import { SimpleInput } from "~/components/SimpleInput";
-import { PostsList } from "~/components/PostList";
-import { useState, useCallback } from "react";
+import { PostsList, PostsSkeleton } from "~/components/PostList";
+import { useState, useCallback, Suspense } from "react";
 import { RefreshIcon } from "~/components/Icons";
 import { Link } from "react-router";
 import { useFeaturedPost } from "~/hooks/useBlogPostsData";
+import { extractPlainText } from "~/components/markdown";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -19,16 +20,13 @@ export default function Blog() {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  const latestPost = useFeaturedPost({ reloadTrigger: refreshKey });
-
   return (
     <div>
       {/* Hero Section */}
       <div className="flex flex-col justify-center items-center text-center pt-4 pb-8">
         <h1 className="text-4xl sm:text-6xl font-semibold">
-          Weekly <span className="text-primary-500">embedded</span> +{" "}
-          <span className="text-primary-500">programing</span> tech insights and
-          tutorials
+          Weekly <span className="text-primary-500">DevOps</span> tech insights
+          and tutorials
         </h1>
         <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4">
           Join us as we explore the latest trends in technology and share our
@@ -45,21 +43,9 @@ export default function Blog() {
 
       <div className="flex flex-col justify-center items-center text-center pt-4 pb-8 gap-4">
         <h1 className="text-2xl font-semibold">Latest Post</h1>
-        <Link
-          to={`/blog/${latestPost?.metadata.slug}`}
-          className="flex flex-col sm:flex-row gap-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 justify-center items-center sm:items-start"
-        >
-          <img
-            src={
-              latestPost?.metadata.image || "/assets/blog_post_placeholder.webp"
-            }
-            alt="Latest Post"
-            className="w-full sm:w-3/4 h-full object-cover rounded-2xl"
-          />
-          <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4 w-full sm:w-1/4 text-left">
-            {latestPost?.content?.slice(0, 100)}
-          </p>
-        </Link>
+        <Suspense fallback={<LatestPostSkeleton />}>
+          <LatestPost refreshKey={refreshKey} />
+        </Suspense>
       </div>
       {/* Recent Posts */}
       <div className="flex flex-col mt-6 justify-center text-left">
@@ -77,9 +63,52 @@ export default function Blog() {
           </button>
         </div>
         <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
-          <PostsList reloadTrigger={refreshKey} />
+          <Suspense fallback={<PostsSkeleton />}>
+            <PostsList reloadTrigger={refreshKey} showLatestPost={false} />
+          </Suspense>
         </ul>
       </div>
     </div>
+  );
+}
+
+function LatestPostSkeleton() {
+  return (
+    <div className="flex flex-col sm:flex-row gap-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 w-full">
+      {/* Image skeleton takes up 3/4 of width on sm+ screens, full width on mobile */}
+      <div className="w-full sm:w-3/4 h-48 sm:h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      {/* Text skeleton takes up remaining 1/4 of width on sm+ screens, full width on mobile */}
+      <div className="flex flex-col justify-between w-full sm:w-1/4 py-2">
+        <div className="w-3/4 h-6 bg-gray-200 dark:bg-gray-700 rounded-full mb-4 animate-pulse"></div>
+        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full mb-2 animate-pulse"></div>
+        <div className="w-5/6 h-4 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+  );
+}
+
+function LatestPost({ refreshKey }: { refreshKey: number }) {
+  const latestPost = useFeaturedPost({ reloadTrigger: refreshKey });
+
+  return (
+    <Link
+      to={`/blog/${latestPost?.metadata.slug}`}
+      state={{ post: latestPost }}
+      className="flex flex-col sm:flex-row gap-4 dark:bg-dark-400 bg-gray-100 rounded-xl p-4 justify-center items-center sm:items-start"
+    >
+      <img
+        src={latestPost?.metadata.image || "/assets/blog_post_placeholder.webp"}
+        alt="Latest Post"
+        className="w-full sm:w-3/4 h-full object-cover rounded-2xl"
+      />
+      <div className="flex flex-col justify-between w-full sm:w-1/4 py-2">
+        <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4 w-full text-left">
+          {latestPost?.metadata.title}
+        </p>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-4 w-full text-left">
+          {extractPlainText(latestPost?.content || "", 150)}
+        </p>
+      </div>
+    </Link>
   );
 }
