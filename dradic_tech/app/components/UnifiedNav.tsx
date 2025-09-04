@@ -81,7 +81,7 @@ const DropdownButton = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-md p-2 shadow-lg z-50 min-w-48 space-y-1">
+        <div className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-md p-2 shadow-lg z-50 w-36 space-y-1">
           {item.children?.map((child) => (
             <button
               key={child.label}

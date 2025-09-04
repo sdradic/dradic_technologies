@@ -36,6 +36,8 @@ allowed_origins = [
     "https://expense-tracker-kappa-livid.vercel.app",
     "https://dradic-technologies.vercel.app",
     "https://dradic-technologies-blog.vercel.app",
+    "https://dradic.cl",
+    "https://app.dradic.cl",
 ]
 
 if DRADIC_ENV == "LOCAL":
