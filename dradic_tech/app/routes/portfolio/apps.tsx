@@ -10,7 +10,7 @@ export default function Apps() {
           title="Expense Tracker"
           description="A simple expense tracker app built with React and TypeScript."
           image={"/assets/TallyUp.webp"}
-          link="https://expense-tracker-kappa-livid.vercel.app/"
+          link="https://app.dradic.cl/"
         />
       </div>
     </div>

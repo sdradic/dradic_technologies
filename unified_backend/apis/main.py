@@ -35,7 +35,6 @@ DRADIC_ENV = os.getenv("DRADIC__ENV", "DEV")
 allowed_origins = [
     "https://expense-tracker-kappa-livid.vercel.app",
     "https://dradic-technologies.vercel.app",
-    "https://dradic-technologies-blog.vercel.app",
     "https://dradic.cl",
     "https://app.dradic.cl",
 ]
