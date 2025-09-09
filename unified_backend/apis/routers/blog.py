@@ -399,7 +399,7 @@ async def get_blog_posts_separated():
                 posts.append(post)
 
         # Sort by updated_at (newest first)
-        posts.sort(key=lambda x: x.metadata.updated_at, reverse=True)
+        posts.sort(key=lambda x: x.metadata.created_at, reverse=True)
 
         return BlogPostSeparatedResponse(posts=posts, total_count=len(posts))
 
