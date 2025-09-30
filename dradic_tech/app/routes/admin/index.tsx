@@ -40,7 +40,7 @@ export default function AdminHome() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full h-screen">
       <h1 className="text-4xl sm:text-6xl font-semibold text-center pb-8">
         Blog <span className="text-primary-500">CMS</span>
       </h1>

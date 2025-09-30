@@ -14,16 +14,14 @@ export default function Navbar() {
   const location = useLocation();
   const selectedPath = location.pathname;
   const [isBlog, setIsBlog] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navConfig: NavConfig = [
     { label: "Home", path: "/" },
     { label: "About", path: "/about" },
     {
       label: "Blog",
       path: "/blog",
-    },
-    {
-      label: "Contact",
-      path: "/contact",
     },
     {
       label: "Portfolio",
@@ -44,9 +42,49 @@ export default function Navbar() {
     setIsBlog(location.pathname.startsWith("/blog"));
   }, [location.pathname]);
 
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIsMobile);
+    };
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    // Set initial state on mount
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
-      <nav className="flex flex-row items-center justify-between w-full px-4 max-w-6xl mx-auto">
+      {/*
+        On scroll: fixed, centered, blurred, rounded, max-w-3xl.
+        At top: full width, at top, no blur, no rounding.
+      */}
+      <nav
+        className={`transition-all duration-300
+          ${
+            !isMobile
+              ? isScrolled
+                ? "fixed top-6 left-1/2 z-30 -translate-x-1/2 flex flex-row items-center justify-between w-full max-w-3xl px-4 rounded-2xl bg-white/70 dark:bg-dark-500/70 backdrop-blur-md shadow-lg"
+                : "relative top-0 left-1/2 -translate-x-1/2 flex flex-row items-center justify-between w-full max-w-4xl sm:max-w-6xl px-4 bg-transparent"
+              : "flex flex-row items-center justify-between w-full px-4 max-w-6xl mx-auto"
+          }
+        `}
+        id="navbar"
+      >
         <Logo />
         <div className="flex justify-end items-center gap-2">
           <UnifiedNav

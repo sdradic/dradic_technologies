@@ -44,57 +44,77 @@ export default function Blog() {
   }, [subscribeError, isSubscribed]);
 
   return (
-    <div>
-      {subscribing && (
-        <SimpleNotification
-          message={notificationMessage}
-          type={notificationType}
-          timeout={3000}
-        />
-      )}
-      {/* Hero Section */}
-      <div className="flex flex-col justify-center items-center text-center pt-4 pb-8">
-        <h1 className="text-4xl sm:text-6xl font-semibold">
-          Weekly <span className="text-primary-500">DevOps</span> tech insights
-          and tutorials
-        </h1>
-        <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4">
-          Join us as we explore the latest trends in technology and share our
-          insights with you.
-        </p>
-        {/* Subscribe Bar */}
-        <SimpleInput
-          placeholder="Enter your email"
-          inputType="email"
-          value={userEmail}
-          onChange={(value: string) => setUserEmail(value)}
-          buttonText="Subscribe"
-          buttonOnClick={() => {
-            setSubscribing(true);
-            const isSubscribed = handleSubscribe(userEmail);
-            if (isSubscribed) {
-              setIsSubscribed(true);
-              setUserEmail("");
-            } else {
-              setSubscribeError(true);
-            }
-            setSubscribing(false);
-          }}
-        />
-      </div>
+    <>
+      <div>
+        {subscribing && (
+          <SimpleNotification
+            message={notificationMessage}
+            type={notificationType}
+            timeout={3000}
+          />
+        )}
+        {/* Hero Section */}
+        <div className="flex flex-col justify-center items-center text-center pt-4 pb-8">
+          <h1 className="text-4xl sm:text-6xl font-semibold">
+            Weekly <span className="text-primary-500">DevOps</span> tech
+            insights and tutorials
+          </h1>
+          <p className="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mt-4">
+            Join us as we explore the latest trends in technology and share our
+            insights with you.
+          </p>
+          {/* Subscribe Bar */}
+          <div className="hidden">
+            <SimpleInput
+              placeholder="Enter your email"
+              inputType="email"
+              value={userEmail}
+              onChange={(value: string) => setUserEmail(value)}
+              buttonText="Subscribe"
+              buttonOnClick={() => {
+                setSubscribing(true);
+                const isSubscribed = handleSubscribe(userEmail);
+                if (isSubscribed) {
+                  setIsSubscribed(true);
+                  setUserEmail("");
+                } else {
+                  setSubscribeError(true);
+                }
+                setSubscribing(false);
+              }}
+            />
+          </div>
+        </div>
 
-      <div className="flex flex-col justify-center items-center text-center pt-4 pb-8 gap-4">
-        <h1 className="text-2xl font-semibold">Latest Post</h1>
-        <Suspense fallback={<LatestPostSkeleton />}>
-          <LatestPost refreshKey={refreshKey} />
-        </Suspense>
+        <div className="flex flex-col justify-center items-center text-center pt-4 pb-8 gap-4">
+          <h1 className="text-2xl font-semibold">Latest Post</h1>
+          <Suspense fallback={<LatestPostSkeleton />}>
+            <LatestPost refreshKey={refreshKey} />
+          </Suspense>
+        </div>
+        {/* Recent Posts */}
+        <RecentPosts refreshKey={refreshKey} handleRefresh={handleRefresh} />
       </div>
-      {/* Recent Posts */}
-      <div className="flex flex-col mt-6 justify-center text-left">
-        <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
-          <h2 className="font-semibold text-gray-600 dark:text-gray-400">
-            Recent content
-          </h2>
+    </>
+  );
+}
+
+export function RecentPosts({
+  refreshKey = 0,
+  handleRefresh = () => {},
+  refreshButton = true,
+}: {
+  refreshKey?: number;
+  handleRefresh?: () => void;
+  refreshButton?: boolean;
+}) {
+  return (
+    <div className="flex flex-col mt-6 justify-center text-left">
+      <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+        <h2 className="font-semibold text-gray-600 dark:text-gray-400">
+          Recent content
+        </h2>
+        {refreshButton && (
           <button
             onClick={handleRefresh}
             className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400 group hover:text-primary-500 dark:hover:text-primary-400"
@@ -103,13 +123,13 @@ export default function Blog() {
             <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
             Refresh
           </button>
-        </div>
-        <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
-          <Suspense fallback={<PostsSkeleton />}>
-            <PostsList reloadTrigger={refreshKey} showLatestPost={false} />
-          </Suspense>
-        </ul>
+        )}
       </div>
+      <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
+        <Suspense fallback={<PostsSkeleton />}>
+          <PostsList reloadTrigger={refreshKey} showLatestPost={false} />
+        </Suspense>
+      </ul>
     </div>
   );
 }

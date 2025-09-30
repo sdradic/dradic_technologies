@@ -1,6 +1,8 @@
 import type { Route } from "./+types/index";
 import { ChipSVG } from "~/components/Icons";
 import { Link } from "react-router";
+import AboutPage from "./about";
+import { RecentPosts } from "./blog";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -12,10 +14,16 @@ export function meta(_args: Route.MetaArgs) {
 export default function Home() {
   return (
     <>
-      {/* Hero Section with Background Video */}
-      <div className="relative flex flex-col md:flex-row justify-center items-center text-center">
+      {/* Hero Section */}
+      <div className="flex flex-col justify-center items-center gap-8 sm:mt-0 mt-8">
         {/* Content */}
-        <div className="flex flex-col md:flex-row justify-center items-center text-center relative">
+        <div className="flex flex-col md:flex-row  text-center text-center md:h-screen">
+          <div className="hidden md:flex flex-col md:flex-row md:justify-between items-center mx-auto px-4 md:px-8 gap-4">
+            {/* Right Side: Chip SVG Illustration */}
+            <div className="flex flex-1 items-center justify-center">
+              <ChipSVG className="md:size-72 size-64 stroke-8 stroke-primary-500 fill-gray-100 dark:fill-white" />
+            </div>
+          </div>
           <div className="flex flex-col justify-center items-center">
             <h1 className="text-4xl md:text-6xl font-semibold mb-8">
               Welcome to{" "}
@@ -23,12 +31,17 @@ export default function Home() {
                 Dradic Technologies
               </span>
             </h1>
+            <div className="md:hidden flex flex-col md:flex-row md:justify-between items-center mx-auto px-4 md:px-8 gap-4">
+              {/* Right Side: Chip SVG Illustration */}
+              <div className="flex flex-1 items-center justify-center">
+                <ChipSVG className="md:size-72 size-64 stroke-8 stroke-primary-500 fill-gray-100 dark:fill-white" />
+              </div>
+            </div>
             <p className="text-xl text-gray-500 dark:text-gray-300 text-center md:text-center">
-              At Dradic Technologies, we specialize in cloud solutions and
-              DevOps, with a particular focus on deploying and managing edge
-              devices. Our mission is to deliver innovative, reliable, and
-              scalable infrastructure that bridges the gap between cloud and
-              edge computing.
+              At Dradic Technologies, we empower businesses of all types with
+              innovative, reliable, and scalable technology solutions. Our
+              expertise spans cloud, DevOps, and modern infrastructure. Helping
+              you achieve your goals, no matter your industry.
             </p>
             <Link
               to="/about"
@@ -37,12 +50,14 @@ export default function Home() {
               Learn More
             </Link>
           </div>
-          <div className="flex flex-col md:flex-row md:justify-between md:mt-0 mt-8 items-center mx-auto px-4 md:px-8 gap-4">
-            {/* Right Side: Chip SVG Illustration */}
-            <div className="flex flex-1 items-center justify-center">
-              <ChipSVG className="md:size-72 size-64 stroke-8 stroke-primary-500 fill-gray-100 dark:fill-white" />
-            </div>
-          </div>
+        </div>
+        <AboutPage />
+        <div className="flex flex-col mt-8 w-full">
+          <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
+            {" "}
+            Blog
+          </h1>
+          <RecentPosts refreshButton={false} />
         </div>
       </div>
     </>

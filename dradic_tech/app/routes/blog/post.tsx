@@ -145,7 +145,7 @@ export default function Post({ params }: Route.ComponentProps) {
             : "/assets/blog_post_placeholder.webp"
         }
         alt={renderedPost.metadata.image}
-        className="h-48 md:h-96  rounded-xl object-cover my-4"
+        className="h-48 md:h-96 rounded-xl object-cover my-4"
       />
       <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
         <MarkdownRenderer content={renderedPost.html} />

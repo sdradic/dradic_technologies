@@ -159,7 +159,6 @@ dradic_tech/
 - **About** (`/about`) - Professional profile and experience
 - **Blog** (`/blog`) - Technical articles and tutorials
 - **Portfolio** (`/portfolio`) - Featured projects and applications
-- **Contact** (`/contact`) - Professional contact form
 - **Admin** (`/admin`) - Content management dashboard
 
 ## 🔧 Available Scripts

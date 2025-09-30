@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import ContactForm from "~/components/ContactForm";
 import { downloadFileFromBackend } from "~/modules/apis";
 
 interface Experience {
@@ -6,17 +7,51 @@ interface Experience {
   location: string;
   roles: Role[];
   overallPeriod: string;
-  highlights: string[];
+  highlights?: string[];
 }
 
 interface Role {
   title: string;
   period?: string;
+  highlights?: string[];
 }
 
 export default function About() {
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!contactModalOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setContactModalOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [contactModalOpen]);
+
   return (
     <div className="flex flex-col gap-8 w-full">
+      {contactModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          aria-modal="true"
+          role="dialog"
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            aria-hidden="true"
+            onClick={() => setContactModalOpen(false)}
+          />
+          {/* Modal content */}
+          <div className="relative bg-white dark:bg-dark-200 rounded-lg shadow-xl z-10">
+            <ContactForm setContactModalOpen={setContactModalOpen} />
+          </div>
+        </div>
+      )}
       <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
         About Me
       </h1>
@@ -31,7 +66,7 @@ export default function About() {
           Dusan Radic
         </h2>
         <p className="text-lg text-center md:text-left text-gray-500 dark:text-gray-400">
-          DevOps Lead and Software Engineer with expertise in AWS cloud-native
+          DevOps and Software Engineer with expertise in AWS cloud-native
           architectures, automation, and CI/CD. Proven success delivering
           scalable serverless systems and developer tooling for distributed
           platforms. Background in Electrical Engineering with a diploma in
@@ -49,9 +84,12 @@ export default function About() {
         >
           Download CV
         </button>
-        <Link to="/contact" className="btn-primary w-full text-center max-w-48">
+        <button
+          className="btn-primary w-full text-center max-w-48"
+          onClick={() => setContactModalOpen(true)}
+        >
           Contact Me
-        </Link>
+        </button>
       </div>
       {/* Experience */}
       <div className="flex flex-col gap-6">
@@ -81,21 +119,35 @@ export default function About() {
                 {company.roles.map((role, idx) => (
                   <div
                     key={role.title + idx}
-                    className="flex flex-col sm:flex-row sm:items-center sm:gap-2"
+                    className="flex flex-col sm:items-center sm:gap-2"
                   >
-                    <span className="font-medium text-gray-800 dark:text-gray-200">
-                      {role.title}
-                    </span>
-                    {role.period && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                        {role.period}
+                    <div className="flex flex-row justify-between items-center sm:gap-2 w-full">
+                      <span className="font-medium text-gray-800 dark:text-gray-200 text-left">
+                        {role.title}
                       </span>
-                    )}
+                      {role.period && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                          {role.period}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-row sm:items-center sm:gap-2 w-full">
+                      <ul className="list-disc list-inside pl-2 text-gray-700 dark:text-gray-300 text-sm space-y-1">
+                        {role.highlights?.map((highlight, idx) => (
+                          <li
+                            key={idx}
+                            className="list-disc list-inside pl-2 text-gray-700 dark:text-gray-300 text-sm space-y-1"
+                          >
+                            {highlight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 ))}
               </div>
               <ul className="list-disc list-inside pl-2 text-gray-700 dark:text-gray-300 text-sm space-y-1">
-                {company.highlights.map((highlight, idx) => (
+                {company.highlights?.map((highlight, idx) => (
                   <li key={idx} className="leading-snug">
                     {highlight}
                   </li>
@@ -115,22 +167,26 @@ const experience: Experience[] = [
     roles: [
       {
         title: "DevOps Lead",
-        period: "Jun 2025 – Present",
+        period: "Jun 2025 – Sep 2025",
+        highlights: [
+          "Architected comprehensive AWS Lambda cost monitoring system with granular per-customer billing analysis, integrating CloudWatch Logs and S3 storage for real-time cost attribution and anomaly detection.",
+          "Engineered intelligent error monitoring platform featuring AI-powered error classification, smart deduplication logic, and automated Slack notifications with CloudWatch integration for rapid incident response.",
+        ],
       },
       {
         title: "Software Engineer",
         period: "Mar 2023 – Jun 2025",
+        highlights: [
+          "Led development of AI-driven error monitoring system with Slack notifications for rapid incident response.",
+          "Optimized high-cost AWS Lambda functions by implementing per-client tracking, reducing memory-related timeouts.",
+          "Developed automated transcription pipeline for Zendesk voice messages, increasing support efficiency.",
+          "Integrated external web tools into SwiftCX platform, enhancing functionality and user engagement.",
+          "Redesigned chatbot widget architecture to handle increased traffic and improve performance.",
+          "Implemented infrastructure provisioning with CDK and established automated testing frameworks.",
+        ],
       },
     ],
-    overallPeriod: "Mar 2023 – Present",
-    highlights: [
-      "Led development of AI-driven error monitoring system with Slack notifications for rapid incident response.",
-      "Optimized high-cost AWS Lambda functions by implementing per-client tracking, reducing memory-related timeouts.",
-      "Developed automated transcription pipeline for Zendesk voice messages, increasing support efficiency.",
-      "Integrated external web tools into SwiftCX platform, enhancing functionality and user engagement.",
-      "Redesigned chatbot widget architecture to handle increased traffic and improve performance.",
-      "Implemented infrastructure provisioning with CDK and established automated testing frameworks.",
-    ],
+    overallPeriod: "Mar 2023 – Sep 2025 (2 years 6 months)",
   },
   {
     company: "Deloitte Consulting",
@@ -140,7 +196,7 @@ const experience: Experience[] = [
         title: "Data Engineer",
       },
     ],
-    overallPeriod: "Mar 2022 – Mar 2023",
+    overallPeriod: "Mar 2022 – Mar 2023 (1 year)",
     highlights: [
       "Built scalable ETL pipelines using PySpark and AWS services (S3, Lambda, Redshift).",
       "Delivered production-grade data pipelines for internal and client-facing analytics.",
@@ -154,7 +210,7 @@ const experience: Experience[] = [
         title: "Software Engineer",
       },
     ],
-    overallPeriod: "Sep 2021 – Mar 2022",
+    overallPeriod: "Sep 2021 – Mar 2022 (6 months)",
     highlights: [
       "Developed full-stack features using Django and Vue.js.",
       "Applied AWS security best practices and automated infrastructure with Ansible.",
@@ -168,7 +224,7 @@ const experience: Experience[] = [
         title: "Backend Engineer",
       },
     ],
-    overallPeriod: "Jun 2021 – Oct 2021",
+    overallPeriod: "Jun 2021 – Oct 2021 (4 months)",
     highlights: [
       "Managed AWS infrastructure for cost and performance efficiency.",
       "Designed PostgreSQL schemas for optimized data retrieval.",
