@@ -89,3 +89,11 @@ dmypy.json
 
 # Development files
 cors.json
+
+
+TODO.txt
+
+*.pem
+
+.terraform/
+.ruff_cache/*
