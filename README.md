@@ -11,7 +11,7 @@ dradic_technologies/
 ├── unified_backend/       # Shared FastAPI backend serving both frontends
 │   ├── apis/             # FastAPI application with routers
 │   └── db_migrations/    # Database migrations with Alembic
-├── minimal_eks_project/   # Infrastructure as Code (Terraform)
+├── infra/                # Infrastructure as Code (Terraform)
 ├── run_local.sh          # Development startup script
 └── README.md             # This file
 ```
@@ -223,12 +223,14 @@ This monorepo uses a simple structure without workspace management:
 
 **Architecture**: FastAPI, SQLAlchemy, PostgreSQL, Pydantic, uvicorn
 
-### Infrastructure (`minimal_eks_project/`)
+### Infrastructure (`infra/`)
 
 **Terraform configurations for cloud infrastructure deployment.**
 
 - **Infrastructure as Code**: Terraform modules for AWS/cloud deployment
-- **Container Orchestration**: EKS configuration for scalable deployments
+- **Container Orchestration**: ECS configuration for scalable deployments
+- **Multi-Environment**: Separate dev and prod configurations
+- **Modular Architecture**: Reusable Terraform modules for networking, ECS, ECR, IAM, and SSM
 
 ## 🚀 Getting Started
 
