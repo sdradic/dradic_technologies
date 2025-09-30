@@ -1,11 +1,13 @@
 import type { Route } from "./+types/index";
 import { SimpleInput } from "~/components/SimpleInput";
 import { PostsList, PostsSkeleton } from "~/components/PostList";
-import { useState, useCallback, Suspense } from "react";
+import { useState, useCallback, Suspense, useEffect } from "react";
 import { RefreshIcon } from "~/components/Icons";
 import { Link } from "react-router";
 import { useFeaturedPost } from "~/hooks/useBlogPostsData";
 import { extractPlainText } from "~/components/markdown";
+import { handleSubscribe } from "~/modules/utils";
+import { SimpleNotification } from "~/components/SimpleNotification";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -19,9 +21,37 @@ export default function Blog() {
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeError, setSubscribeError] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState<string>("");
+  const [notificationType, setNotificationType] = useState<
+    "info" | "success" | "error"
+  >("info");
+
+  useEffect(() => {
+    setNotificationType(
+      subscribeError ? "error" : isSubscribed ? "success" : "info",
+    );
+    setNotificationMessage(
+      subscribeError
+        ? "Failed to subscribe"
+        : isSubscribed
+          ? "Subscribed successfully"
+          : "Subscribing...",
+    );
+  }, [subscribeError, isSubscribed]);
 
   return (
     <div>
+      {subscribing && (
+        <SimpleNotification
+          message={notificationMessage}
+          type={notificationType}
+          timeout={3000}
+        />
+      )}
       {/* Hero Section */}
       <div className="flex flex-col justify-center items-center text-center pt-4 pb-8">
         <h1 className="text-4xl sm:text-6xl font-semibold">
@@ -35,9 +65,21 @@ export default function Blog() {
         {/* Subscribe Bar */}
         <SimpleInput
           placeholder="Enter your email"
-          value=""
-          onChange={() => {}}
+          inputType="email"
+          value={userEmail}
+          onChange={(value: string) => setUserEmail(value)}
           buttonText="Subscribe"
+          buttonOnClick={() => {
+            setSubscribing(true);
+            const isSubscribed = handleSubscribe(userEmail);
+            if (isSubscribed) {
+              setIsSubscribed(true);
+              setUserEmail("");
+            } else {
+              setSubscribeError(true);
+            }
+            setSubscribing(false);
+          }}
         />
       </div>
 

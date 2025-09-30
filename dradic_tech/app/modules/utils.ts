@@ -199,3 +199,17 @@ export function getDefaultFormData(): BlogFormData {
     author: "",
   };
 }
+
+function validateEmail(email: string) {
+  // Simple email regex
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export const handleSubscribe = (userEmail: string) => {
+  if (!validateEmail(userEmail)) {
+    console.error("Please enter a valid email address.");
+    return false;
+  }
+  console.log(userEmail);
+  return true;
+};

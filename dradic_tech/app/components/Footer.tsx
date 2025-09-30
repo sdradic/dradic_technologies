@@ -3,9 +3,11 @@ import { DradicTechLogo } from "./Icons";
 import { SimpleInput } from "./SimpleInput";
 import { ThemeToggle } from "./ThemeToggle";
 import { useLocation } from "react-router";
+import { handleSubscribe } from "~/modules/utils";
 
 export default function Footer() {
   const [isBlog, setIsBlog] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
   const location = useLocation();
 
   useEffect(() => {
@@ -32,9 +34,14 @@ export default function Footer() {
               </span>
               <SimpleInput
                 placeholder="Enter your email"
-                value=""
-                onChange={() => {}}
+                inputType="email"
+                value={userEmail}
+                onChange={(value: string) => setUserEmail(value)}
                 buttonText="Subscribe"
+                buttonOnClick={() => {
+                  handleSubscribe(userEmail);
+                  setUserEmail("");
+                }}
               />
             </div>
           )}
