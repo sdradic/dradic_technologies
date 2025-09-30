@@ -275,6 +275,10 @@ docker build -t dradic-api .
 docker run -p 8000:8000 dradic-api
 ```
 
+### Deploy command
+
+`sh run_build_and_deploy.sh $(date +"%s") DEV`
+
 ### Production Considerations
 
 - **ASGI Server**: Uvicorn with multiple workers for production

@@ -64,11 +64,6 @@ if [ -n "$GITHUB_OUTPUT" ]; then
 fi
 
 # Inject secrets into SSM
-echo "SUPABASE_URL=$SUPABASE_URL"
-echo "SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY"
-echo "SUPABASE_DATABASE_URL=$SUPABASE_DATABASE_URL"
-echo "SUPABASE_STORAGE_ACCESS_KEY_ID=$SUPABASE_STORAGE_ACCESS_KEY_ID"
-echo "SUPABASE_STORAGE_SECRET_ACCESS_KEY=$SUPABASE_STORAGE_SECRET_ACCESS_KEY"
 echo "🔑 Injecting secrets into SSM..."
 aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_URL" --value $SUPABASE_URL --type String --overwrite
 aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_SERVICE_ROLE_KEY" --value $SUPABASE_SERVICE_ROLE_KEY --type String --overwrite
