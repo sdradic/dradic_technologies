@@ -65,11 +65,11 @@ fi
 
 # Inject secrets into SSM
 echo "🔑 Injecting secrets into SSM..."
-aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_URL" --value $SUPABASE_URL --type String --overwrite
-aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_SERVICE_ROLE_KEY" --value $SUPABASE_SERVICE_ROLE_KEY --type String --overwrite
-aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_DATABASE_URL" --value $SUPABASE_DATABASE_URL --type String --overwrite
-aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_STORAGE_ACCESS_KEY_ID" --value $SUPABASE_STORAGE_ACCESS_KEY_ID --type String --overwrite
-aws ssm put-parameter --name "/${PROJECT_NAME}/${lowercase_environment}/SUPABASE_STORAGE_SECRET_ACCESS_KEY" --value $SUPABASE_STORAGE_SECRET_ACCESS_KEY --type String --overwrite
+aws ssm put-parameter --name "/${PROJECT_NAME}/SUPABASE_URL" --value $SUPABASE_URL --type String --overwrite
+aws ssm put-parameter --name "/${PROJECT_NAME}/SUPABASE_SERVICE_ROLE_KEY" --value $SUPABASE_SERVICE_ROLE_KEY --type String --overwrite
+aws ssm put-parameter --name "/${PROJECT_NAME}/SUPABASE_DATABASE_URL" --value $SUPABASE_DATABASE_URL --type String --overwrite
+aws ssm put-parameter --name "/${PROJECT_NAME}/SUPABASE_STORAGE_ACCESS_KEY_ID" --value $SUPABASE_STORAGE_ACCESS_KEY_ID --type String --overwrite
+aws ssm put-parameter --name "/${PROJECT_NAME}/SUPABASE_STORAGE_SECRET_ACCESS_KEY" --value $SUPABASE_STORAGE_SECRET_ACCESS_KEY --type String --overwrite
 
 # Go back to APIs directory
 cd ../../../unified_backend/apis
@@ -78,9 +78,9 @@ cd ../../../unified_backend/apis
 echo "🔐 Logging into ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
 
-# Build the Docker image
+# Build the Docker image for AMD64 platform
 echo "🔨 Building image: $ECR_REPO_URL:$IMAGE_TAG"
-docker build -t $ECR_REPO_URL:$IMAGE_TAG .
+docker build --platform linux/amd64 --load -t $ECR_REPO_URL:$IMAGE_TAG .
 
 # Also tag as latest for the environment
 echo "🔖 Tagging image: $ECR_REPO_URL:$IMAGE_TAG as $ECR_REPO_URL:latest"
