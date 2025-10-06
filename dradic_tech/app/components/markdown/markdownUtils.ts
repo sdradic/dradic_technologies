@@ -28,6 +28,20 @@ export function processMarkdownContent(content: string): string {
     '<div class="callout callout-tip">$1</div>',
   );
 
+  // Normalize links where a newline appears between the label and URL
+  // e.g. "[text]\n(url)" or "[text]\r\n(url)" -> "[text](url)"
+  processed = processed.replace(/\]\s*\r?\n\s*\(/g, "](");
+
+  // Ensure a blank line before GFM tables so the parser recognizes them
+  // Matches: a normal line, then a table header row, then the separator row
+  processed = processed.replace(
+    /([^\n]*)\n(\|[^\n]+\|[^\n]*)\n(\|[-:\s|]+\|[^\n]*)/g,
+    (_match, before: string, headerRow: string, separatorRow: string) => {
+      const needsBlank = before.trim().length > 0;
+      return `${needsBlank ? before + "\n" : before}\n${headerRow}\n${separatorRow}`;
+    },
+  );
+
   return processed;
 }
 

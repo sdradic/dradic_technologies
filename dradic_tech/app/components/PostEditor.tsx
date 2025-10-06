@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
+import { MarkdownRenderer } from "~/components/markdown";
 import {
   SaveIcon,
   ChevronLeftIcon,
@@ -40,6 +41,42 @@ export default function PostEditor({
   const hasNavigated = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"edit" | "preview" | "split">(
+    "edit",
+  );
+  const editorRootRef = useRef<HTMLElement | null>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  // Synchronize scrolling between editor and preview in split view
+  useEffect(() => {
+    if (viewMode !== "split") return;
+    const editorEl = editorRootRef.current;
+    const previewEl = previewRef.current;
+    if (!editorEl || !previewEl) return;
+
+    let syncing = false;
+
+    const sync = (source: HTMLElement, target: HTMLElement) => {
+      if (syncing) return;
+      syncing = true;
+      const sourceMax = source.scrollHeight - source.clientHeight;
+      const ratio = sourceMax > 0 ? source.scrollTop / sourceMax : 0;
+      const targetMax = target.scrollHeight - target.clientHeight;
+      target.scrollTop = ratio * targetMax;
+      syncing = false;
+    };
+
+    const onEditorScroll = () => sync(editorEl, previewEl);
+    const onPreviewScroll = () => sync(previewEl, editorEl);
+
+    editorEl.addEventListener("scroll", onEditorScroll);
+    previewEl.addEventListener("scroll", onPreviewScroll);
+
+    return () => {
+      editorEl.removeEventListener("scroll", onEditorScroll);
+      previewEl.removeEventListener("scroll", onPreviewScroll);
+    };
+  }, [viewMode]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -302,11 +339,66 @@ export default function PostEditor({
 
       {/* Editor */}
       <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-gray-300 dark:border-gray-600">
-        <MDXEditorComponent
-          selectedPost={selectedPost}
-          selectedPostContent={postContent}
-          setSelectedPostContent={setPostContent}
-        />
+        {/* View Mode Switcher */}
+        <div className="flex items-center justify-end gap-2 p-2">
+          <button
+            onClick={() => setViewMode("edit")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => setViewMode("preview")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          >
+            Preview
+          </button>
+          <button
+            onClick={() => setViewMode("split")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          >
+            Split
+          </button>
+        </div>
+
+        {/* Content */}
+        {viewMode === "edit" && (
+          <MDXEditorComponent
+            selectedPost={selectedPost}
+            selectedPostContent={postContent}
+            setSelectedPostContent={setPostContent}
+          />
+        )}
+
+        {viewMode === "preview" && (
+          <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
+            <MarkdownRenderer content={postContent} />
+          </div>
+        )}
+
+        {viewMode === "split" && (
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            style={{ height: "70vh" }}
+          >
+            <div className="h-full overflow-y-auto">
+              <MDXEditorComponent
+                selectedPost={selectedPost}
+                selectedPostContent={postContent}
+                setSelectedPostContent={setPostContent}
+                onRootElementReady={(el) => {
+                  editorRootRef.current = el;
+                }}
+              />
+            </div>
+            <div
+              ref={previewRef}
+              className="h-full rounded-lg p-4 md:p-6 overflow-y-auto overflow-x-auto border-l border-gray-200 dark:border-gray-700"
+            >
+              <MarkdownRenderer content={postContent} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

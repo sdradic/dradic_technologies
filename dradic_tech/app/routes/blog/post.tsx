@@ -1,7 +1,6 @@
 import { useLocation } from "react-router";
 import { fetchPostContent } from "~/modules/apis";
 import type { Route } from "./+types/post";
-import { renderMarkdownToHtml } from "~/modules/utils";
 import { MarkdownRenderer } from "~/components/markdown";
 import { useEffect, useState } from "react";
 import NotFound from "../404";
@@ -9,7 +8,7 @@ import Loader from "~/components/Loader";
 import type { BlogPostWithSeparatedContent } from "~/modules/types";
 
 interface LoaderData {
-  html: string;
+  content: string; // raw markdown content
   metadata: {
     title: string;
     created_at: string;
@@ -63,13 +62,8 @@ export default function Post({ params }: Route.ComponentProps) {
           throw new Error("No post content available");
         }
 
-        // Render markdown content (now pure markdown without frontmatter)
-        const html = await renderMarkdownToHtml(post.content);
-
-        setRenderedPost({
-          html,
-          metadata: post.metadata,
-        });
+        // Keep pure markdown content; rendering handled by MarkdownRenderer
+        setRenderedPost({ content: post.content, metadata: post.metadata });
       } catch (err) {
         console.error("Failed to load blog post", err);
       } finally {
@@ -148,7 +142,7 @@ export default function Post({ params }: Route.ComponentProps) {
         className="h-48 md:h-96 rounded-xl object-cover my-4"
       />
       <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
-        <MarkdownRenderer content={renderedPost.html} />
+        <MarkdownRenderer content={renderedPost.content} />
       </div>
     </div>
   );

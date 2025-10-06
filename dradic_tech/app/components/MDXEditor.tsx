@@ -35,12 +35,14 @@ interface MDXEditorProps {
   selectedPost: BlogPost;
   selectedPostContent: string;
   setSelectedPostContent: (content: string) => void;
+  onRootElementReady?: (el: HTMLElement) => void;
 }
 
 export default function MDXEditorComponent({
   selectedPost,
   selectedPostContent,
   setSelectedPostContent,
+  onRootElementReady,
 }: MDXEditorProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -67,6 +69,9 @@ export default function MDXEditorComponent({
           '[data-testid="mdxeditor-root"]',
         );
         if (editorElement) {
+          if (onRootElementReady) {
+            onRootElementReady(editorElement as HTMLElement);
+          }
           if (theme === "dark") {
             editorElement.classList.add("dark");
             document.documentElement.classList.add("dark");
@@ -115,7 +120,7 @@ export default function MDXEditorComponent({
       {selectedPost && (
         <>
           <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
-          <div className="w-full rounded-md flex-1 h-full lg:min-h-[calc(100vh-210px)] border border-gray-300 dark:border-gray-600">
+          <div className="w-full rounded-md flex-1 h-full lg:min-h-[calc(100vh-210px)]">
             <MDXEditor
               ref={editorRef}
               markdown={safeContent}

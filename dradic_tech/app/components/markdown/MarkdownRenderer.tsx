@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import DOMPurify from "dompurify";
+import { renderMarkdownToHtml } from "./markdownUtils";
 
 interface MarkdownRendererProps {
   content: string;
@@ -13,9 +14,16 @@ export function MarkdownRenderer({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (contentRef.current) {
+    let cancelled = false;
+
+    async function render() {
+      if (!contentRef.current) return;
+
+      // Convert markdown to HTML
+      const html = await renderMarkdownToHtml(content);
+
       // Sanitize the HTML content
-      const sanitizedHtml = DOMPurify.sanitize(content, {
+      const sanitizedHtml = DOMPurify.sanitize(html, {
         ALLOWED_TAGS: [
           "h1",
           "h2",
@@ -60,6 +68,8 @@ export function MarkdownRenderer({
         ALLOW_DATA_ATTR: false,
       });
 
+      if (cancelled || !contentRef.current) return;
+
       contentRef.current.innerHTML = sanitizedHtml;
 
       // Add copy button to code blocks
@@ -81,7 +91,7 @@ export function MarkdownRenderer({
             }
           };
 
-          preBlock.style.position = "relative";
+          (preBlock as HTMLElement).style.position = "relative";
           preBlock.appendChild(copyButton);
         }
       });
@@ -99,6 +109,12 @@ export function MarkdownRenderer({
         });
       });
     }
+
+    render();
+
+    return () => {
+      cancelled = true;
+    };
   }, [content]);
 
   return <div ref={contentRef} className={`markdown-content ${className}`} />;
