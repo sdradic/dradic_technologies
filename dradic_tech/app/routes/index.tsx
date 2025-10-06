@@ -57,7 +57,7 @@ export default function Home() {
             {" "}
             Blog
           </h1>
-          <RecentPosts refreshButton={false} />
+          <RecentPosts refreshButton={false} showLatestPost={true} />
         </div>
       </div>
     </>

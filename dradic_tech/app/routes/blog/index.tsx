@@ -103,10 +103,12 @@ export function RecentPosts({
   refreshKey = 0,
   handleRefresh = () => {},
   refreshButton = true,
+  showLatestPost = false,
 }: {
   refreshKey?: number;
   handleRefresh?: () => void;
   refreshButton?: boolean;
+  showLatestPost?: boolean;
 }) {
   return (
     <div className="flex flex-col mt-6 justify-center text-left">
@@ -127,7 +129,10 @@ export function RecentPosts({
       </div>
       <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
         <Suspense fallback={<PostsSkeleton />}>
-          <PostsList reloadTrigger={refreshKey} showLatestPost={false} />
+          <PostsList
+            reloadTrigger={refreshKey}
+            showLatestPost={showLatestPost}
+          />
         </Suspense>
       </ul>
     </div>
