@@ -1,7 +1,6 @@
 import type { Route } from "./+types/index";
 import { ChipSVG } from "~/components/Icons";
 import { Link } from "react-router";
-import AboutPage from "./about";
 import { RecentPosts } from "./blog";
 
 export function meta(_args: Route.MetaArgs) {
@@ -51,7 +50,6 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <AboutPage />
         <div className="flex flex-col mt-8 w-full">
           <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
             {" "}

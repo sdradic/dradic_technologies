@@ -87,7 +87,7 @@ export default function Post({ params }: Route.ComponentProps) {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-4">
+    <div className="flex flex-col w-full max-w-4xl mx-auto pt-4">
       <div className="flex flex-row w-full mb-4 pt-4 items-center justify-center gap-2">
         <p className="text-gray-500 dark:text-gray-400 text-md md:text-lg">
           {new Date(renderedPost.metadata.created_at).toLocaleDateString(
