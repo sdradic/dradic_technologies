@@ -173,7 +173,7 @@ function LatestPost({ refreshKey }: { refreshKey: number }) {
           {latestPost?.metadata.title}
         </p>
         <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-4 w-full text-left">
-          {extractPlainText(latestPost?.content || "", 150)}
+          {extractPlainText(latestPost?.content || "", 100)}
         </p>
       </div>
     </Link>

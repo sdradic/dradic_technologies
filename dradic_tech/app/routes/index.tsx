@@ -37,10 +37,10 @@ export default function Home() {
               </div>
             </div>
             <p className="text-xl text-gray-500 dark:text-gray-300 text-center md:text-center">
-              At Dradic Technologies, we empower businesses of all types with
-              innovative, reliable, and scalable technology solutions. Our
-              expertise spans cloud, DevOps, and modern infrastructure. Helping
-              you achieve your goals, no matter your industry.
+              Dradic Technologies specializes in DevOps, infrastructure, and
+              cloud consulting. We deliver modern, scalable, and reliable
+              technology solutions designed to help your business grow and
+              succeed.
             </p>
             <Link
               to="/about"
@@ -51,10 +51,6 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-col mt-8 w-full">
-          <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
-            {" "}
-            Blog
-          </h1>
           <RecentPosts refreshButton={false} showLatestPost={true} />
         </div>
       </div>

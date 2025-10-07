@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { UnifiedNav } from "./UnifiedNav";
 import type { NavConfig, NavItem } from "~/modules/types";
@@ -14,8 +14,13 @@ export default function Navbar() {
   const location = useLocation();
   const selectedPath = location.pathname;
   const [isBlog, setIsBlog] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
+  const [isScrolled, setIsScrolled] = useState(() =>
+    typeof window !== "undefined" ? window.scrollY > 10 : false,
+  );
+  const [enableTransition, setEnableTransition] = useState(false);
   const navConfig: NavConfig = [
     { label: "Home", path: "/" },
     { label: "About", path: "/about" },
@@ -42,29 +47,35 @@ export default function Navbar() {
     setIsBlog(location.pathname.startsWith("/blog"));
   }, [location.pathname]);
 
+  useLayoutEffect(() => {
+    // Establish initial layout state before first paint to avoid transition flicker
+    setIsMobile(window.innerWidth < 768);
+    setIsScrolled(window.scrollY > 10);
+  }, []);
+
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    checkIsMobile();
     window.addEventListener("resize", checkIsMobile);
-
     return () => {
       window.removeEventListener("resize", checkIsMobile);
     };
-  });
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
 
-    // Set initial state on mount
-    handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Enable transitions only after initial mount to prevent on-load animations
+    setEnableTransition(true);
   }, []);
 
   return (
@@ -74,7 +85,7 @@ export default function Navbar() {
         At top: full width, at top, no blur, no rounding.
       */}
       <nav
-        className={`transition-all duration-300
+        className={`${enableTransition && !isMobile ? "transition-all duration-300" : ""}
           ${
             !isMobile
               ? isScrolled

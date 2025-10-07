@@ -116,7 +116,7 @@ export default function MDXEditorComponent({
   }
 
   return (
-    <div className="flex flex-col w-full lg:max-h-full max-h-96 min-h-96">
+    <div className="flex flex-col w-full max-h-96 min-h-96">
       {selectedPost && (
         <>
           <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>

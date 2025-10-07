@@ -66,12 +66,10 @@ export default function About() {
           Dusan Radic
         </h2>
         <p className="text-lg text-center md:text-left text-gray-500 dark:text-gray-400">
-          DevOps and Software Engineer with expertise in AWS cloud-native
-          architectures, automation, and CI/CD. Proven success delivering
-          scalable serverless systems and developer tooling for distributed
-          platforms. Background in Electrical Engineering with a diploma in
-          Bioinformatics. Passionate about building clean, maintainable code and
-          fostering team collaboration.
+          I&apos;m a software engineer focused on backend and cloud development,
+          now expanding into DevOps and embedded systems. I explore how software
+          connects with hardware, networks, and real-world systems, documenting
+          my work and learning through my blog and portfolio.
         </p>
       </div>
       {/* Download CV and Contact Me Buttons */}

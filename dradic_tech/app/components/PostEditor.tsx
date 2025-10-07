@@ -337,30 +337,29 @@ export default function PostEditor({
       {/* Metadata Form */}
       <BlogPostForm formData={formData} onFormDataChange={setFormData} />
 
+      {/* View Mode Switcher */}
+      <div className="flex items-center justify-end gap-2 p-2">
+        <button
+          onClick={() => setViewMode("edit")}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => setViewMode("preview")}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+        >
+          Preview
+        </button>
+        <button
+          onClick={() => setViewMode("split")}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+        >
+          Split
+        </button>
+      </div>
       {/* Editor */}
       <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-gray-300 dark:border-gray-600">
-        {/* View Mode Switcher */}
-        <div className="flex items-center justify-end gap-2 p-2">
-          <button
-            onClick={() => setViewMode("edit")}
-            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => setViewMode("preview")}
-            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
-          >
-            Preview
-          </button>
-          <button
-            onClick={() => setViewMode("split")}
-            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
-          >
-            Split
-          </button>
-        </div>
-
         {/* Content */}
         {viewMode === "edit" && (
           <MDXEditorComponent
