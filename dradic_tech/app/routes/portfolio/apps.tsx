@@ -5,12 +5,18 @@ export default function Apps() {
       <p className="text-2xl text-gray-500 dark:text-gray-400 mt-4">
         Here are some of the apps I have worked on.
       </p>
-      <div className="mt-12 max-w-2xl mx-auto">
+      <div className="mt-12 max-w-2xl mx-auto gap-4 flex flex-col">
         <AppCard
           title="Expense Tracker"
           description="A simple expense tracker app built with React and TypeScript."
           image={"/assets/TallyUp.webp"}
           link="https://app.dradic.cl/"
+        />
+        <AppCard
+          title="Gym Tracker"
+          description="A gym tracker app built with Next.js and TypeScript."
+          image={"/assets/gymTracker.png"}
+          link="https://gym-tracker.dradic.cl/"
         />
       </div>
     </div>

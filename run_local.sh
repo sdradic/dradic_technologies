@@ -54,9 +54,10 @@ echo ""
 echo "🌐 Select a frontend project to run on port 3000:"
 echo "1) Dradic Tech"
 echo "2) Expense Tracker"
-echo "3) Exit"
+echo "3) Gym Tracker"
+echo "4) Exit"
 echo ""
-read -p "Enter your choice (1-3): " choice
+read -p "Enter your choice (1-4): " choice
 
 case $choice in
     1)
@@ -70,6 +71,11 @@ case $choice in
         pnpm dev
         ;;
     3)
+        echo "🚀 Starting Gym Tracker..."
+        cd gym_tracker
+        pnpm dev
+        ;;
+    4)
         echo "👋 Goodbye!"
         kill $BACKEND_PID 2>/dev/null || true
         exit 0
