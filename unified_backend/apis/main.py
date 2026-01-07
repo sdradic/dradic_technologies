@@ -17,6 +17,8 @@ from routers.expense_tracker import (
     incomes,
     users,
 )
+from routers.gym_tracker import exercises, gym_activity
+
 from utils.auth import get_credentials_from_token
 from utils.supabase_service import SupabaseService
 
@@ -43,6 +45,7 @@ if DRADIC_ENV == "LOCAL":
     allowed_origins.extend(
         [
             "http://localhost:3000",
+            "http://localhost:3001",
         ]
     )
 
@@ -299,6 +302,16 @@ app.include_router(
     incomes.incomes_router,
     prefix="/api/expense-tracker/incomes",
     tags=["Expense Tracker - Incomes"],
+)
+app.include_router(
+    exercises.exercises_router,
+    prefix="/api/gym-tracker/exercises",
+    tags=["Gym Tracker - Exercises"],
+)
+app.include_router(
+    gym_activity.gym_activity_router,
+    prefix="/api/gym-tracker/activities",
+    tags=["Gym Tracker - Activities"],
 )
 
 if __name__ == "__main__":
