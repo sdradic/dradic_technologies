@@ -18,7 +18,7 @@ from sqlalchemy import (
     create_engine,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import func
 
@@ -129,6 +129,38 @@ incomes_table = Table(
     ),
 )
 
+# Gym Tracker tables
+exercises_table = Table(
+    "exercises",
+    metadata,
+    Column("id", PG_UUID(as_uuid=True), primary_key=True, default=uuid4),
+    Column("name", String, nullable=False, unique=True),
+    Column("muscles_trained", JSONB, nullable=False),  # JSONB column type
+    Column(
+        "created_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+    Column(
+        "updated_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+)
+
+gym_activity_table = Table(
+    "gym_activity",
+    metadata,
+    Column("id", PG_UUID(as_uuid=True), primary_key=True, default=uuid4),
+    Column("user_id", String, ForeignKey("dradic_tech.users.id"), nullable=False),
+    Column("exercise_id", PG_UUID(as_uuid=True), ForeignKey("dradic_tech.exercises.id"), nullable=False),
+    Column("sets", Float, nullable=False),
+    Column("reps", Float, nullable=False),
+    Column("weight", Float, nullable=True),
+    Column(
+        "created_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+    Column(
+        "updated_at", DateTime(timezone=True), server_default=func.now(), nullable=False
+    ),
+)
+
 
 def get_db() -> Session:
     """Get database session"""
@@ -175,6 +207,8 @@ class DatabaseModel(BaseModel):
             "expenses": expenses_table,
             "income_sources": income_sources_table,
             "incomes": incomes_table,
+            "exercises": exercises_table,
+            "gym_activity": gym_activity_table,
         }
 
         if table_name not in table_map:
@@ -213,6 +247,8 @@ class DatabaseModel(BaseModel):
             "expenses": expenses_table,
             "income_sources": income_sources_table,
             "incomes": incomes_table,
+            "exercises": exercises_table,
+            "gym_activity": gym_activity_table,
         }
 
         if table_name not in table_map:
@@ -247,6 +283,8 @@ class DatabaseModel(BaseModel):
             "expenses": expenses_table,
             "income_sources": income_sources_table,
             "incomes": incomes_table,
+            "exercises": exercises_table,
+            "gym_activity": gym_activity_table,
         }
 
         if table_name not in table_map:

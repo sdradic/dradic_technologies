@@ -356,3 +356,62 @@ class AuthUser(BaseModel):
     email: str
     name: str
     email_verified: bool
+
+
+# Gym Tracker Models
+class ExerciseBase(BaseModel):
+    name: str
+    muscles_trained: dict  # e.g., {"chest": 60, "triceps": 30, "shoulders": 10}
+
+    class Config:
+        from_attributes = True
+
+
+class ExerciseCreate(ExerciseBase):
+    pass
+
+
+class Exercise(ExerciseBase):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class GymActivityBase(BaseModel):
+    exercise_id: UUID
+    sets: int
+    reps: int
+    weight: Optional[float] = None  # Nullable for calisthenics
+
+    class Config:
+        from_attributes = True
+
+
+class GymActivityCreate(GymActivityBase):
+    pass
+
+
+class GymActivity(GymActivityBase):
+    id: UUID
+    user_id: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class GymActivityWithDetails(GymActivity):
+    exercise_name: str
+    muscles_trained: dict
+
+
+class GymActivityResponse(BaseModel):
+    activities: List[GymActivityWithDetails]
+    total_count: int
+
+
+# Dashboard models for gym tracker
+class GymDashboardStats(BaseModel):
+    total_workouts_this_month: int
+    most_trained_muscle: Optional[str] = None
+    total_weight_lifted: Optional[float] = None
+    activities_by_date: dict  # {"2026-01-01": 3, "2026-01-02": 2}
+    muscle_groups_distribution: dict  # {"chest": 120, "back": 80}
