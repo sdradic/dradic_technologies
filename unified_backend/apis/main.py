@@ -39,7 +39,7 @@ allowed_origins = [
     "https://dradic-technologies.vercel.app",
     "https://dradic.cl",
     "https://app.dradic.cl",
-    "https://gym-tracker.dradic.cl",
+    "https://gym.dradic.cl",
 ]
 
 if DRADIC_ENV == "LOCAL":
