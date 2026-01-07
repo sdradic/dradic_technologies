@@ -16,7 +16,7 @@ export default function Apps() {
           title="Gym Tracker"
           description="A gym tracker app built with Next.js and TypeScript."
           image={"/assets/gymTracker.png"}
-          link="https://gym-tracker.dradic.cl/"
+          link="https://gym.dradic.cl/"
         />
       </div>
     </div>
