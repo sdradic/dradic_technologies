@@ -13,7 +13,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedPath = location.pathname;
-  const [isBlog, setIsBlog] = useState(false);
+  const isBlog = location.pathname.startsWith("/blog");
   const [isScrolled, setIsScrolled] = useState(() =>
     typeof window !== "undefined" ? window.scrollY > 10 : false,
   );
@@ -23,10 +23,7 @@ export default function Navbar() {
     { label: "About", path: "/#about" },
     { label: "Insights", path: "/#insights" },
     { label: "Contact", path: "/#contact" },
-    {
-      label: "Blog",
-      path: "/blog",
-    },
+    { label: "Blog", path: "/blog" },
   ];
 
   const handleNavClick = (item: NavItem) => {
@@ -51,14 +48,7 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    setIsBlog(location.pathname.startsWith("/blog"));
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

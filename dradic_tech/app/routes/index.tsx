@@ -1,5 +1,4 @@
 import type { Route } from "./+types/index";
-import { useState } from "react";
 import {
   ChevronRight,
   Terminal,
@@ -12,7 +11,6 @@ import {
   Mail,
   MessageSquare,
 } from "lucide-react";
-import ContactForm from "~/components/ContactForm";
 import { Link } from "react-router";
 
 export function meta(_args: Route.MetaArgs) {
@@ -112,28 +110,8 @@ const BLOG_POSTS = [
 ];
 
 export default function Home() {
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-
   return (
     <main>
-      {/* Contact Modal */}
-      {contactModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          aria-modal="true"
-          role="dialog"
-        >
-          <div
-            className="absolute inset-0 bg-black/50"
-            aria-hidden="true"
-            onClick={() => setContactModalOpen(false)}
-          />
-          <div className="relative bg-white dark:bg-dark-200 rounded-lg shadow-xl z-10">
-            <ContactForm setContactModalOpen={setContactModalOpen} />
-          </div>
-        </div>
-      )}
-
       {/* Hero Section */}
       <section
         id="home"
@@ -163,8 +141,12 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-4">
               <button
-                onClick={() => setContactModalOpen(true)}
-                className="px-8 py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/25 flex items-center gap-2"
+                onClick={() =>
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="px-8 py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/25 flex items-center gap-2 cursor-pointer"
               >
                 Get in Touch <ChevronRight className="w-5 h-5" />
               </button>
@@ -210,7 +192,7 @@ export default function Home() {
                   <br />
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-brand-500">&#8594;</span>
+                  <span className="text-brand-500">➜</span>
                   <span className="text-slate-700 dark:text-slate-300">
                     deploy --env production
                   </span>
@@ -430,7 +412,6 @@ export default function Home() {
                   className="space-y-6"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    setContactModalOpen(true);
                   }}
                 >
                   <div>
@@ -455,9 +436,9 @@ export default function Home() {
                       required
                     >
                       <option value="">Select Service</option>
-                      <option value="devops">DevOps &amp; CI/CD</option>
+                      <option value="devops">DevOps & CI/CD</option>
                       <option value="cloud">Cloud Solutions</option>
-                      <option value="iot">IoT &amp; Embedded</option>
+                      <option value="iot">IoT & Embedded</option>
                       <option value="network">Network Engineering</option>
                     </select>
                   </div>

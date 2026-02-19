@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import ContactForm from "~/components/ContactForm";
+import { Link } from "react-router";
 import { downloadFileFromBackend } from "~/modules/apis";
 
 interface Experience {
@@ -17,41 +16,8 @@ interface Role {
 }
 
 export default function Team() {
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!contactModalOpen) return;
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setContactModalOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [contactModalOpen]);
-
   return (
     <div className="flex flex-col gap-8 w-full">
-      {contactModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          aria-modal="true"
-          role="dialog"
-        >
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            aria-hidden="true"
-            onClick={() => setContactModalOpen(false)}
-          />
-          {/* Modal content */}
-          <div className="relative bg-white dark:bg-dark-200 rounded-lg shadow-xl z-10">
-            <ContactForm setContactModalOpen={setContactModalOpen} />
-          </div>
-        </div>
-      )}
       <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
         About Me
       </h1>
@@ -82,12 +48,12 @@ export default function Team() {
         >
           Download CV
         </button>
-        <button
+        <Link
+          to="/#contact"
           className="btn-primary w-full text-center max-w-48"
-          onClick={() => setContactModalOpen(true)}
         >
           Contact Me
-        </button>
+        </Link>
       </div>
       {/* Experience */}
       <div className="flex flex-col gap-6">

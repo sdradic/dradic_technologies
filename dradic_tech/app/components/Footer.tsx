@@ -1,17 +1,12 @@
-import { useEffect, useState } from "react";
-import { SimpleInput } from "./SimpleInput";
+import { useState } from "react";
 import { useLocation, Link } from "react-router";
 import { handleSubscribe } from "~/modules/utils";
 import { Github, Linkedin, Mail } from "lucide-react";
 
 export default function Footer() {
-  const [isBlog, setIsBlog] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const location = useLocation();
-
-  useEffect(() => {
-    setIsBlog(location.pathname.startsWith("/blog"));
-  }, [location.pathname]);
+  const isBlog = location.pathname.startsWith("/blog");
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== "/") {
