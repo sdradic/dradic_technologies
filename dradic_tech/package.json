@@ -23,6 +23,7 @@
     "dompurify": "^3.2.6",
     "frontmatter": "^0.0.3",
     "isbot": "^5.1.27",
+    "lucide-react": "^0.575.0",
     "marked": "^15.0.12",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

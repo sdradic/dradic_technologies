@@ -66,14 +66,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function AppContent() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main
-        className={`flex-1 w-full max-w-4xl sm:max-w-6xl mx-auto px-4 flex transition-opacity duration-300 ease-in-out`}
-      >
-        <Outlet />
-      </main>
+      {isHome ? (
+        <main className="flex-1 w-full">
+          <Outlet />
+        </main>
+      ) : (
+        <main className="flex-1 w-full max-w-4xl sm:max-w-6xl mx-auto px-4 pt-24">
+          <Outlet />
+        </main>
+      )}
       <Footer />
     </div>
   );

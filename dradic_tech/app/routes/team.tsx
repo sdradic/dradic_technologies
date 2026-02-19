@@ -16,7 +16,7 @@ interface Role {
   highlights?: string[];
 }
 
-export default function About() {
+export default function Team() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
   useEffect(() => {
@@ -98,11 +98,11 @@ export default function About() {
           {experience.map((company) => (
             <div
               key={company.company}
-              className="bg-white dark:bg-dark-400 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-6 transition hover:shadow-lg"
+              className="bg-white dark:bg-dark-400 border border-slate-200 dark:border-slate-700 rounded-xl shadow-md p-6 transition hover:shadow-lg hover:border-brand-500"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h3 className="text-xl font-semibold text-primary-600 dark:text-primary-400">
+                  <h3 className="text-xl font-semibold text-brand-600 dark:text-brand-400">
                     {company.company}
                   </h3>
                   <span className="text-sm text-gray-500 dark:text-gray-400">

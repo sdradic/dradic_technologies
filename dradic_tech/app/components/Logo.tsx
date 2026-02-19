@@ -1,4 +1,3 @@
-import { DradicTechLogo } from "./Icons";
 import { useNavigate } from "react-router";
 
 export const Logo = () => {
@@ -6,7 +5,7 @@ export const Logo = () => {
 
   return (
     <div
-      className="flex items-center cursor-pointer"
+      className="text-2xl font-black tracking-tighter cursor-pointer flex items-center gap-2 group"
       onClick={() => navigate("/")}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -18,14 +17,11 @@ export const Logo = () => {
       role="button"
       aria-label="Navigate to home page"
     >
-      <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500" />
-      <div className="hidden md:flex items-center">
-        <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
-        <div className="flex flex-col">
-          <span className="text-2xl font-semibold">Dradic</span>
-          <span className="text-sm text-gray-500">Technologies</span>
-        </div>
+      <div className="bg-brand-600 text-white p-1 rounded group-hover:scale-110 transition-transform">
+        DR
       </div>
+      <span className="dark:text-white text-slate-900 uppercase">Dradic</span>
+      <span className="text-brand-600 uppercase">Tech</span>
     </div>
   );
 };

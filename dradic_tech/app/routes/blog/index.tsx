@@ -54,8 +54,8 @@ export default function Blog() {
           />
         )}
         {/* Hero Section */}
-        <div className="flex flex-col justify-center items-center text-center pt-4 pb-8">
-          <h1 className="text-4xl sm:text-6xl font-semibold">
+        <div className="flex flex-col justify-center items-center text-center pt-8 pb-8">
+          <h1 className="text-3xl sm:text-5xl font-bold">
             Weekly <span className="text-primary-500">DevOps</span> tech
             insights and tutorials
           </h1>

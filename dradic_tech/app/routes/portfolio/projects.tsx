@@ -64,7 +64,7 @@ const ProjectCard = ({
 }) => {
   return (
     <div
-      className="flex flex-col gap-4 mt-4 border bg-gray-50 dark:bg-dark-400 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-dark-300 rounded-lg p-4 w-full max-w-2xl mx-auto cursor-pointer"
+      className="flex flex-col gap-4 mt-4 border bg-gray-50 dark:bg-dark-400 border-slate-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-dark-300 hover:border-brand-500 rounded-lg p-4 w-full max-w-2xl mx-auto cursor-pointer transition-all"
       onClick={() => {
         window.open(link, "_blank");
       }}
@@ -86,7 +86,7 @@ const ProjectCard = ({
             key={tag}
             className="inline-flex items-center gap-2 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-dark-300 text-gray-700 dark:text-gray-300"
           >
-            <div className="size-2 rounded-full bg-primary-300 dark:bg-primary-700" />
+            <div className="size-2 rounded-full bg-brand-300 dark:bg-brand-700" />
             #{tag}
           </span>
         ))}
