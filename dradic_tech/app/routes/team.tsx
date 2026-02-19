@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import ContactForm from "~/components/ContactForm";
+import { Link } from "react-router";
 import { downloadFileFromBackend } from "~/modules/apis";
 
 interface Experience {
@@ -16,42 +15,9 @@ interface Role {
   highlights?: string[];
 }
 
-export default function About() {
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!contactModalOpen) return;
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setContactModalOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [contactModalOpen]);
-
+export default function Team() {
   return (
     <div className="flex flex-col gap-8 w-full">
-      {contactModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          aria-modal="true"
-          role="dialog"
-        >
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            aria-hidden="true"
-            onClick={() => setContactModalOpen(false)}
-          />
-          {/* Modal content */}
-          <div className="relative bg-white dark:bg-dark-200 rounded-lg shadow-xl z-10">
-            <ContactForm setContactModalOpen={setContactModalOpen} />
-          </div>
-        </div>
-      )}
       <h1 className="text-4xl sm:text-6xl font-semibold text-center pt-2">
         About Me
       </h1>
@@ -82,12 +48,12 @@ export default function About() {
         >
           Download CV
         </button>
-        <button
+        <Link
+          to="/#contact"
           className="btn-primary w-full text-center max-w-48"
-          onClick={() => setContactModalOpen(true)}
         >
           Contact Me
-        </button>
+        </Link>
       </div>
       {/* Experience */}
       <div className="flex flex-col gap-6">
@@ -98,11 +64,11 @@ export default function About() {
           {experience.map((company) => (
             <div
               key={company.company}
-              className="bg-white dark:bg-dark-400 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-6 transition hover:shadow-lg"
+              className="bg-white dark:bg-dark-400 border border-slate-200 dark:border-slate-700 rounded-xl shadow-md p-6 transition hover:shadow-lg hover:border-brand-500"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h3 className="text-xl font-semibold text-primary-600 dark:text-primary-400">
+                  <h3 className="text-xl font-semibold text-brand-600 dark:text-brand-400">
                     {company.company}
                   </h3>
                   <span className="text-sm text-gray-500 dark:text-gray-400">

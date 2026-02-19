@@ -20,7 +20,7 @@ const NavButton = ({
   onNavClick: (item: NavItem) => void;
 }) => (
   <button
-    className={`text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer gap-2 px-2 py-1 text-md rounded-md ${
+    className={`text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer gap-2 px-3 py-1.5 text-[15px] font-semibold rounded-md ${
       selectedPath === item.path
         ? "border-b-2 border-primary-500 dark:border-primary-500 rounded-none"
         : ""
@@ -65,7 +65,7 @@ const DropdownButton = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className={`flex group items-center gap-1 text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer px-2 py-1 text-md rounded-md ${
+        className={`flex group items-center gap-1 text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer px-3 py-1.5 text-[15px] font-semibold rounded-md ${
           selectedPath === item.path
             ? "border-b-2 border-primary-500 dark:border-primary-500 rounded-none"
             : ""
@@ -187,88 +187,93 @@ const SidebarItem = ({
   );
 };
 
-export const UnifiedNav = ({
+export const DesktopNav = ({
+  navConfig,
+  selectedPath,
+  onNavClick,
+}: Pick<UnifiedNavProps, "navConfig" | "selectedPath" | "onNavClick">) => (
+  <div className="hidden md:flex gap-4">
+    {navConfig.map((item) => (
+      <div key={item.label}>
+        {item.children && item.children.length > 0 ? (
+          <DropdownButton
+            item={item}
+            selectedPath={selectedPath}
+            onNavClick={onNavClick}
+          />
+        ) : (
+          <NavButton
+            item={item}
+            selectedPath={selectedPath}
+            onNavClick={onNavClick}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+export const MobileMenuButton = ({
+  isSidebarOpen,
+  onToggleSidebar,
+}: Pick<UnifiedNavProps, "isSidebarOpen" | "onToggleSidebar">) => (
+  <div className="flex md:hidden">
+    <button className="cursor-pointer" onClick={onToggleSidebar}>
+      <MenuIcon
+        isSidebarOpen={isSidebarOpen}
+        className="size-7 stroke-1 stroke-gray-500 dark:stroke-white"
+      />
+    </button>
+  </div>
+);
+
+export const MobileSidebar = ({
   navConfig,
   selectedPath,
   onNavClick,
   isSidebarOpen,
   onToggleSidebar,
-}: UnifiedNavProps) => {
-  return (
-    <>
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex gap-4">
-        {navConfig.map((item) => (
-          <div key={item.label}>
-            {item.children && item.children.length > 0 ? (
-              <DropdownButton
-                item={item}
-                selectedPath={selectedPath}
-                onNavClick={onNavClick}
-              />
-            ) : (
-              <NavButton
-                item={item}
-                selectedPath={selectedPath}
-                onNavClick={onNavClick}
-              />
-            )}
+}: UnifiedNavProps) => (
+  <>
+    <div
+      className={`fixed top-0 right-0 h-full w-64 bg-white dark:bg-slate-900 transform transition-transform duration-300 ease-in-out z-50 shadow-lg md:hidden ${
+        isSidebarOpen ? "translate-x-0" : "translate-x-full"
+      }`}
+    >
+      <div className="flex items-center justify-center mt-4">
+        <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500" />
+        <div className="flex items-center">
+          <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
+          <div className="flex flex-col">
+            <span className="text-2xl font-semibold">Dradic</span>
+            <span className="text-sm text-gray-500">Technologies</span>
           </div>
+        </div>
+      </div>
+      <div className="flex flex-col p-6 space-y-2">
+        {navConfig.map((item) => (
+          <SidebarItem
+            key={item.label}
+            item={item}
+            selectedPath={selectedPath}
+            onNavClick={onNavClick}
+          />
         ))}
       </div>
+    </div>
 
-      {/* Mobile Navigation Button */}
-      <div className="flex md:hidden">
-        <button className="cursor-pointer" onClick={onToggleSidebar}>
-          <MenuIcon
-            isSidebarOpen={isSidebarOpen}
-            className="size-7 stroke-1 stroke-gray-500 dark:stroke-white"
-          />
-        </button>
-      </div>
-
-      {/* Mobile Sidebar */}
+    {isSidebarOpen && (
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white dark:bg-dark-500 transform transition-transform duration-300 ease-in-out z-20 shadow-lg md:hidden ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex items-center justify-center mt-4">
-          <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500" />
-          <div className="flex items-center">
-            <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
-            <div className="flex flex-col">
-              <span className="text-2xl font-semibold">Dradic</span>
-              <span className="text-sm text-gray-500">Technologies</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col p-6 space-y-2">
-          {navConfig.map((item) => (
-            <SidebarItem
-              key={item.label}
-              item={item}
-              selectedPath={selectedPath}
-              onNavClick={onNavClick}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 z-10 md:hidden bg-black/50"
-          onClick={onToggleSidebar}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              onToggleSidebar();
-            }
-          }}
-          tabIndex={-1}
-          role="presentation"
-        />
-      )}
-    </>
-  );
-};
+        className="fixed inset-0 z-40 md:hidden bg-black/50"
+        onClick={onToggleSidebar}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onToggleSidebar();
+          }
+        }}
+        tabIndex={-1}
+        role="presentation"
+      />
+    )}
+  </>
+);

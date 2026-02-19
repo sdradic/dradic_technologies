@@ -8,7 +8,7 @@ import {
 export default [
   route("*", "routes/404.tsx"),
   index("routes/index.tsx"),
-  route("/about", "routes/about.tsx"),
+  route("/team", "routes/team.tsx"),
   ...prefix("blog", [
     index("routes/blog/index.tsx"),
     route("/:slug", "routes/blog/post.tsx"),

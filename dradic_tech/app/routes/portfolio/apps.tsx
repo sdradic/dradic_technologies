@@ -36,7 +36,7 @@ const AppCard = ({
 }) => {
   return (
     <div
-      className={`flex flex-col gap-2 bg-gray-50 dark:bg-dark-400 rounded-lg p-4 w-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors ${
+      className={`flex flex-col gap-2 bg-gray-50 dark:bg-dark-400 rounded-lg p-4 w-full border border-slate-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-dark-300 hover:border-brand-500 transition-all ${
         link ? "cursor-pointer" : "cursor-not-allowed"
       }`}
       onClick={() => {

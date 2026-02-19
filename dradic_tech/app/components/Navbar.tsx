@@ -1,6 +1,6 @@
-import { useEffect, useState, useLayoutEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { UnifiedNav } from "./UnifiedNav";
+import { DesktopNav, MobileMenuButton, MobileSidebar } from "./UnifiedNav";
 import type { NavConfig, NavItem } from "~/modules/types";
 import { Logo } from "./Logo";
 import { SearchIcon } from "./Icons";
@@ -13,119 +13,95 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedPath = location.pathname;
-  const [isBlog, setIsBlog] = useState(false);
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth < 768 : false,
-  );
+  const isBlog = location.pathname.startsWith("/blog");
   const [isScrolled, setIsScrolled] = useState(() =>
     typeof window !== "undefined" ? window.scrollY > 10 : false,
   );
-  const [enableTransition, setEnableTransition] = useState(false);
   const navConfig: NavConfig = [
-    { label: "Home", path: "/" },
-    { label: "About", path: "/about" },
-    {
-      label: "Blog",
-      path: "/blog",
-    },
-    {
-      label: "Portfolio",
-      path: "/portfolio",
-      children: [
-        { label: "Apps", path: "/portfolio/" },
-        { label: "Projects", path: "/portfolio/projects" },
-      ],
-    },
+    { label: "Home", path: "/#home" },
+    { label: "Services", path: "/#services" },
+    { label: "About", path: "/#about" },
+    { label: "Insights", path: "/#insights" },
+    { label: "Contact", path: "/#contact" },
+    { label: "Blog", path: "/blog" },
   ];
 
   const handleNavClick = (item: NavItem) => {
-    navigate(item.path);
+    if (item.path.startsWith("/#")) {
+      const sectionId = item.path.substring(2);
+      if (location.pathname !== "/") {
+        navigate("/");
+        setTimeout(() => {
+          document
+            .getElementById(sectionId)
+            ?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      } else {
+        document
+          .getElementById(sectionId)
+          ?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(item.path);
+    }
     setIsSidebarOpen(false);
   };
 
   useEffect(() => {
-    setIsBlog(location.pathname.startsWith("/blog"));
-  }, [location.pathname]);
-
-  useLayoutEffect(() => {
-    // Establish initial layout state before first paint to avoid transition flicker
-    setIsMobile(window.innerWidth < 768);
-    setIsScrolled(window.scrollY > 10);
-  }, []);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", checkIsMobile);
-    return () => {
-      window.removeEventListener("resize", checkIsMobile);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    // Enable transitions only after initial mount to prevent on-load animations
-    setEnableTransition(true);
-  }, []);
-
   return (
     <>
-      {/*
-        On scroll: fixed, centered, blurred, rounded, max-w-3xl.
-        At top: full width, at top, no blur, no rounding.
-      */}
       <nav
-        className={`${enableTransition && !isMobile ? "transition-all duration-300" : ""}
-          ${
-            !isMobile
-              ? isScrolled
-                ? "fixed top-6 left-1/2 z-30 -translate-x-1/2 flex flex-row items-center justify-between w-full max-w-3xl px-4 rounded-2xl bg-white/70 dark:bg-dark-500/70 backdrop-blur-md shadow-lg"
-                : "relative top-0 left-1/2 -translate-x-1/2 flex flex-row items-center justify-between w-full max-w-4xl sm:max-w-6xl px-4 bg-transparent"
-              : "flex flex-row items-center justify-between w-full px-4 max-w-6xl mx-auto"
-          }
-        `}
+        className={`fixed top-0 left-0 z-30 w-full ${isScrolled ? "glass shadow-sm" : "bg-transparent"}`}
         id="navbar"
       >
-        <Logo />
-        <div className="flex justify-end items-center gap-2">
-          <UnifiedNav
-            navConfig={navConfig}
-            selectedPath={selectedPath}
-            onNavClick={handleNavClick}
-            isSidebarOpen={isSidebarOpen}
-            onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-
-          <ThemeToggle />
-          {isBlog && (
-            <div
-              className="cursor-pointer rounded-xl p-2"
-              onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setIsSearchModalOpen(!isSearchModalOpen);
-                }
-              }}
-              tabIndex={0}
-              role="button"
-              aria-label="Open search modal"
-            >
-              <SearchIcon className="size-5 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
-            </div>
-          )}
+        <div
+          className={`max-w-7xl mx-auto px-6 flex flex-row items-center justify-between ${isScrolled ? "py-3" : "py-5"}`}
+        >
+          <Logo />
+          <div className="flex justify-end items-center gap-2">
+            <DesktopNav
+              navConfig={navConfig}
+              selectedPath={selectedPath}
+              onNavClick={handleNavClick}
+            />
+            <MobileMenuButton
+              isSidebarOpen={isSidebarOpen}
+              onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+            />
+            <ThemeToggle />
+            {isBlog && (
+              <div
+                className="cursor-pointer rounded-xl p-2"
+                onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setIsSearchModalOpen(!isSearchModalOpen);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label="Open search modal"
+              >
+                <SearchIcon className="size-5 stroke-gray-500 dark:stroke-white hover:stroke-primary-500 dark:hover:stroke-primary-500" />
+              </div>
+            )}
+          </div>
         </div>
       </nav>
+
+      <MobileSidebar
+        navConfig={navConfig}
+        selectedPath={selectedPath}
+        onNavClick={handleNavClick}
+        isSidebarOpen={isSidebarOpen}
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+      />
 
       <SearchModal
         isOpen={isSearchModalOpen}
