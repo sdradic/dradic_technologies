@@ -139,7 +139,7 @@ export default function MDXEditorComponent({
                 quotePlugin(),
                 thematicBreakPlugin(),
                 markdownShortcutPlugin(),
-                codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
+                codeBlockPlugin({ defaultCodeBlockLanguage: "" }),
                 codeMirrorPlugin({
                   codeBlockLanguages: {
                     js: "JavaScript",

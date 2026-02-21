@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import MDXEditorComponent from "~/components/MDXEditor";
 import { MarkdownRenderer } from "~/components/markdown";
+import { MarkdownPasteModal } from "~/components/MarkdownPasteModal";
 import {
   SaveIcon,
   ChevronLeftIcon,
@@ -46,6 +47,7 @@ export default function PostEditor({
     "edit",
   );
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const editorRootRef = useRef<HTMLElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
@@ -147,6 +149,18 @@ export default function PostEditor({
     postContent,
     existingPost?.metadata.created_at,
   ]);
+
+  const handlePasteMarkdown = (markdownContent: string) => {
+    // Clear content first to reset editor state
+    setPostContent("");
+    setFormData((prev) => ({ ...prev, content: "" }));
+
+    // Small delay to ensure editor resets, then set new content
+    setTimeout(() => {
+      setPostContent(markdownContent);
+      setFormData((prev) => ({ ...prev, content: markdownContent }));
+    }, 100);
+  };
 
   const handleSave = useCallback(async () => {
     if (!isAuthenticated) {
@@ -361,14 +375,15 @@ export default function PostEditor({
             Split
           </button>
         </div>
-        <button
-          onClick={() => setRefreshKey((prev) => prev + 1)}
-          className="flex items-center gap-2 px-3 py-1 rounded-md text-sm border border-slate-300 dark:border-slate-600 bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors duration-200"
-          title="Refresh preview"
-        >
-          <RefreshIcon className="size-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsPasteModalOpen(true)}
+            className="px-3 py-1 rounded-md text-sm border border-slate-300 dark:border-slate-600 bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors duration-200"
+            title="Paste markdown content"
+          >
+            Paste Markdown
+          </button>
+        </div>
       </div>
       {/* Editor */}
       <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-slate-200 dark:border-slate-700">
@@ -411,6 +426,13 @@ export default function PostEditor({
           </div>
         )}
       </div>
+
+      {/* Markdown Paste Modal */}
+      <MarkdownPasteModal
+        isOpen={isPasteModalOpen}
+        onClose={() => setIsPasteModalOpen(false)}
+        onSave={handlePasteMarkdown}
+      />
     </div>
   );
 }
