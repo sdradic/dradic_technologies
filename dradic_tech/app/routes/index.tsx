@@ -6,12 +6,16 @@ import {
   Network,
   Cpu,
   Settings,
-  BookOpen,
   ArrowRight,
   Mail,
   MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router";
+import { Dropdown } from "~/components/Dropdown";
+import React from "react";
+
+// Lazy-load PostList and its skeleton loader
+const PostList = React.lazy(() => import("~/components/PostList"));
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -19,7 +23,7 @@ export function meta(_args: Route.MetaArgs) {
     {
       name: "description",
       content:
-        "Elite engineering solutions in DevOps, Cloud Architecture, IoT, and Embedded Systems for enterprises that refuse to compromise.",
+        "Elite engineering solutions in DevOps and Cloud Architecture for enterprises that refuse to compromise.",
     },
   ];
 }
@@ -37,6 +41,7 @@ const SERVICES = [
       "Terraform",
       "Infrastructure as Code",
     ],
+    comingSoon: false,
   },
   {
     id: "cloud",
@@ -50,6 +55,7 @@ const SERVICES = [
       "Hybrid Cloud",
       "Cost Optimization",
     ],
+    comingSoon: false,
   },
   {
     id: "iot",
@@ -63,6 +69,7 @@ const SERVICES = [
       "Hardware Prototyping",
       "Firmware Security",
     ],
+    comingSoon: true,
   },
   {
     id: "networks",
@@ -76,36 +83,7 @@ const SERVICES = [
       "Network Security",
       "Latency Optimization",
     ],
-  },
-];
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "The Future of Edge Computing in IoT",
-    excerpt:
-      "How local processing is revolutionizing data latency in industrial sensors...",
-    date: "Oct 12, 2023",
-    author: "Dr. Jane Dradic",
-    category: "IOT",
-  },
-  {
-    id: 2,
-    title: "Scaling Kubernetes to 10k Nodes",
-    excerpt:
-      "Lessons learned from managing hyper-scale clusters in production environments.",
-    date: "Sep 28, 2023",
-    author: "Mark Sterling",
-    category: "CLOUD",
-  },
-  {
-    id: 3,
-    title: "Rust vs C++ in Embedded Systems",
-    excerpt:
-      "Why memory safety is becoming the top priority for mission-critical hardware.",
-    date: "Sep 15, 2023",
-    author: "Alex Chen",
-    category: "EMBEDDED",
+    comingSoon: true,
   },
 ];
 
@@ -135,9 +113,8 @@ export default function Home() {
               <span className="text-brand-600 italic">Unbreakable</span> Future
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-lg leading-relaxed">
-              Dradic Technologies provides elite engineering solutions in
-              DevOps, Cloud Architecture, IoT, and Embedded Systems for
-              enterprises that refuse to compromise.
+              Dradic Technologies provides elite engineering solutions in DevOps
+              and Cloud Architecture for enterprises that refuse to compromise.
             </p>
             <div className="flex flex-wrap gap-4">
               <button
@@ -173,32 +150,32 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 <div className="text-xs font-mono text-slate-400">
-                  ~/dradic-core/arch_viewer.sh
+                  ~/dradic-core/
                 </div>
               </div>
               <div className="space-y-4 font-mono text-sm">
                 <div className="flex gap-2">
                   <span className="text-green-500">$</span>
                   <span className="text-slate-700 dark:text-slate-300">
-                    init-cluster --region us-east-1
+                    terraform apply -auto-approve
                   </span>
                 </div>
                 <div className="pl-4 text-slate-500">
-                  Initializing control plane... [OK]
+                  module.eks.cluster... Creating...
                   <br />
-                  Deploying IoT Edge Nodes... [OK]
+                  module.eks.node_group... [OK]
                   <br />
-                  Synchronizing Embedded Hubs... [OK]
+                  aws_lb.web... [OK]
                   <br />
                 </div>
                 <div className="flex gap-2">
                   <span className="text-brand-500">➜</span>
                   <span className="text-slate-700 dark:text-slate-300">
-                    deploy --env production
+                    gh workflow run deploy.yml --ref main
                   </span>
                 </div>
                 <div className="text-brand-500 animate-pulse">
-                  Running architectural analysis...
+                  Running CI pipeline...
                 </div>
               </div>
             </div>
@@ -217,12 +194,12 @@ export default function Home() {
               Deep Technical Expertise
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
-              We specialize in the complex layers of modern infrastructure and
-              hardware development.
+              We specialize in DevOps and Cloud—the foundation of modern
+              infrastructure.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {SERVICES.map((s) => {
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {SERVICES.filter((s) => !s.comingSoon).map((s) => {
               const Icon = s.icon;
               return (
                 <div
@@ -251,6 +228,34 @@ export default function Home() {
               );
             })}
           </div>
+          <div className="mt-12 pt-12 border-t border-slate-200 dark:border-slate-700">
+            <p className="text-center text-md text-slate-500 dark:text-slate-400 mb-6">
+              Coming soon
+            </p>
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {SERVICES.filter((s) => s.comingSoon).map((s) => {
+                const Icon = s.icon;
+                return (
+                  <div
+                    key={s.id}
+                    className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 opacity-75"
+                  >
+                    <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg shrink-0">
+                      <Icon className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-600 dark:text-slate-400">
+                        {s.title}
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {s.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -277,15 +282,15 @@ export default function Home() {
             <h2 className="text-4xl font-bold">Why Dradic Technologies?</h2>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               We started with a simple mission: to handle the engineering tasks
-              that others find too daunting. Whether it&apos;s porting legacy
-              firmware to modern RTOS, optimizing multi-cloud costs, or
-              designing secure global networks, our team has seen and solved it
+              that others find too daunting. Whether it&apos;s building
+              bulletproof CI/CD pipelines, optimizing multi-cloud costs, or
+              scaling infrastructure with code, our team has seen and solved it
               all.
             </p>
             <div className="space-y-4">
               {[
-                "Unmatched expertise in cross-disciplinary domains.",
-                "Security-first approach in every line of code and hardware design.",
+                "Unmatched expertise in DevOps and cloud-native architecture.",
+                "Security-first approach in every line of code and infrastructure design.",
                 "Agile, transparent, and results-driven methodologies.",
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 items-start">
@@ -322,35 +327,36 @@ export default function Home() {
               All Articles <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {BLOG_POSTS.map((post) => (
-              <article
-                key={post.id}
-                className="group glass border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all"
-              >
-                <div className="h-48 bg-slate-200 dark:bg-slate-800 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                  <BookOpen className="w-12 h-12 text-slate-400" />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 text-xs font-semibold text-brand-600 mb-3 uppercase tracking-wider">
-                    {post.category}
+          <React.Suspense
+            fallback={
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Try to use PostList.Skeleton if exported, else fallback to a simple skeleton */}
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
+                  >
+                    <div className="animate-pulse flex flex-col">
+                      <div className="h-48 bg-slate-300 dark:bg-slate-800 rounded-t-2xl"></div>
+                      <div className="p-6 space-y-4">
+                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                        <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                        <div className="h-3 bg-slate-100 dark:bg-slate-900 rounded w-1/2"></div>
+                        <div className="flex justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <div className="h-3 w-12 bg-slate-100 dark:bg-slate-900 rounded"></div>
+                          <div className="h-3 w-20 bg-slate-100 dark:bg-slate-900 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-brand-500 transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <span className="text-xs text-slate-400">{post.date}</span>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                      {post.author}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                ))}
+              </div>
+            }
+          >
+            <PostList max={3} layout="row" reloadTrigger={0} />{" "}
+            {/* row layout and only 3 posts */}
+          </React.Suspense>
           <div className="mt-10 md:hidden text-center">
             <Link
               to="/blog"
@@ -388,7 +394,7 @@ export default function Home() {
                         href="mailto:hello@dradic.tech"
                         className="text-lg font-semibold hover:text-brand-600 transition-colors"
                       >
-                        hello@dradic.tech
+                        hello@dradic.cl
                       </a>
                     </div>
                   </div>
@@ -401,7 +407,7 @@ export default function Home() {
                         Live Chat
                       </div>
                       <div className="text-lg font-semibold">
-                        Mon - Fri, 9am - 6pm EST
+                        Mon - Fri, 9am - 6pm CLT
                       </div>
                     </div>
                   </div>
@@ -431,16 +437,18 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <select
+                    <Dropdown
+                      id="service"
+                      defaultValue=""
+                      onChange={() => {}}
+                      data={[
+                        "DevOps & CI/CD",
+                        "Cloud Solutions",
+                        "IoT & Embedded",
+                        "Network Engineering",
+                      ]}
                       className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
-                      required
-                    >
-                      <option value="">Select Service</option>
-                      <option value="devops">DevOps & CI/CD</option>
-                      <option value="cloud">Cloud Solutions</option>
-                      <option value="iot">IoT & Embedded</option>
-                      <option value="network">Network Engineering</option>
-                    </select>
+                    />
                   </div>
                   <div>
                     <textarea

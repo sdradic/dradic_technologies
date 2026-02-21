@@ -25,7 +25,7 @@ export function BlogPostForm({
       <div className="md:col-span-2">
         <label
           htmlFor="post-title"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
           Post Title *
         </label>
@@ -35,7 +35,7 @@ export function BlogPostForm({
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           placeholder="Enter your post title..."
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
           required
           disabled={disabled}
         />
@@ -45,7 +45,7 @@ export function BlogPostForm({
       <div>
         <label
           htmlFor="post-category"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
           Category
         </label>
@@ -62,7 +62,7 @@ export function BlogPostForm({
       <div>
         <label
           htmlFor="post-author"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
           Author
         </label>
@@ -72,7 +72,7 @@ export function BlogPostForm({
           value={formData.author}
           onChange={(e) => handleChange("author", e.target.value)}
           placeholder="Enter author name..."
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
           disabled={disabled}
         />
       </div>
@@ -81,7 +81,7 @@ export function BlogPostForm({
       <div className="md:col-span-2">
         <label
           htmlFor="post-image"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
           Featured Image URL
         </label>
@@ -91,7 +91,7 @@ export function BlogPostForm({
           value={formData.image}
           onChange={(e) => handleChange("image", e.target.value)}
           placeholder="https://example.com/image.jpg"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-500 text-gray-900 dark:text-gray-100"
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
           disabled={disabled}
         />
         {formData.image && (
@@ -99,7 +99,7 @@ export function BlogPostForm({
             <img
               src={formData.image}
               alt="Preview"
-              className="w-32 h-24 object-cover rounded-md border border-gray-300 dark:border-gray-600"
+              className="w-32 h-24 object-cover rounded-md border border-slate-200 dark:border-slate-700"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}

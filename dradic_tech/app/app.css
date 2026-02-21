@@ -120,3 +120,4 @@ html.dark {
 
 /* Import markdown styles */
 @import "./components/markdown/markdown.css";
+@import "./components/markdown/mdx-editor.css";

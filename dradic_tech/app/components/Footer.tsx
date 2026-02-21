@@ -21,7 +21,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="bg-slate-900 text-slate-400 py-16 md:py-20 mt-24">
+      <footer className="bg-slate-900 text-slate-400 py-16 md:py-20 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row gap-12 md:gap-8">
             <div className="md:w-1/3">
@@ -38,7 +38,8 @@ export default function Footer() {
               </Link>
               <p className="text-sm mb-6 leading-relaxed">
                 High-performance engineering solutions for the modern world.
-                Specializing in DevOps, Cloud, IoT, and Embedded Systems.
+                Specializing in DevOps and Cloud Architecture.
+                {/* Specializing in DevOps, Cloud, IoT, and Embedded Systems. */}
               </p>
               <div className="flex gap-4">
                 <a

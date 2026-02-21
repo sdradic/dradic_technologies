@@ -4,7 +4,8 @@ import { useNavigate } from "react-router";
 import { useAuth } from "~/contexts/AuthContext";
 import Loader from "~/components/Loader";
 import { RefreshIcon } from "~/components/Icons";
-import { PostsList, PostsSkeleton } from "~/components/PostList";
+import PostsList from "~/components/PostList";
+import { PostsSkeleton } from "~/components/PostList";
 
 export default function AdminHome() {
   const navigate = useNavigate();
@@ -42,25 +43,25 @@ export default function AdminHome() {
   return (
     <div className="w-full h-screen">
       <h1 className="text-4xl sm:text-6xl font-semibold text-center pb-8">
-        Blog <span className="text-primary-500">CMS</span>
+        Blog <span className="text-brand-600">CMS</span>
       </h1>
       {/* Recent Posts */}
-      <div className="flex flex-row items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h1 className="font-semibold text-gray-600 dark:text-gray-400">
+      <div className="flex flex-row items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+        <h1 className="font-semibold text-slate-600 dark:text-slate-400">
           All Posts
         </h1>
         <div className="flex items-center gap-4">
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400 group hover:text-primary-500 dark:hover:text-primary-400"
+            className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 group hover:text-brand-500 dark:hover:text-brand-400"
             title="Refresh posts"
           >
-            <RefreshIcon className="w-4 h-4 stroke-gray-600 dark:stroke-gray-400 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+            <RefreshIcon className="w-4 h-4 stroke-slate-600 dark:stroke-slate-400 group-hover:stroke-brand-500 dark:group-hover:stroke-brand-400" />
             Refresh
           </button>
           <button
             onClick={() => navigate("/admin/new-post")}
-            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors cursor-pointer"
+            className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 transition-colors cursor-pointer"
           >
             New Post
           </button>
@@ -71,7 +72,7 @@ export default function AdminHome() {
         setSearchQuery={setSearchQuery}
         placeholder="Search for a post..."
       />
-      <ul className="flex flex-col mt-4 dark:bg-dark-400 bg-gray-100 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
+      <ul className="flex flex-col mt-4 glass border border-slate-200 dark:border-slate-800 rounded-xl divide-y divide-slate-200 dark:divide-slate-700">
         <Suspense fallback={<PostsSkeleton />}>
           <PostsList
             reloadTrigger={refreshKey}

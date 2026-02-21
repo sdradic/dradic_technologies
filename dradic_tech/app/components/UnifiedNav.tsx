@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { MenuIcon, ChevronDownIcon, DradicTechLogo } from "./Icons";
+import { MenuIcon, ChevronDownIcon } from "./Icons";
+import { Logo } from "./Logo";
 import type { NavItem } from "~/modules/types";
 
 interface UnifiedNavProps {
@@ -240,15 +241,20 @@ export const MobileSidebar = ({
         isSidebarOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >
-      <div className="flex items-center justify-center mt-4">
-        <DradicTechLogo className="h-18 stroke-4 stroke-primary-500 dark:stroke-primary-500" />
-        <div className="flex items-center">
-          <div className="h-0.5 w-8 bg-primary-500 rounded-full rotate-90" />
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">Dradic</span>
-            <span className="text-sm text-gray-500">Technologies</span>
-          </div>
-        </div>
+      <div
+        className="flex items-center justify-center mt-4 cursor-pointer"
+        onClick={onToggleSidebar}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggleSidebar();
+          }
+        }}
+        tabIndex={0}
+        role="button"
+        aria-label="Close menu and go to home"
+      >
+        <Logo />
       </div>
       <div className="flex flex-col p-6 space-y-2">
         {navConfig.map((item) => (

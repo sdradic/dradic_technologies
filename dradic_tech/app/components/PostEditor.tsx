@@ -255,9 +255,9 @@ export default function PostEditor({
         <div className="flex flex-row w-full pt-4 items-center justify-between">
           <button
             onClick={() => navigate("/admin")}
-            className="group flex flex-row items-center gap-2 px-4 py-2 min-w-24 justify-center cursor-pointer hover:text-primary-500 dark:hover:text-primary-400"
+            className="group flex flex-row items-center gap-2 px-4 py-2 min-w-24 justify-center cursor-pointer hover:text-brand-500 dark:hover:text-brand-400"
           >
-            <ChevronLeftIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400" />
+            <ChevronLeftIcon className="size-4 stroke-2 stroke-slate-500 dark:stroke-slate-400 group-hover:stroke-brand-500 dark:group-hover:stroke-brand-400" />
             Back
           </button>
           {/* Desktop Buttons */}
@@ -265,7 +265,7 @@ export default function PostEditor({
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="group flex-row md:flex hidden items-center gap-2 border border-primary-500 text-white bg-primary-400 dark:bg-primary-600 dark:border-gray-700 rounded-full px-4 py-2 min-w-28 justify-center cursor-pointer hover:bg-primary-500 dark:hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex-row md:flex hidden items-center gap-2 border border-brand-600 text-white bg-brand-600 dark:bg-brand-600 dark:border-slate-700 rounded-full px-4 py-2 min-w-28 justify-center cursor-pointer hover:bg-brand-700 dark:hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <SaveIcon className="size-4 stroke-2 md:flex hidden stroke-white dark:stroke-gray-100 group-hover:stroke-gray-50 dark:group-hover:stroke-gray-50" />
               {isSaving ? "Saving..." : "Save"}
@@ -283,7 +283,7 @@ export default function PostEditor({
           {/* Mobile Buttons */}
           <div className="flex gap-2 md:hidden">
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              <ThreeDotsMenuIcon className="size-5 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-500 dark:group-hover:stroke-primary-400 cursor-pointer" />
+              <ThreeDotsMenuIcon className="size-5 stroke-2 stroke-slate-500 dark:stroke-slate-400 group-hover:stroke-brand-500 dark:group-hover:stroke-brand-400 cursor-pointer" />
             </button>
             {isMobileMenuOpen && (
               <>
@@ -298,7 +298,7 @@ export default function PostEditor({
                   tabIndex={-1}
                   role="presentation"
                 />
-                <div className="absolute right-4 top-36 bg-white dark:bg-dark-500 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10">
+                <div className="absolute right-4 top-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -306,9 +306,9 @@ export default function PostEditor({
                       setIsMobileMenuOpen(false);
                     }}
                     disabled={isSaving}
-                    className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-gray-700 dark:hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="group flex flex-row items-center rounded-md gap-2 px-4 py-2 min-w-28 justify-start cursor-pointer hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800 dark:hover:text-brand-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <SaveIcon className="size-4 stroke-2 stroke-gray-500 dark:stroke-gray-100 group-hover:stroke-primary-600 dark:group-hover:stroke-primary-600" />
+                    <SaveIcon className="size-4 stroke-2 stroke-slate-500 dark:stroke-slate-400 group-hover:stroke-brand-600 dark:group-hover:stroke-brand-400" />
                     {isSaving ? "Saving..." : "Save"}
                   </button>
                   {!isNewPost && (
@@ -341,25 +341,25 @@ export default function PostEditor({
       <div className="flex items-center justify-end gap-2 p-2">
         <button
           onClick={() => setViewMode("edit")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
         >
           Edit
         </button>
         <button
           onClick={() => setViewMode("preview")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
         >
           Preview
         </button>
         <button
           onClick={() => setViewMode("split")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-primary-600 text-white border-primary-600" : "bg-transparent text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"} cursor-pointer`}
+          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
         >
           Split
         </button>
       </div>
       {/* Editor */}
-      <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-gray-300 dark:border-gray-600">
+      <div className="w-full rounded-lg min-h-72 px-2 overflow-x-auto border border-slate-200 dark:border-slate-700">
         {/* Content */}
         {viewMode === "edit" && (
           <MDXEditorComponent
@@ -392,7 +392,7 @@ export default function PostEditor({
             </div>
             <div
               ref={previewRef}
-              className="h-full rounded-lg p-4 md:p-6 overflow-y-auto overflow-x-auto border-l border-gray-200 dark:border-gray-700"
+              className="h-full rounded-lg p-4 md:p-6 overflow-y-auto overflow-x-auto border-l border-slate-200 dark:border-slate-700"
             >
               <MarkdownRenderer content={postContent} />
             </div>
