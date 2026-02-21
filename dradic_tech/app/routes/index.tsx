@@ -1,4 +1,5 @@
 import type { Route } from "./+types/index";
+import { useState } from "react";
 import {
   ChevronRight,
   Terminal,
@@ -88,6 +89,7 @@ const SERVICES = [
 ];
 
 export default function Home() {
+  const [selectedService, setSelectedService] = useState("");
   return (
     <main>
       {/* Hero Section */}
@@ -391,10 +393,10 @@ export default function Home() {
                         Email Us
                       </div>
                       <a
-                        href="mailto:hello@dradic.tech"
+                        href="mailto:contact@dradic.cl"
                         className="text-lg font-semibold hover:text-brand-600 transition-colors"
                       >
-                        hello@dradic.cl
+                        contact@dradic.cl
                       </a>
                     </div>
                   </div>
@@ -424,7 +426,7 @@ export default function Home() {
                     <input
                       type="text"
                       placeholder="Full Name"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required
                     />
                   </div>
@@ -432,15 +434,15 @@ export default function Home() {
                     <input
                       type="email"
                       placeholder="Email Address"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required
                     />
                   </div>
                   <div>
                     <Dropdown
                       id="service"
-                      defaultValue=""
-                      onChange={() => {}}
+                      defaultValue={selectedService}
+                      onChange={(value) => setSelectedService(value)}
                       data={[
                         "DevOps & CI/CD",
                         "Cloud Solutions",
@@ -454,7 +456,7 @@ export default function Home() {
                     <textarea
                       placeholder="Project details..."
                       rows={4}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
                       required
                     />
                   </div>

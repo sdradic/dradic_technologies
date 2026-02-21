@@ -1,57 +1,34 @@
 # Markdown Rendering System
 
-This folder contains an enhanced markdown rendering system for the blog with rich styling and additional features.
+This folder contains a simplified markdown rendering system for the blog using react-markdown.
 
 ## Components
 
 ### MarkdownRenderer
 
-A React component that renders markdown content with enhanced features:
+A React component that renders markdown content using react-markdown with:
 
-- HTML sanitization using DOMPurify
-- Copy buttons for code blocks
-- Smooth scrolling for anchor links
-- Rich Tailwind CSS styling
-
-### MarkdownConfig
-
-Configuration for the marked library with:
-
-- GitHub Flavored Markdown (GFM) support
-- Line breaks enabled
-- Custom renderer setup
-
-### markdownUtils
-
-Utility functions for markdown processing:
-
-- `renderMarkdownToHtml()` - Enhanced markdown to HTML conversion
-- `processMarkdownContent()` - Pre-processing with additional features
-- `calculateReadingTime()` - Estimate reading time
-- `extractTableOfContents()` - Generate table of contents
+- GitHub Flavored Markdown (GFM) support via remark-gfm
+- Frontmatter parsing via remark-frontmatter
+- Tailwind CSS prose styling
+- No innerHTML - renders React elements directly
+- No DOMPurify needed - XSS protection by design
+- No async rendering - no useEffect or innerHTML timing
 
 ## Features
 
-### Rich Styling
+### Clean React-based Rendering
 
-- Responsive typography with proper heading hierarchy
-- Enhanced code blocks with syntax highlighting support
-- Beautiful blockquotes with accent borders
-- Responsive tables with hover effects
-- Dark mode support throughout
+- Renders markdown as React components instead of HTML strings
+- Built-in XSS protection through React's DOM handling
+- Automatic frontmatter stripping
+- GFM support for tables, strikethrough, and more
 
-### Interactive Elements
+### Styling
 
-- Copy buttons on code blocks
-- Smooth scrolling for anchor links
-- Hover effects on links and tables
-
-### Additional Features
-
-- Reading time calculation
-- Table of contents extraction
-- Callout blocks support (NOTE, WARNING, TIP)
-- Enhanced image rendering with shadows
+- Uses Tailwind CSS prose classes for beautiful typography
+- Dark mode support with `dark:prose-invert`
+- Responsive design with `max-w-none` for full-width content
 
 ## Usage
 
@@ -63,15 +40,16 @@ function BlogPost({ content }) {
 }
 ```
 
-## Styling
+## Dependencies
 
-The system uses Tailwind CSS classes defined in `markdown.css` which is imported in the main `app.css`. All styles support both light and dark modes.
+- `react-markdown` - Core markdown rendering
+- `remark-gfm` - GitHub Flavored Markdown support
+- `remark-frontmatter` - Frontmatter parsing and removal
 
-## Customization
+## Benefits over Previous System
 
-To add new features:
-
-1. Update `markdownUtils.ts` for processing logic
-2. Add styles to `markdown.css`
-3. Update `MarkdownRenderer.tsx` for interactive features
-4. Export new functions in `index.ts`
+- **Simpler**: No complex async rendering pipeline
+- **Safer**: No innerHTML means no XSS vulnerabilities
+- **Cleaner**: No DOMPurify or manual DOM manipulation
+- **More React-like**: Renders actual React components
+- **Better Performance**: No async overhead or DOM sanitization

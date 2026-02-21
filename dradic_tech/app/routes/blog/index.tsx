@@ -6,7 +6,7 @@ import { useState, useCallback, Suspense, useEffect } from "react";
 import { RefreshIcon } from "~/components/Icons";
 import { Link } from "react-router";
 import { useFeaturedPost } from "~/hooks/useBlogPostsData";
-import { extractPlainText } from "~/components/markdown";
+import { extractPlainText } from "~/modules/utils";
 import { handleSubscribe } from "~/modules/utils";
 import { SimpleNotification } from "~/components/SimpleNotification";
 

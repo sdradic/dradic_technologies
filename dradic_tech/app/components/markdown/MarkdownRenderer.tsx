@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
-import DOMPurify from "dompurify";
-import { renderMarkdownToHtml } from "./markdownUtils";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkFrontmatter from "remark-frontmatter";
 
 interface MarkdownRendererProps {
   content: string;
@@ -11,111 +11,21 @@ export function MarkdownRenderer({
   content,
   className = "",
 }: MarkdownRendererProps) {
-  const contentRef = useRef<HTMLDivElement>(null);
+  // Strip frontmatter manually since remark-frontmatter only parses it
+  const stripFrontmatter = (content: string): string => {
+    if (!content.trim().startsWith("---")) return content;
+    const endIndex = content.indexOf("---", 3);
+    if (endIndex === -1) return content;
+    return content.slice(endIndex + 3).trimStart();
+  };
 
-  useEffect(() => {
-    let cancelled = false;
+  const contentWithoutFrontmatter = stripFrontmatter(content);
 
-    async function render() {
-      if (!contentRef.current) return;
-
-      // Convert markdown to HTML
-      const html = await renderMarkdownToHtml(content);
-
-      // Sanitize the HTML content
-      const sanitizedHtml = DOMPurify.sanitize(html, {
-        ALLOWED_TAGS: [
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-          "p",
-          "br",
-          "strong",
-          "em",
-          "del",
-          "ul",
-          "ol",
-          "li",
-          "blockquote",
-          "pre",
-          "code",
-          "table",
-          "thead",
-          "tbody",
-          "tr",
-          "th",
-          "td",
-          "a",
-          "img",
-          "hr",
-          "div",
-          "span",
-        ],
-        ALLOWED_ATTR: [
-          "href",
-          "src",
-          "alt",
-          "title",
-          "id",
-          "class",
-          "target",
-          "rel",
-          "loading",
-        ],
-        ALLOW_DATA_ATTR: false,
-      });
-
-      if (cancelled || !contentRef.current) return;
-
-      contentRef.current.innerHTML = sanitizedHtml;
-
-      // Add copy button to code blocks
-      const preBlocks = contentRef.current.querySelectorAll("pre");
-      preBlocks.forEach((preBlock) => {
-        if (!preBlock.querySelector(".copy-button")) {
-          const copyButton = document.createElement("button");
-          copyButton.className =
-            "copy-button absolute top-2 right-2 px-2 py-1 text-xs bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors duration-200";
-          copyButton.textContent = "Copy";
-          copyButton.onclick = () => {
-            const code = preBlock.querySelector("code");
-            if (code) {
-              navigator.clipboard.writeText(code.textContent || "");
-              copyButton.textContent = "Copied!";
-              setTimeout(() => {
-                copyButton.textContent = "Copy";
-              }, 2000);
-            }
-          };
-
-          (preBlock as HTMLElement).style.position = "relative";
-          preBlock.appendChild(copyButton);
-        }
-      });
-
-      // Add smooth scrolling for anchor links
-      const anchorLinks = contentRef.current.querySelectorAll('a[href^="#"]');
-      anchorLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const targetId = link.getAttribute("href")?.substring(1);
-          const targetElement = document.getElementById(targetId || "");
-          if (targetElement) {
-            targetElement.scrollIntoView({ behavior: "smooth" });
-          }
-        });
-      });
-    }
-
-    render();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [content]);
-
-  return <div ref={contentRef} className={`markdown-content ${className}`} />;
+  return (
+    <article className={`markdown-content ${className}`}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkFrontmatter]}>
+        {contentWithoutFrontmatter}
+      </ReactMarkdown>
+    </article>
+  );
 }

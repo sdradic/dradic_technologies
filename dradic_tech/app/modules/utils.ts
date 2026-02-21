@@ -1,23 +1,33 @@
-import { marked } from "marked";
-import { renderMarkdownToHtml as enhancedRender } from "../components/markdown";
-
-marked.use({
-  breaks: true,
-  gfm: true,
-});
-
-export async function renderMarkdownToHtml(content: string): Promise<string> {
-  try {
-    return await enhancedRender(content);
-  } catch (error) {
-    console.error("Failed to render markdown to HTML:", error);
-    return await marked.parse(content);
-  }
-}
-
 // Local storage
 interface LocalStateData {
   theme: string;
+}
+
+// Extract plain text from markdown content for previews
+export function extractPlainText(content: string, maxLength?: number): string {
+  if (!content) return "";
+
+  // Remove markdown syntax (headers, links, bold, italic, etc.)
+  let plainText = content
+    .replace(/^#{1,6}\s+/gm, "") // Remove headers
+    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
+    .replace(/\*(.*?)\*/g, "$1") // Remove italic
+    .replace(/`(.*?)`/g, "$1") // Remove inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove links, keep text
+    .replace(/```[\s\S]*?```/g, "") // Remove code blocks
+    .replace(/^\s*[-*+]\s+/gm, "") // Remove list markers
+    .replace(/^\s*\d+\.\s+/gm, "") // Remove numbered list markers
+    .replace(/^\s*>\s+/gm, "") // Remove blockquote markers
+    .replace(/\n+/g, " ") // Replace newlines with spaces
+    .replace(/\s+/g, " ") // Normalize multiple spaces
+    .trim();
+
+  // Truncate to maxLength if specified
+  if (maxLength && plainText.length > maxLength) {
+    return plainText.slice(0, maxLength) + "...";
+  }
+
+  return plainText;
 }
 
 const DEFAULT_STATE: LocalStateData = {

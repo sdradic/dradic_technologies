@@ -7,6 +7,7 @@ import {
   ChevronLeftIcon,
   TrashIcon,
   ThreeDotsMenuIcon,
+  RefreshIcon,
 } from "~/components/Icons";
 import type { BlogPost, BlogPostWithSeparatedContent } from "~/modules/types";
 import { v7 as uuidv7 } from "uuid";
@@ -44,6 +45,7 @@ export default function PostEditor({
   const [viewMode, setViewMode] = useState<"edit" | "preview" | "split">(
     "edit",
   );
+  const [refreshKey, setRefreshKey] = useState(0);
   const editorRootRef = useRef<HTMLElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
@@ -244,7 +246,7 @@ export default function PostEditor({
   }
 
   return (
-    <div className="w-full ">
+    <div className="w-full">
       {error && (
         <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg">
           {error}
@@ -338,24 +340,34 @@ export default function PostEditor({
       <BlogPostForm formData={formData} onFormDataChange={setFormData} />
 
       {/* View Mode Switcher */}
-      <div className="flex items-center justify-end gap-2 p-2">
+      <div className="flex items-center justify-between gap-2 p-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode("edit")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => setViewMode("preview")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
+          >
+            Preview
+          </button>
+          <button
+            onClick={() => setViewMode("split")}
+            className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
+          >
+            Split
+          </button>
+        </div>
         <button
-          onClick={() => setViewMode("edit")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "edit" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
+          onClick={() => setRefreshKey((prev) => prev + 1)}
+          className="flex items-center gap-2 px-3 py-1 rounded-md text-sm border border-slate-300 dark:border-slate-600 bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors duration-200"
+          title="Refresh preview"
         >
-          Edit
-        </button>
-        <button
-          onClick={() => setViewMode("preview")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "preview" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
-        >
-          Preview
-        </button>
-        <button
-          onClick={() => setViewMode("split")}
-          className={`px-3 py-1 rounded-md text-sm border ${viewMode === "split" ? "bg-brand-600 text-white border-brand-600" : "bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"} cursor-pointer`}
-        >
-          Split
+          <RefreshIcon className="size-4" />
+          Refresh
         </button>
       </div>
       {/* Editor */}
@@ -371,7 +383,7 @@ export default function PostEditor({
 
         {viewMode === "preview" && (
           <div className="w-full rounded-lg min-h-72 p-4 md:p-6 overflow-x-auto">
-            <MarkdownRenderer content={postContent} />
+            <MarkdownRenderer key={refreshKey} content={postContent} />
           </div>
         )}
 
@@ -394,7 +406,7 @@ export default function PostEditor({
               ref={previewRef}
               className="h-full rounded-lg p-4 md:p-6 overflow-y-auto overflow-x-auto border-l border-slate-200 dark:border-slate-700"
             >
-              <MarkdownRenderer content={postContent} />
+              <MarkdownRenderer key={refreshKey} content={postContent} />
             </div>
           </div>
         )}

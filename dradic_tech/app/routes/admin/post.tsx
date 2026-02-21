@@ -101,10 +101,12 @@ export default function AdminPost({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <PostEditor
-      isNewPost={false}
-      existingPost={existingPost}
-      slug={params.slug}
-    />
+    <div className="pb-8">
+      <PostEditor
+        isNewPost={false}
+        existingPost={existingPost}
+        slug={params.slug}
+      />
+    </div>
   );
 }

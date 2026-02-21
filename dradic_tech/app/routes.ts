@@ -19,8 +19,5 @@ export default [
     route("/:slug", "routes/admin/post.tsx"),
     route("/new-post", "routes/admin/new-post.tsx"),
   ]),
-  ...prefix("portfolio", [
-    index("routes/portfolio/apps.tsx"),
-    route("/projects", "routes/portfolio/projects.tsx"),
-  ]),
+  ...prefix("portfolio", [index("routes/portfolio/index.tsx")]),
 ] satisfies RouteConfig;

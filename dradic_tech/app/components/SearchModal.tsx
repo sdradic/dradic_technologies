@@ -77,7 +77,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/50"
+        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
         onKeyDown={(e) => {
           if (e.key === "Escape") {
@@ -89,18 +89,18 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-2">
-        <div className="bg-white dark:bg-dark-400 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+      <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-6">
+        <div className="bg-white dark:bg-slate-950 rounded-3xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between py-4 px-2 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between py-6 px-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">
               Search Posts
             </h2>
             <button
               onClick={onClose}
               className="rounded-lg transition-colors cursor-pointer"
             >
-              <XIcon className="size-6 stroke-gray-500 dark:stroke-gray-400 hover:stroke-primary-500 dark:hover:stroke-primary-500" />
+              <XIcon className="size-6 stroke-slate-500 dark:stroke-slate-400 hover:stroke-brand-500 dark:hover:stroke-brand-400" />
             </button>
           </div>
 
@@ -114,32 +114,32 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
           {/* Results */}
           <div className="overflow-y-auto max-h-[60vh]">
             {isLoading ? (
-              <div className="animate-pulse space-y-4 px-2 py-4">
+              <div className="animate-pulse space-y-4 px-6 py-6">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-32 h-24 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                    <div className="w-32 h-24 bg-slate-200 dark:bg-slate-700 rounded-md"></div>
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : posts.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-slate-500 dark:text-slate-400">
                   No posts available. Please visit the blog page first.
                 </p>
               </div>
             ) : (
-              <div className="px-2 py-4">
+              <div className="px-6 py-6">
                 {filteredPosts.length > 0 ? (
-                  <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <ul className="divide-y divide-slate-200 dark:divide-slate-700">
                     {filteredPosts.map((post) => (
                       <li key={post.metadata.slug} className="py-2">
                         <a
                           href={`/blog/${post.metadata.slug}`}
-                          className="flex gap-4 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="flex gap-4 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
                           onClick={onClose}
                         >
                           <img
@@ -151,10 +151,10 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                             className="object-cover w-32 h-24 rounded-md"
                           />
                           <div className="flex flex-col gap-2 items-start justify-center">
-                            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200">
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">
                               {post.metadata.title}
                             </h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                               {new Date(
                                 post.metadata.created_at,
                               ).toLocaleDateString("en-US", {
@@ -170,7 +170,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                   </ul>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-slate-500 dark:text-slate-400">
                       {searchQuery
                         ? "No posts found matching your search."
                         : "No posts available."}

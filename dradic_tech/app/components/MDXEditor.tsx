@@ -90,9 +90,11 @@ export default function MDXEditorComponent({
   if (!mounted || !isClient) {
     return (
       <div className="flex flex-col px-2 w-full lg:max-h-full max-h-96 min-h-96">
-        <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
-        <div className="w-full rounded-md flex-1 bg-white dark:bg-gray-800 h-full lg:min-h-[calc(100vh-210px)] animate-pulse">
-          <div className="h-full bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+        <h1 className="text-2xl font-bold py-4 text-center text-slate-800 dark:text-slate-200">
+          Editor
+        </h1>
+        <div className="w-full rounded-md flex-1 bg-white dark:bg-slate-900 h-full lg:min-h-[calc(100vh-210px)] animate-pulse">
+          <div className="h-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
         </div>
       </div>
     );
@@ -105,9 +107,11 @@ export default function MDXEditorComponent({
   if (!selectedPost || typeof selectedPost !== "object") {
     return (
       <div className="flex flex-col px-2 w-full lg:max-h-full max-h-96 min-h-96">
-        <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
-        <div className="w-full rounded-md flex-1 bg-white dark:bg-gray-800 h-full lg:min-h-[calc(100vh-210px)]">
-          <div className="h-full flex items-center justify-center text-gray-500">
+        <h1 className="text-2xl font-bold py-4 text-center text-slate-800 dark:text-slate-200">
+          Editor
+        </h1>
+        <div className="w-full rounded-md flex-1 bg-white dark:bg-slate-900 h-full lg:min-h-[calc(100vh-210px)]">
+          <div className="h-full flex items-center justify-center text-slate-500 dark:text-slate-400">
             Invalid post data
           </div>
         </div>
@@ -119,7 +123,9 @@ export default function MDXEditorComponent({
     <div className="flex flex-col w-full max-h-96 min-h-96">
       {selectedPost && (
         <>
-          <h1 className="text-2xl font-bold py-4 text-center">Editor</h1>
+          <h1 className="text-2xl font-bold py-4 text-center text-slate-800 dark:text-slate-200">
+            Editor
+          </h1>
           <div className="w-full rounded-md flex-1 h-full lg:min-h-[calc(100vh-210px)]">
             <MDXEditor
               ref={editorRef}
@@ -173,8 +179,8 @@ export default function MDXEditorComponent({
               className={`h-full ${theme === "dark" ? "dark" : ""}`}
               contentEditableClassName={`prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none ${
                 theme === "dark"
-                  ? "prose-invert prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-em:text-gray-300 prose-code:text-green-400 prose-pre:bg-gray-800 prose-pre:text-gray-200"
-                  : "prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-em:text-gray-700 prose-code:text-green-600 prose-pre:bg-gray-100 prose-pre:text-gray-800"
+                  ? "prose-invert prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-100 prose-em:text-slate-300 prose-code:text-brand-400 prose-pre:bg-slate-800 prose-pre:text-slate-200"
+                  : "prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-em:text-slate-700 prose-code:text-brand-600 prose-pre:bg-slate-100 prose-pre:text-slate-800"
               }`}
               placeholder="Start writing your blog post..."
             />
