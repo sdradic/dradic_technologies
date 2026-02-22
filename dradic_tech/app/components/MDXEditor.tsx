@@ -26,6 +26,7 @@ import {
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import { useTheme } from "~/contexts/ThemeContext";
+import { pasteHtmlAsMarkdownPlugin } from "~/components/markdown/pasteHtmlAsMarkdownPlugin";
 import type { BlogPost } from "~/modules/types";
 
 // Import the editor styles
@@ -134,12 +135,13 @@ export default function MDXEditorComponent({
                 setSelectedPostContent(newContent);
               }}
               plugins={[
+                pasteHtmlAsMarkdownPlugin(),
                 headingsPlugin(),
                 listsPlugin(),
                 quotePlugin(),
                 thematicBreakPlugin(),
                 markdownShortcutPlugin(),
-                codeBlockPlugin({ defaultCodeBlockLanguage: "" }),
+                codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
                 codeMirrorPlugin({
                   codeBlockLanguages: {
                     js: "JavaScript",
