@@ -186,6 +186,42 @@ export function useAuthStore() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const signup = useCallback(
+    async (email: string, password: string, name?: string) => {
+      try {
+        setIsLoading(true);
+        setAuthError(null);
+
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: name ? { data: { full_name: name } } : undefined,
+        });
+
+        if (error) {
+          setAuthError(error.message);
+          throw error;
+        }
+
+        if (data?.user) {
+          loadUserProfile(data.user);
+          return data.user;
+        }
+        return null;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "An error occurred during sign up";
+        setAuthError(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       setIsLoading(true);
@@ -278,13 +314,14 @@ export function useAuthStore() {
       isAuthenticated,
       user,
       login,
+      signup,
       handleGuestLogin,
       logout,
       isLoading,
       isGuest,
       authError,
     }),
-    [isAuthenticated, user, isLoading, login, isGuest, authError],
+    [isAuthenticated, user, isLoading, login, signup, isGuest, authError],
   );
 
   return contextValue;
@@ -305,6 +342,7 @@ export interface AuthStore {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<User | null>;
+  signup: (email: string, password: string, name?: string) => Promise<unknown>;
   handleGuestLogin: (isLoggingIn: boolean) => void;
   logout: () => Promise<void>;
   isLoading: boolean;

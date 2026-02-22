@@ -50,80 +50,72 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 sm:px-2 px-4 my-auto min-h-screen py-8 sm:py-0">
-      <div className="max-w-md w-full space-y-8 p-4 bg-white dark:bg-gray-800 rounded-md shadow">
-        <div>
-          <div className="flex flex-row items-center justify-center gap-2 mt-4 mb-2">
-            <TallyUpLogo className="w-18 h-18 stroke-primary-400 fill-primary-400 dark:stroke-primary-600 dark:fill-primary-600 cursor-pointer" />
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 min-h-screen py-8 px-4">
+      <div className="modal-content-fintrack max-w-md w-full overflow-visible">
+        <div className="px-10 pt-10 pb-6">
+          <div className="flex justify-center mb-6">
+            <TallyUpLogo className="w-16 h-16 stroke-primary-500 fill-primary-500 dark:stroke-primary-600 dark:fill-primary-600" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tighter text-center">
             Welcome to TallyUp
           </h2>
-          <div className="flex flex-col items-center justify-center gap-1 mt-2">
-            <h3 className="text-gray-500 dark:text-gray-400 mb-8 text-center">
-              Sign in to your account to continue
-            </h3>
-          </div>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 text-center">
+            Sign in to your account to continue
+          </p>
         </div>
         {state?.error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <ErrorXIcon className="h-5 w-5 text-red-400" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{state.error}</p>
-              </div>
-            </div>
+          <div className="mx-10 mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3">
+            <ErrorXIcon className="h-5 w-5 text-red-500 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+              {state.error}
+            </p>
           </div>
         )}
-        <form className="mt-6 space-y-6" action={submitAction}>
-          <div className="-space-y-px flex flex-col gap-6">
-            <div>
-              <label htmlFor="email" className="">
-                Email address
-              </label>
+        <form className="px-10 pb-10 space-y-6" action={submitAction}>
+          <div>
+            <label htmlFor="email" className="label-fintrack">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="input-fintrack"
+              placeholder="Email address"
+              autoComplete="username"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="label-fintrack">
+              Password
+            </label>
+            <div className="relative">
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
                 required
-                className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                placeholder="Email address"
-                autoComplete="username"
+                className="input-fintrack pr-12"
+                placeholder="Password"
+                autoComplete="current-password"
               />
-            </div>
-            <div>
-              <label htmlFor="password" className="">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="relative border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-gray-700"
-                  placeholder="Password"
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 stroke-gray-400 dark:stroke-dark-200" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 stroke-gray-400 dark:stroke-dark-200" />
-                  )}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5 stroke-current" />
+                ) : (
+                  <EyeIcon className="h-5 w-5 stroke-current" />
+                )}
+              </button>
             </div>
           </div>
           <button
             type="submit"
-            className={`btn-primary-long dark:text-white ${
+            className={`btn-primary-long w-full py-4 rounded-2xl font-bold ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}
@@ -138,31 +130,34 @@ export default function Login() {
             )}
           </button>
         </form>
-        <div className="flex flex-row w-full items-center justify-center gap-4 mt-2">
-          <div className="separator"></div>
-          <div className="text-sm text-gray-500 dark:text-gray-500">Or</div>
-          <div className="separator"></div>
+        <div className="flex items-center gap-4 px-10 pb-6">
+          <div className="separator flex-1" />
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            Or
+          </span>
+          <div className="separator flex-1" />
         </div>
-        <button
-          className={`btn-secondary-long ${
-            isGuestLoading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={isGuestLoading}
-          onClick={() => {}}
-        >
-          {isGuestLoading ? (
-            <Loader loaderSize={[4, 4]} />
-          ) : (
-            "Continue as guest"
-          )}
-        </button>
-        <div className="flex flex-col items-center justify-center text-sm">
-          <div className="flex items-center gap-2 mt-2">
-            <p className="text-gray-500 dark:text-gray-400">
-              &copy; {new Date().getFullYear()} Dradic Technologies
-            </p>
-            <ThemeToggle />
-          </div>
+        <div className="px-10 pb-8">
+          <button
+            type="button"
+            className={`btn-secondary-long w-full py-4 rounded-2xl font-bold ${
+              isGuestLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isGuestLoading}
+            onClick={handleGuest}
+          >
+            {isGuestLoading ? (
+              <Loader loaderSize={[4, 4]} />
+            ) : (
+              "Continue as guest"
+            )}
+          </button>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-2 pb-8">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            &copy; {new Date().getFullYear()} Dradic Technologies
+          </p>
+          <ThemeToggle />
         </div>
       </div>
     </div>

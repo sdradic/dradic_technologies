@@ -133,7 +133,7 @@ function ExpensesContent({
           {/* Donut Graph */}
           {dashboardData?.donut_graph &&
             dashboardData.donut_graph.data.length > 0 && (
-              <div className="my-6 w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+              <div className="my-6 w-full card-fintrack-lg p-6">
                 <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                   {dashboardData.donut_graph.title}
                 </h3>
@@ -171,7 +171,7 @@ function ExpensesContent({
                 setIsModalOpen(true);
               },
             }}
-            tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
+            tableContainerClassName="w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm min-h-0 sm:min-h-[420px] overflow-x-auto"
             tableClassName="w-full p-6"
             onRowClick={(row) => {
               // Find the full expense object from the expenses array
@@ -278,7 +278,7 @@ export default function Expenses() {
   };
 
   return (
-    <div className="p-4 rounded-xl">
+    <div className="space-y-8">
       <CreateEditModal
         mode="expense"
         isModalOpen={isModalOpen}
@@ -289,7 +289,7 @@ export default function Expenses() {
         editData={selectedExpense || undefined}
         expenseItems={expenseItems}
       />
-      <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
+      <div>
         <HeaderControls>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-2 sm:mt-0">
             <Dropdown
@@ -317,7 +317,7 @@ export default function Expenses() {
           </div>
         </HeaderControls>
         <div className="separator my-4" />
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-6">
           <Suspense fallback={<Loader message="Loading expenses..." />}>
             <ExpensesContent
               reloadTrigger={reloadTrigger}

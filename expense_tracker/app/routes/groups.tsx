@@ -58,7 +58,7 @@ function GroupsContent({
             buttonClassName: "btn-primary",
             onClick: () => setIsModalOpen(true),
           }}
-          tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
+          tableContainerClassName="w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm min-h-0 sm:min-h-[420px] overflow-x-auto"
           tableClassName="w-full p-6"
           onRowClick={() => {}}
         />
@@ -121,7 +121,7 @@ export default function GroupSettings() {
   };
 
   return (
-    <div className="p-4 rounded-xl">
+    <div className="space-y-8">
       <SimpleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -136,7 +136,7 @@ export default function GroupSettings() {
         />
       </SimpleModal>
 
-      <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
+      <div>
         <HeaderControls />
         <div className="separator my-4" />
 

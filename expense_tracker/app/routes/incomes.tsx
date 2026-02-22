@@ -71,7 +71,7 @@ function IncomesContent({
               setIsModalOpen(true);
             },
           }}
-          tableContainerClassName="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 min-h-0 sm:min-h-[420px] overflow-x-auto"
+          tableContainerClassName="w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm min-h-0 sm:min-h-[420px] overflow-x-auto"
           tableClassName="w-full p-6"
           onRowClick={(row: any) => {
             // Find the full income object from the incomes array
@@ -178,7 +178,7 @@ export default function Incomes() {
   };
 
   return (
-    <div className="p-4 rounded-xl">
+    <div className="space-y-8">
       <CreateEditModal
         mode="income"
         isModalOpen={isModalOpen}
@@ -190,7 +190,7 @@ export default function Incomes() {
         incomeSources={incomeSources}
       />
 
-      <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4">
+      <div>
         <HeaderControls>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-2 sm:mt-0">
             <Dropdown
@@ -218,7 +218,7 @@ export default function Incomes() {
           </div>
         </HeaderControls>
         <div className="separator my-4" />
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-6">
           <Suspense fallback={<Loader message="Loading incomes..." />}>
             <IncomesContent
               reloadTrigger={reloadTrigger}

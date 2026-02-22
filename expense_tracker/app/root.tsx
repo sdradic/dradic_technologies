@@ -10,8 +10,7 @@ import {
 } from "react-router";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { Sidebar } from "./components/Sidebar";
-import { Navbar } from "./components/Navbar";
+import { Layout } from "./components/Layout";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -102,29 +101,17 @@ function AppContent() {
 
   // For authenticated routes, render with layout
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Desktop Sidebar - only show on md and above */}
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
-
-      {/* Main content area */}
-      <main className="flex-1 overflow-auto">
-        {/* Mobile/Tablet Navbar - only show on screens smaller than md */}
-        <div className="md:hidden">
-          <Navbar />
-        </div>
-        <Suspense
-          fallback={
-            <div className="p-4 flex items-center justify-center">
-              <Loader />
-            </div>
-          }
-        >
-          <Outlet />
-        </Suspense>
-      </main>
-    </div>
+    <Layout>
+      <Suspense
+        fallback={
+          <div className="p-4 flex items-center justify-center">
+            <Loader />
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
+    </Layout>
   );
 }
 

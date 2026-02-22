@@ -10,16 +10,16 @@ export default function PageHeader({
   children,
 }: PageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-2 w-full px-6 py-4">
+    <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 w-full">
       <div className="flex flex-col">
-        <h1 className="text-center md:text-start text-3xl dark:text-white">
+        <h1 className="text-center md:text-start text-4xl font-black text-gray-900 dark:text-white tracking-tighter">
           {title}
         </h1>
-        <p className="text-gray-400 dark:text-gray-600 text-center md:text-left">
+        <p className="text-gray-500 dark:text-gray-400 font-bold text-sm mt-1 uppercase tracking-widest text-center md:text-left">
           {subtitle}
         </p>
       </div>
-      <div className="flex items-center gap-2 ">
+      <div className="flex items-center gap-2">
         {children && <div className="flex items-center gap-2">{children}</div>}
       </div>
     </div>

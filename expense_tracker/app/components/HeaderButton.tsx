@@ -29,7 +29,7 @@ export function HeaderButton({
     <button
       onClick={handleClick}
       disabled={isButtonDisabled}
-      className={`${className} flex items-center gap-2 ${
+      className={`${className} flex items-center gap-2 cursor-pointer ${
         isButtonDisabled ? "opacity-50 pointer-events-none" : ""
       }`}
     >

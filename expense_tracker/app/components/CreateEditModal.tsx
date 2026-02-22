@@ -719,10 +719,65 @@ export const CreateEditModal = ({
   return (
     <SimpleModal
       isOpen={isModalOpen}
-      onClose={() => setIsModalOpen(false)}
+      onClose={handleCancel}
       className="w-full max-w-md"
     >
-      <div className="p-6">
+      <div className="px-10 py-8 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+        <div>
+          <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tighter">
+            {getModalTitle()}
+          </h3>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
+            {editData ? "Edit entry" : "New entry"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {editData && onDelete && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (
+                  window.confirm("Are you sure you want to delete this item?")
+                ) {
+                  setIsLoading(true);
+                  try {
+                    await onDelete(editData.id, mode);
+                    setIsModalOpen(false);
+                  } catch (error) {
+                    console.error("Error deleting:", error);
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }
+              }}
+              className="w-10 h-10 rounded-2xl bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors cursor-pointer"
+              title="Delete"
+            >
+              <TrashIcon className="w-5 h-5 stroke-2 stroke-current" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-10 h-10 rounded-2xl bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="p-10">
         {isLoading ? (
           <Loader
             message="Processing..."
@@ -731,56 +786,24 @@ export const CreateEditModal = ({
           />
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {getModalTitle()}
-              </h2>
-              {editData && onDelete && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this item?",
-                      )
-                    ) {
-                      setIsLoading(true);
-                      try {
-                        await onDelete(editData.id, mode);
-                        setIsModalOpen(false);
-                      } catch (error) {
-                        console.error("Error deleting:", error);
-                      } finally {
-                        setIsLoading(false);
-                      }
-                    }
-                  }}
-                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors cursor-pointer"
-                  title="Delete"
-                >
-                  <TrashIcon className="w-5 h-5 stroke-2 stroke-red-500" />
-                </button>
-              )}
-            </div>
-
             <div className="space-y-6">
               {renderSourceSection()}
               {renderAmountSection()}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-3 mt-8">
+            <div className="flex justify-end gap-3 mt-8 pt-6">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="btn-secondary max-w-24"
+                className="btn-secondary max-w-28"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSave}
-                className="btn-primary max-w-24"
+                className="btn-primary max-w-28"
               >
                 Save
               </button>

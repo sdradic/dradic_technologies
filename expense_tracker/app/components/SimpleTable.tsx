@@ -33,10 +33,10 @@ export default function SimpleTable({
   data,
   hasButton = false,
   buttonProps,
-  tableContainerClassName = "w-full bg-white dark:bg-gray-800 rounded-lg",
-  tableClassName = "w-full p-6",
-  tableHeadClassName = "border-b bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-500",
-  tableRowClassName = "border-b border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700",
+  tableContainerClassName = "w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden",
+  tableClassName = "w-full",
+  tableHeadClassName = "bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800",
+  tableRowClassName = "border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors",
   tableHeaderClassName = "",
   tableCellClassName = "",
   onRowClick,
@@ -49,39 +49,42 @@ export default function SimpleTable({
 
   return (
     <div className={tableContainerClassName}>
-      <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6">
+      <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between px-8 py-6">
         <div className="flex flex-col sm:flex-row justify-between w-full items-center gap-4">
           <div className="flex flex-col w-full items-left">
-            <h2 className="text-xl sm:text-2xl text-left text-gray-800 dark:text-white  mb-2">
-              {title}
-            </h2>
+            {title && (
+              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight mb-1">
+                {title}
+              </h2>
+            )}
             {description && (
-              <p className="text-sm sm:text-base text-gray-400 dark:text-gray-600 text-left mb-4">
+              <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left">
                 {description}
               </p>
             )}
           </div>
           {hasButton && (
-            <div
-              className={` ${buttonProps?.buttonClassName}`}
+            <button
+              type="button"
+              className={`flex items-center gap-2 ${buttonProps?.buttonClassName}`}
               onClick={buttonProps?.onClick}
             >
               {buttonProps?.buttonIcon}
               {buttonProps?.buttonText}
-            </div>
+            </button>
           )}
         </div>
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden sm:block">
+      <div className="hidden sm:block overflow-x-auto">
         <table className={tableClassName}>
           <thead className={tableHeadClassName}>
             <tr>
               {columns.map((column) => (
                 <th
                   key={column}
-                  className={`px-4 py-2 ${tableHeaderClassName}`}
+                  className={`px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-left ${tableHeaderClassName}`}
                 >
                   {column}
                 </th>
@@ -93,7 +96,7 @@ export default function SimpleTable({
               data.map((row) => (
                 <tr
                   key={row.id}
-                  className={`${tableRowClassName} ${
+                  className={`${tableRowClassName} group ${
                     onRowClick ? "cursor-pointer" : ""
                   }`}
                   onClick={() => handleRowClick(row)}
@@ -101,7 +104,7 @@ export default function SimpleTable({
                   {columns.map((column) => (
                     <td
                       key={column}
-                      className={`px-4 py-2 ${tableCellClassName}`}
+                      className={`px-8 py-5 text-sm font-semibold text-gray-600 dark:text-gray-400 ${tableCellClassName}`}
                     >
                       {column.toLowerCase() === "amount" &&
                       typeof row[column.replace(/\s+/g, "_").toLowerCase()] ===
@@ -120,10 +123,27 @@ export default function SimpleTable({
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-2 pt-8">
-                  <p className="text-gray-500 dark:text-gray-400 text-center">
-                    No records found
-                  </p>
+                <td colSpan={columns.length} className="px-8 py-24 text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800/50 rounded-3xl flex items-center justify-center mb-4">
+                      <svg
+                        className="w-8 h-8 opacity-20 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1"
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                        />
+                      </svg>
+                    </div>
+                    <p className="font-bold tracking-tight text-gray-500 dark:text-gray-400">
+                      No records found
+                    </p>
+                  </div>
                 </td>
               </tr>
             )}

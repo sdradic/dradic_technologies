@@ -26,36 +26,33 @@ export default function SimpleCard({
       : null;
 
   return (
-    <>
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-6 w-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-center">
-        <h2 className="text-lg sm:text-xl md:text-2xl mb-2">{title}</h2>
-        {description && (
-          <p className="text-sm sm:text-base text-gray-400 dark:text-gray-600 mb-4">
-            {description}
-          </p>
-        )}
-        <div className="flex flex-col items-center justify-center md:flex-row gap-2 sm:gap-4 w-full">
-          <p
-            className={`text-lg sm:text-xl md:text-2xl w-full ${
-              value >= 0 ? "" : "text-red-500"
-            }`}
-          >
-            {formatCurrency(value, currency)}
-          </p>
-          {percentageChange && (
-            <p
-              className={`text-sm w-full ${
-                isIncrease
-                  ? "text-primary-500 dark:text-primary-400"
-                  : "text-red-400 dark:text-red-400"
-              }`}
-            >
-              {isIncrease ? "+" : null}
-              {percentageChange.toFixed(2)}%
-            </p>
-          )}
+    <div className="card-fintrack p-6 w-full hover:shadow-md transition-all text-left">
+      <h3 className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">
+        {title}
+      </h3>
+      {description && (
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+          {description}
+        </span>
+      )}
+      <p
+        className={`text-3xl font-extrabold text-gray-900 dark:text-white tracking-tighter mt-1 ${
+          value >= 0 ? "" : "text-red-500"
+        }`}
+      >
+        {formatCurrency(value, currency)}
+      </p>
+      {percentageChange != null && (
+        <div className="mt-4 flex items-center text-xs font-bold">
+          <span className={isIncrease ? "text-emerald-600" : "text-red-500"}>
+            {isIncrease ? "+" : ""}
+            {percentageChange.toFixed(1)}%
+          </span>
+          <span className="text-gray-400 dark:text-gray-500 font-medium ml-1.5">
+            vs previous
+          </span>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }

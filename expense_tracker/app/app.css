@@ -3,27 +3,52 @@
 
 @layer components {
   .btn-primary {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 justify-center bg-primary-400 hover:bg-primary-500 border-primary-300 hover:border-primary-400 items-center border rounded-md text-sm  cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 justify-center bg-primary-500 hover:bg-primary-600 border-primary-400 hover:border-primary-500 items-center border rounded-2xl text-sm font-bold cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
   }
 
   .btn-secondary {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 justify-center items-center border border-primary-400 hover:border-primary-600 rounded-md text-sm cursor-pointer text-primary-400 hover:text-primary-600 dark:border-dark-300 dark:hover:border-dark-200 dark:text-dark-100 dark:hover:text-dark-50;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 max-w-42 h-10 justify-center items-center border border-primary-400 hover:border-primary-600 rounded-2xl text-sm font-bold cursor-pointer text-primary-500 hover:text-primary-600 dark:border-dark-300 dark:hover:border-dark-200 dark:text-dark-100 dark:hover:text-dark-50;
   }
 
   .btn-small {
-    @apply flex flex-row w-8 h-8 gap-2 justify-center items-center border border-primary-400 rounded-full  cursor-pointer text-primary-400 dark:border-dark-300 dark:text-dark-300;
+    @apply flex flex-row w-8 h-8 gap-2 justify-center items-center border border-primary-400 rounded-full cursor-pointer text-primary-400 dark:border-dark-300 dark:text-dark-300;
   }
 
   .btn-primary-long {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center bg-primary-400 hover:bg-primary-500 border-primary-300 hover:border-primary-400 items-center border-2 rounded-md text-sm  cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center bg-primary-500 hover:bg-primary-600 border-primary-400 hover:border-primary-500 items-center border-2 rounded-2xl text-sm font-bold cursor-pointer text-white hover:text-gray-50 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 dark:hover:border-primary-500;
   }
 
   .btn-secondary-long {
-    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center items-center border-2 border-primary-400 hover:border-primary-600 rounded-md text-sm  cursor-pointer text-primary-400 hover:text-primary-600 dark:border-gray-500 dark:hover:border-dark-400 dark:text-dark-200 dark:hover:text-dark-100;
+    @apply flex flex-row py-1 w-full gap-2 min-w-28 h-10 justify-center items-center border-2 border-primary-400 hover:border-primary-600 rounded-2xl text-sm font-bold cursor-pointer text-primary-500 hover:text-primary-600 dark:border-gray-500 dark:hover:border-dark-400 dark:text-dark-200 dark:hover:text-dark-100;
   }
 
   .separator {
     @apply w-full h-px bg-gray-300 dark:bg-gray-600;
+  }
+
+  /* Fintrack-style design tokens */
+  .card-fintrack {
+    @apply bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors;
+  }
+
+  .card-fintrack-lg {
+    @apply bg-white dark:bg-gray-900 rounded-[40px] border border-gray-200 dark:border-gray-800 shadow-sm transition-colors;
+  }
+
+  .label-fintrack {
+    @apply block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5;
+  }
+
+  .input-fintrack {
+    @apply w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 dark:text-white rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-primary-500 transition-all font-semibold;
+  }
+
+  .modal-overlay-fintrack {
+    @apply fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4;
+  }
+
+  .modal-content-fintrack {
+    @apply bg-white dark:bg-gray-900 rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden border border-gray-200 dark:border-gray-800;
   }
 }
 @theme {
@@ -75,15 +100,15 @@ input[type="number"] {
 }
 
 input {
-  @apply w-full p-2 border rounded-lg border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  @apply w-full p-2 border rounded-2xl border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
 }
 
 textarea {
-  @apply w-full p-2 border rounded-lg resize-none overflow-auto border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  @apply w-full p-2 border rounded-2xl resize-none overflow-auto border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
 }
 
 select {
-  @apply appearance-none w-full p-2 border cursor-pointer rounded-lg border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  @apply appearance-none w-full p-2 border cursor-pointer rounded-2xl border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
 }
 
 label {

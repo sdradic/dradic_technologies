@@ -37,13 +37,10 @@ export const SimpleModal = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
-      onClick={handleBackdropClick}
-    >
+    <div className="modal-overlay-fintrack" onClick={handleBackdropClick}>
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl ${className}`}
+        className={`modal-content-fintrack ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

@@ -46,9 +46,9 @@ export const Dropdown = ({
     >
       <button
         type="button"
-        className={`inline-flex justify-between w-full rounded-md border px-4 py-2 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100
+        className={`inline-flex justify-between w-full rounded-xl border px-4 py-2.5 bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-gray-700 dark:text-gray-100
           border-gray-200 dark:border-gray-700
-          ${!disabled ? "focus:outline-none cursor-pointer" : "cursor-not-allowed"}
+          ${!disabled ? "focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer" : "cursor-not-allowed"}
           ${isOpen ? "ring-2 ring-primary-500 border-primary-500 dark:border-primary-500" : ""}
         `}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -68,7 +68,7 @@ export const Dropdown = ({
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 mb-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+        <div className="absolute z-10 w-full mt-1 mb-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
           <ul className="py-1 max-h-32 overflow-auto divide-y divide-gray-200 dark:divide-gray-700">
             {options.map((option) => (
               <li
